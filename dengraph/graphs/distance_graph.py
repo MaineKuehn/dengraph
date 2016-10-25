@@ -64,7 +64,7 @@ class DistanceGraph(graph.Graph):
         return iter(self._nodes)
 
     def get_neighbours(self, node, distance):
-        neighbours = [candidate for candidate in self if self[node, candidate] <= distance]
+        neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
         neighbours.sort()
         return neighbours
 
