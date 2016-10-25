@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import collections
 import dengraph.graph
 import dengraph.cluster
