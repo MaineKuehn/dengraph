@@ -2,6 +2,9 @@ import dengraph.graph
 
 
 class DenGraphCluster(dengraph.graph.Graph):
+    """
+    Cluster in a DenGraph
+    """
     CORE_NODE = 1
     BORDER_NODE = 2
 
@@ -32,3 +35,6 @@ class DenGraphCluster(dengraph.graph.Graph):
 
     def __contains__(self, node):
         return node in self.border_nodes or node in self.core_nodes
+
+    def get_neighbours(self, node, distance):
+        raise NotImplementedError

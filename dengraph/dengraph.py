@@ -62,8 +62,24 @@ class DenGraphIO(dengraph.graph.Graph):
     def __len__(self):
         return sum(len(clstr) for clstr in self.clusters)
 
-    def __getitem__(self, a_b):
-        return self.graph[a_b]
+    def __getitem__(self, item):
+        if item in self:
+            return self.graph[item]
+        else:
+            # raise the appropriate error
+            if isinstance(item, slice):
+                raise dengraph.graph.NoSuchEdge  # Edge not in any Cluster
+            raise dengraph.graph.NoSuchNode  # Node not in any Cluster
+
+    def __setitem__(self, key, value):
+        raise NotImplementedError  # TODO: insert/update edge
+
+    def __delitem__(self, item):
+        # a:b -> slice -> edge
+        if isinstance(item, slice):
+            raise NotImplementedError  # TODO: remove edge
+        else:
+            raise NotImplementedError  # TODO: remove node
 
     def __iter__(self):
         for node in self.graph:
@@ -71,6 +87,9 @@ class DenGraphIO(dengraph.graph.Graph):
                 if node in cluster:
                     yield node
                     break
+
+    def get_neighbours(self, node, distance):
+        raise NotImplementedError  # TODO: find closest nodes
 
     def insert_node(self, node, *args, **kwargs):
         raise NotImplementedError
