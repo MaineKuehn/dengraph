@@ -34,3 +34,24 @@ class TestDenGraphIO(unittest.TestCase):
         self.assertEqual(2, len(io_graph.clusters))
         for index, cluster in enumerate(io_graph.clusters):
             print("%s (%s): %s" % (index, len(cluster), [element for element in cluster]))
+
+    def test_incremental_behaviour(self):
+        graph = DistanceGraph(
+            nodes=[],
+            distance=self.distance_cls(),
+            symmetric=True
+        )
+        io_graph = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        self.assertEqual(0, len(io_graph.clusters))
+        io_graph[1] = {}
+        io_graph[2] = {}
+        io_graph[3] = {}
+        io_graph[4] = {}
+        io_graph[5] = {}
+        self.assertEqual(0, len(io_graph.clusters))
+        io_graph[6] = {}
+        self.assertEqual(1, len(io_graph.clusters))

@@ -97,7 +97,19 @@ class DenGraphIO(dengraph.graph.Graph):
             raise dengraph.graph.NoSuchNode  # Node not in any Cluster
 
     def __setitem__(self, key, value):
-        raise NotImplementedError  # TODO: insert/update edge
+        # add stuff to graph
+        try:
+            self.graph[key] = value
+        except:
+            raise
+        else:
+            if isinstance(key, slice):
+                nodes = [key.start, key.stop]
+            else:
+                nodes = [key]
+            for node in nodes:
+                if node not in self._finalized_cores:
+                    self._process_node(key)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
