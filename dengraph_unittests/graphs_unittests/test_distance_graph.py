@@ -37,3 +37,20 @@ class TestDistanceGraph(unittest.TestCase):
             for node_a, node_b in itertools.product(nodes, nodes):
                 self.assertEqual(distance(node_a, node_b), graph[node_a:node_b])
                 self.assertEqual(graph[node_a:node_b], graph[node_b:node_a])
+
+    def test_diagonal(self):
+        if not self.distance_cls.is_symmetric:
+            self.skipTest('Distance is not symmetric')
+        for nodes in (
+                nodes_factory() for nodes_factory in (
+                    lambda: [1, 2, 3], lambda: self.random_nodes(5), lambda: self.random_nodes(20)
+        )):
+            distance = self.distance_cls()
+            graph = dengraph.graphs.distance_graph.DistanceGraph(
+                nodes,
+                distance,
+                symmetric=True
+            )
+            for node in nodes:
+                self.assertEqual(0, distance(node, node))
+                self.assertEqual(distance(node, node), graph[node:node])
