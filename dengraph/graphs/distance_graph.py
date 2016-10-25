@@ -35,7 +35,7 @@ class DistanceGraph(graph.Graph):
         else:
             raise TypeError('Not an edge: %s' % item)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, item, value):
         raise TypeError('%s does not support edge assignment' % self.__class__.__name__)
 
     def __delitem__(self, item):

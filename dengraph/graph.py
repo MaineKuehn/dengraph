@@ -67,7 +67,7 @@ class Graph(object):
     def __setitem__(self, item, value):
         raise NotImplementedError
 
-    def __delitem__(self, key):
+    def __delitem__(self, item):
         raise NotImplementedError
 
     def __iter__(self):
