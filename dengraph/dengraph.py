@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import collections
 import dengraph.graph
@@ -7,14 +8,12 @@ import dengraph.cluster
 class DenGraphIO(dengraph.graph.Graph):
     """
     Density Graph allowing for Overlap and Incremental updates.
+
+    :param base_graph: the underlying graph
+    :param cluster_distance: maximum distance for nodes to be considered as neighbours (ε)
+    :param core_neighbours: number of neighbours required for core nodes (η)
     """
     def __init__(self, base_graph, cluster_distance, core_neighbours):
-        """
-
-        :param base_graph: the underlying graph
-        :param cluster_distance: eta
-        :param core_neighbours: epsilon
-        """
         self.graph = base_graph
         self.cluster_distance = cluster_distance
         self.core_neighbours = core_neighbours
