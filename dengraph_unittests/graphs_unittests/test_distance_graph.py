@@ -4,6 +4,7 @@ import itertools
 
 
 import dengraph.graphs.distance_graph
+from dengraph.graph import NoSuchNode
 
 
 class DeltaDistance(object):
@@ -88,5 +89,14 @@ class TestDistanceGraph(unittest.TestCase):
         for node in nodes:
             self.assertEqual(graph.get_neighbours(node, distance=threshold),
                              [elem for elem in range(node-threshold, node+threshold+1)
-                              if elem != node and elem >= 0 and elem < maximum])
+                              if elem != node and 0 <= elem < maximum])
 
+    def test_exception(self):
+        graph = dengraph.graphs.distance_graph.DistanceGraph(
+            nodes=[],
+            distance=None,
+            symmetric=True
+        )
+        self.assertIsNotNone(graph)
+        with self.assertRaises(NoSuchNode):
+            del graph[1]
