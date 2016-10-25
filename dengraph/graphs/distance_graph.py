@@ -23,6 +23,10 @@ class DistanceGraph(graph.Graph):
         if isinstance(item, slice):
             assert item.step is None, '%s does not support stride argument for edges' % self.__class__.__name__
             node_from, node_to = item.start, item.stop
+            if node_from not in self._nodes:
+                raise graph.NoSuchNode  # first edge node
+            elif node_to not in self._nodes:
+                raise graph.NoSuchNode  # second edge node
             # Since we don't know the type of nodes, we cannot test
             # node_to > node_from to detect swapped pairs. Since we
             # *do* store nodes in a `set`, they must support hash.
