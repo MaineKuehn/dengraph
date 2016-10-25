@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import dengraph.compat
 
 
 class NoSuchEdge(Exception):
@@ -9,7 +10,7 @@ class NoSuchNode(Exception):
     pass
 
 
-class Graph(object):
+class Graph(dengraph.compat.ABCBase):
     """
     Abstract Base Class for graphs represented via nodes
 
