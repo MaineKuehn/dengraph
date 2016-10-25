@@ -54,14 +54,20 @@ class Graph(object):
 
       Return an iterator over the nodes in `g`.
 
-    In addition, several methods are provided. While methods for retrieving
-    data must be implemented by all subclasses, methods for *modifying* data
-    may not be applicable to certain graphs.
+    In addition, several methods are provided. While methods and operators for
+    retrieving data must be implemented by all subclasses, methods for
+    *modifying* data may not be applicable to certain graphs.
     """
     def __len__(self):
         raise NotImplementedError
 
-    def __getitem__(self, a_b):
+    def __getitem__(self, item):
+        raise NotImplementedError
+
+    def __setitem__(self, item, value):
+        raise NotImplementedError
+
+    def __delitem__(self, key):
         raise NotImplementedError
 
     def __iter__(self):
