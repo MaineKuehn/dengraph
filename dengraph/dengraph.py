@@ -98,6 +98,8 @@ class DenGraphIO(dengraph.graph.Graph):
         unchecked = set(neighbours)
         while unchecked:
             current_node = unchecked.pop()
+            if current_node in checked:
+                continue
             if current_node in self._finalized_cores:
                 # If we merged with an already existing node, it means we do not have to perform
                 # further changes and can just drop operation. Neighbouring nodes should already
@@ -105,23 +107,22 @@ class DenGraphIO(dengraph.graph.Graph):
                 this_cluster = self._check_for_merge(cluster=this_cluster, node=current_node)
                 checked.add(current_node)
                 continue
-            if current_node not in checked:
-                checked.add(current_node)
-                # Whenever we inserted a new node that become a new core, it can also happen,
-                # that the next neighbouring node becomes a core. Thus it is connecting to
-                # another cluster.
-                is_new_core, neighbouring_nodes = self._test_change_to_core(node=current_node)
-                if is_new_core:
-                    # Next neighbouring node also builds a new core node, so we need to also
-                    # prepare its neighbouring nodes by recursing into the current method.
-                    self._finalized_cores.add(current_node)
-                    this_cluster.categorize_node(current_node, this_cluster.CORE_NODE)
-                    unchecked.update([node for node in neighbouring_nodes if
-                                      node not in checked and
-                                      node != current_node])
-                else:
-                    # However, at least each node belongs to the new clusters
-                    this_cluster.categorize_node(current_node, this_cluster.BORDER_NODE)
+            checked.add(current_node)
+            # Whenever we inserted a new node that become a new core, it can also happen,
+            # that the next neighbouring node becomes a core. Thus it is connecting to
+            # another cluster.
+            is_new_core, neighbouring_nodes = self._test_change_to_core(node=current_node)
+            if is_new_core:
+                # Next neighbouring node also builds a new core node, so we need to also
+                # prepare its neighbouring nodes by recursing into the current method.
+                self._finalized_cores.add(current_node)
+                this_cluster.categorize_node(current_node, this_cluster.CORE_NODE)
+                unchecked.update([node for node in neighbouring_nodes if
+                                    node not in checked and
+                                    node != current_node])
+            else:
+                # However, at least each node belongs to the new clusters
+                this_cluster.categorize_node(current_node, this_cluster.BORDER_NODE)
         return this_cluster
 
     def _test_change_to_core(self, node):
