@@ -5,6 +5,12 @@ from dengraph import graph
 class DistanceGraph(graph.Graph):
     """
     Graph of nodes connected by a distance function
+
+    :param nodes: all nodes contained in the graph
+    :param distance: a function `dist(a, b)->object` that computes the distance between any two nodes
+    :param symmetric: whether distance can be treated as symmetric, i.e. `dist(a, b) == dist(b, a)`
+
+    :warning: For N nodes, all NxN edges are exposed.
     """
     def __init__(self, nodes, distance, symmetric=True):
         self._nodes = set(nodes)
