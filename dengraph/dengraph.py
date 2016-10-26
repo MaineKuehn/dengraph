@@ -135,8 +135,8 @@ class DenGraphIO(dengraph.graph.Graph):
         """
         result = False
         # determine the neighbours of current node
+        neighbours = self.graph.get_neighbours(node, self.cluster_distance)
         if node not in self._finalized_cores:
-            neighbours = self.graph.get_neighbours(node, self.cluster_distance)
             # check if current node becomes a core node
             if len(neighbours) >= self.core_neighbours:
                 result = True
