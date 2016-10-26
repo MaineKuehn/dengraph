@@ -80,7 +80,7 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 self._adjacency[node_from][node_to] = value
             except KeyError:
                 raise dengraph.graph.NoSuchEdge  # first edge node
-        # g[a] = {b: 3, c:4, d:6}
+        # g[a] = {b: 3, c: 4, d: 6}
         else:
             if item not in self._adjacency:
                 self._adjacency[item] = value.copy()
