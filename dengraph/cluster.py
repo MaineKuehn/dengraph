@@ -37,5 +37,5 @@ class DenGraphCluster(dengraph.graph.Graph):
     def __contains__(self, node):
         return node in self.border_nodes or node in self.core_nodes
 
-    def get_neighbours(self, node, distance):
-        raise NotImplementedError
+    def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
+        return [neighbour for neighbour in self.graph.get_neighbours(node, distance) if neighbour in self]
