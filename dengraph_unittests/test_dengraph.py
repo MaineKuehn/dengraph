@@ -99,6 +99,29 @@ class TestDenGraphIO(unittest.TestCase):
             io_graph[node] = {}
         self._validate_cluster_equality(validation_io_graph.clusters, io_graph.clusters)
 
+    def test_noise_removal(self):
+        base_nodes = [1, 2, 3, 4, 5, 6, 7, 8]
+        remove_nodes = [30, 31]
+        validation_io_graph = self._validation_graph_for_nodes(
+            nodes=base_nodes,
+            distance=self.distance_cls,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        graph = DistanceGraph(
+            nodes=base_nodes+remove_nodes,
+            distance=self.distance_cls(),
+            symmetric=True
+        )
+        io_graph = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        for node in remove_nodes:
+            del io_graph[node]
+        self._validate_cluster_equality(validation_io_graph.clusters, io_graph.clusters)
+
     def test_remove_incremental_behaviour(self):
         complete_nodes = [1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17]
         base_nodes = [1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17]
