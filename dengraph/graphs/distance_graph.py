@@ -52,7 +52,7 @@ class DistanceGraph(graph.Graph):
             raise TypeError('Not an edge: %s' % item)
 
     def __setitem__(self, item, value):
-        if isinstance(item, slice):
+        if value or isinstance(item, slice):
             raise TypeError('%s does not support edge assignment' % self.__class__.__name__)
         else:
             self.insert_node(item)
