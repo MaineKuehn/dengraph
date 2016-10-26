@@ -169,12 +169,17 @@ class DenGraphIO(dengraph.graph.Graph):
             # node has just been a border node, so remove from current clusters
             for cluster in clusters:
                 cluster.border_nodes.discard(node)
+        self.clusters.sort(key=lambda clstr: len(clstr))
         # also check each of the nodes neighbours for downgrading
-        # TODO: does this need to be done or is it performed automatically when reclustering?
         for neighbour in neighbours:
             downgrade_core, neighbouring_neighbours = self._test_change_from_core(neighbour)
             if downgrade_core:
-                raise NotImplementedError
+                try:
+                    cluster = self._current_core_cluster(neighbour)
+                except NoSuchCluster:
+                    pass
+                else:
+                    cluster.categorize_node(neighbour, cluster.BORDER_NODE)
 
     def _process_incremental_node(self, node):
         """
