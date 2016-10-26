@@ -31,7 +31,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        self.assertEqual(set([20]), io_graph._get_noise())
+        self.assertEqual(set([20]), io_graph.noise)
 
     def test_simple_graph(self):
         graph = DistanceGraph(

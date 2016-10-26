@@ -208,7 +208,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 continue
             self._process_node(node)
         # preprocess noise
-        self.noise = set([node for node in self.graph]) - set([node for node in self])
+        self.noise = set(self.graph) - set(self)
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
