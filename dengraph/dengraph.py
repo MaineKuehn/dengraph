@@ -308,5 +308,28 @@ class DenGraphIO(dengraph.graph.Graph):
                     yield node
                     break
 
+    def __eq__(self, other):
+        checked = set()
+        if isinstance(self, other.__class__):
+            if (
+                len(self) != len(other) or
+                self.cluster_distance != other.cluster_distance or
+                self.core_neighbours != other.core_neighbours
+            ):
+                return False
+            elif self.noise != other.noise:
+                return False
+            else:
+                return all(my_clst in other.clusters for my_clst in self.clusters)
+
+    def __repr__(self):
+        return '%s(cluster_distance=%s, core_neighbours=%s, clusters=%d, noise=%d)' % (
+            self.__class__.__name__,
+            self.cluster_distance,
+            self.core_neighbours,
+            len(self.clusters),
+            len(self.noise),
+        )
+
     def get_neighbours(self, node, distance):
         raise NotImplementedError  # TODO: find closest nodes
