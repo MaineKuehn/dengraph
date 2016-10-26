@@ -18,8 +18,13 @@ class DistanceGraph(graph.Graph):
         self.symmetric = symmetric
         self._distance_values = {}
 
-    def __contains__(self, node):
-        return node in self._nodes
+    def __contains__(self, item):
+        # a:b -> slice -> edge
+        if item.__class__ == slice:
+            node_from, node_to = item.start, item.stop
+            return node_from in self._nodes and node_to in self._nodes
+        # node
+        return item in self._nodes
 
     def __len__(self):
         return len(self._nodes)

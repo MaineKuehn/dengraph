@@ -47,8 +47,13 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 adjacency[node] = {other: neighbours[other] for other in neighbours if neighbours[other] <= max_distance}
         return adjacency
 
-    def __contains__(self, node):
-        return node in self._adjacency
+    def __contains__(self, item):
+        # a:b -> slice -> edge
+        if item.__class__ == slice:
+            node_from, node_to = item.start, item.stop
+            return node_from in self._adjacency and node_to in self._adjacency[node_from]
+        # node
+        return item in self._adjacency
 
     def __len__(self):
         return len(self._adjacency)
