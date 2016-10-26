@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import itertools
 import dengraph.graph
 import dengraph.utilities.iterutils
 import dengraph.compat
@@ -22,6 +23,9 @@ class AdjacencyGraph(dengraph.graph.Graph):
         Any subclass of :py:class:`~dengraph.graph.Graph`; complexity depends
         on the graph's implementation of `iter(graph)`, `graph.get_neighbours`
         and `graph[node_from:node_to]`.
+
+    :note: :py:class:`~AdjacencyGraph` does not store `max_distance`. It is not
+           checked when adding edges or merging other graphs.
     """
     def __init__(self, source, max_distance=dengraph.graph.ANY_DISTANCE):
         self._adjacency = {}  # {node: {neighbour: distance, neighbour: distance, ...}, ...}
@@ -116,3 +120,20 @@ class AdjacencyGraph(dengraph.graph.Graph):
             if distance is dengraph.graph.ANY_DISTANCE:
                 return list(adjacency_list)
             return [neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance]
+
+    def __add__(self, other):
+        if isinstance(other, dengraph.graph.Graph):
+            new_adjacency = {}
+            for node in itertools.chain(self, other):
+                if node in new_adjacency:
+                    continue
+                self_adjacency = self._adjacency[node]  # our own internal buffer, do NOT modify
+                other_adjacency = {neighbour: self[node:neighbour] for neighbour in self.get_neighbours(node)}
+                # make sure there is no ambiguity in edges from sequence of merging
+                for common_node in dengraph.compat.viewkeys(self_adjacency) & dengraph.compat.viewkeys(other_adjacency):
+                    if self_adjacency[common_node] != other_adjacency[common_node]:
+                        raise ValueError('Edge [%r:%r] inconsistent between nodes' % (node, common_node))
+                other_adjacency.update(self_adjacency)  # update other so we do not mutate our own state
+                new_adjacency[node] = other_adjacency
+            return self.__class__(new_adjacency)
+        return NotImplemented
