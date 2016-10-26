@@ -43,12 +43,6 @@ class DenGraphIO(dengraph.graph.Graph):
             pass
         return base_cluster
 
-    def _get_noise(self):
-        if self.noise is None:
-            # calculate noise
-            self.noise = set([node for node in self.graph]) - set([node for node in self])
-        return self.noise
-
     def _current_core_cluster(self, node):
         """
         Method determines the current clusters a node belongs to and is labeled as core node.
@@ -214,7 +208,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 continue
             self._process_node(node)
         # preprocess noise
-        self._get_noise()
+        self.noise = set([node for node in self.graph]) - set([node for node in self])
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
