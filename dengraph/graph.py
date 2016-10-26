@@ -122,8 +122,5 @@ class Graph(dengraph.compat.ABCBase):
         raise NotImplementedError
 
     # TODO:
-    # Interface for insert/remove node/edge, update edge
-
-    # TODO:
     # -- intra distance
     # -- inter distance
