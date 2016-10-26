@@ -214,6 +214,12 @@ class DenGraphIO(dengraph.graph.Graph):
         # more likely to be in earlier containers.
         self.clusters.sort(key=lambda clstr: len(clstr))
 
+    def __contains__(self, item):
+        for cluster in self.clusters:
+            if item in cluster:
+                return True
+        return False
+
     def __len__(self):
         return sum(len(clstr) for clstr in self.clusters)
 
