@@ -127,6 +127,8 @@ class AdjacencyGraph(dengraph.graph.Graph):
             for node in itertools.chain(self, other):
                 if node in new_adjacency:
                     continue
+                # we are already one level in, and have an implicit copy when calling update
+                # this is sufficient to copy our internal data but preserve node and edge identity
                 self_adjacency = self._adjacency[node]  # our own internal buffer, do NOT modify
                 other_adjacency = {neighbour: self[node:neighbour] for neighbour in self.get_neighbours(node)}
                 # make sure there is no ambiguity in edges from sequence of merging
