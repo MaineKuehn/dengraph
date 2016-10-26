@@ -108,15 +108,11 @@ class AdjacencyGraph(dengraph.graph.Graph):
         return iter(self._adjacency)
 
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
-        neighbours = []
         try:
-            adjacency = self._adjacency[node]
+            adjacency_list = self._adjacency[node]
         except KeyError:
-            return neighbours
+            return []
         else:
-            for neighbour, dist in adjacency:
-                if dist <= distance:
-                    neighbours.append(neighbour)
-                else:
-                    break
-            return neighbours
+            if distance is dengraph.graph.ANY_DISTANCE:
+                return list(adjacency_list)
+            return [neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance]
