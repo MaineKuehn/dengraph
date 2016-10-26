@@ -5,6 +5,14 @@ import dengraph.graph
 import dengraph.cluster
 
 
+class NoSuchCluster(Exception):
+    pass
+
+
+class ExceededMaximumRecursion(Exception):
+    pass
+
+
 class DenGraphIO(dengraph.graph.Graph):
     """
     Density Graph allowing for Overlap and Incremental updates.
@@ -23,8 +31,131 @@ class DenGraphIO(dengraph.graph.Graph):
         self.cluster_distance = cluster_distance
         self.core_neighbours = core_neighbours
         self.clusters = []
+        self.noise = None
         self._finalized_cores = set()
         self._init_cluster()
+
+    def _merge_clusters(self, base_cluster, cluster):
+        if base_cluster == cluster:
+            return base_cluster
+        # TODO: implement the actual merging
+        # TODO: remove clusters that have been merged from list
+        print("merging core %s, border %s with core %s, border %s" % (base_cluster.core_nodes, base_cluster.border_nodes, cluster.core_nodes, cluster.border_nodes))
+        base_cluster.border_nodes.update(cluster.border_nodes)
+        base_cluster.core_nodes.update(cluster.core_nodes)
+        base_cluster.border_nodes = base_cluster.border_nodes - base_cluster.core_nodes
+        try:
+            self.clusters.remove(cluster)
+        except ValueError:
+            pass
+        print("returning core %s, border %s" % (base_cluster.core_nodes, base_cluster.border_nodes))
+        return base_cluster
+
+    def _get_noise(self):
+        if self.noise is None:
+            # calculate noise
+            self.noise = set([node for node in self.graph]) - set([node for node in self])
+        return self.noise
+
+    def _current_core_cluster(self, node):
+        """
+        Method determines the current clusters a node belongs to and is labeled as core node.
+
+        :param node: the node to check cluster for
+        :return: Cluster
+        :raise: NoSuchCluster
+        """
+        for cluster in self.clusters:
+            if node in cluster.core_nodes:
+                return cluster
+        raise NoSuchCluster()
+
+    def _clusters_for_node(self, node):
+        result = []
+        for cluster in self.clusters:
+            if node in cluster:
+                result.append(cluster)
+        return result
+
+    def _grow_cluster_from_seed(self, node, neighbours, maximum_steps, cluster=None):
+        if maximum_steps < 1:
+            raise ExceededMaximumRecursion()
+        # create a new cluster
+        if cluster is None:
+            this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
+            self.clusters.append(this_cluster)
+        else:
+            this_cluster = cluster
+        this_cluster.categorize_node(node, this_cluster.CORE_NODE)
+        self._finalized_cores.add(node)
+
+        # check all children for merging
+        for neighbour in neighbours:
+            try:
+                this_cluster = self._merge_clusters(self._current_core_cluster(neighbour), this_cluster)
+            except NoSuchCluster:
+                # node was not part of a cluster, so it is only treated as a border node for the
+                # current cluster
+                this_cluster.categorize_node(neighbour, this_cluster.BORDER_NODE)
+            if maximum_steps > 1:
+                is_new_core, neighbour_neighbours = self._test_change_to_core(node=neighbour)
+                if is_new_core:
+                    this_cluster = self._grow_cluster_from_seed(
+                        node=neighbour,
+                        neighbours=neighbour_neighbours,
+                        maximum_steps=maximum_steps-1,
+                        cluster=this_cluster)
+        return this_cluster
+
+    def _test_change_to_core(self, node):
+        neighbours = self.graph.get_neighbours(node, self.cluster_distance)
+        if node not in self._finalized_cores:
+            if len(neighbours) >= self.core_neighbours:
+                return True, neighbours
+        return False, neighbours
+
+    def _process_incremental_node(self, node):
+        """
+        Method calculates for a newly added node, how it influences the current clustering.
+        The node might become core, border, or even junk.
+
+        :param node: The node that was just added
+        """
+        integrated = False
+        # determine neighbours of the node, if any and check its state
+        is_new_core, neighbours = self._test_change_to_core(node=node)
+        if is_new_core:
+            # we got a core node and should insert it into the maybe already existing cluster
+            self._grow_cluster_from_seed(node=node, neighbours=neighbours, maximum_steps=2)
+            integrated = True
+        else:
+            # The node might be a border node, or even junk
+            for neighbour in neighbours:
+                # check if neighbour itself is a core node
+                try:
+                    cluster = self._current_core_cluster(neighbour)
+                    # The currently checked node is a core node, so the added node should become
+                    # a border node to the received cluster
+                except NoSuchCluster:
+                    # The neighbouring node is apparently a border node or noise.
+                    # Noise nodes might exceed distance thresholds so that it exceeds current
+                    # distance limits to become core.
+                    # If it is a border node, it might belong to several clusters. This means,
+                    # we might have to perform a merge of those clusters if we are exceeding
+                    # current distance thresholds.
+                    neighbour_is_new_core, _ = self._test_change_to_core(node=neighbour)
+                    if neighbour_is_new_core:
+                        self._grow_cluster_from_seed(node=node, neighbours=neighbours, maximum_steps=1)
+                        integrated = True
+                    # Node was a border or noise node, that is not going to change, so stop here.
+                else:
+                    cluster.categorize_node(node, cluster.BORDER_NODE)
+                    integrated = True
+                    # Nothing needs to happen from here, because the related core node cannot
+                    # get better. And the node itself is a border node
+        if not integrated:
+            self.noise.add(node)
+        self.clusters.sort(key=lambda clstr: len(clstr))
 
     def _process_node(self, node):
         """
@@ -81,6 +212,8 @@ class DenGraphIO(dengraph.graph.Graph):
             if node in self._finalized_cores:
                 continue
             self._process_node(node)
+        # preprocess noise
+        self._get_noise()
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
@@ -111,7 +244,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 nodes = [key]
             for node in nodes:
                 if node not in self._finalized_cores:
-                    self._process_node(key)
+                    self._process_incremental_node(node)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge

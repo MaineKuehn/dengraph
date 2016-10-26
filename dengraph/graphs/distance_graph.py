@@ -55,7 +55,7 @@ class DistanceGraph(graph.Graph):
         if value or isinstance(item, slice):
             raise TypeError('%s does not support edge assignment' % self.__class__.__name__)
         else:
-            self.insert_node(item)
+            self._nodes.add(item)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
