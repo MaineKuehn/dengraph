@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+
+import dengraph.utilities.placeholder
 import dengraph.compat
 
 
@@ -8,6 +10,9 @@ class NoSuchEdge(Exception):
 
 class NoSuchNode(Exception):
     pass
+
+
+ANY_DISTANCE = dengraph.utilities.placeholder.Placeholder('<Any Distance>')
 
 
 class Graph(dengraph.compat.ABCBase):
@@ -103,7 +108,7 @@ class Graph(dengraph.compat.ABCBase):
     def __contains__(self, item):
         raise NotImplementedError
 
-    def get_neighbours(self, node, distance):
+    def get_neighbours(self, node, distance=ANY_DISTANCE):
         """
         Get all nodes with edge weight to `node` smaller or equal to `distance`
 
