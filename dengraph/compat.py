@@ -33,8 +33,46 @@ except AttributeError:
         """
         __metaclass__ = _abc.ABCMeta
 
+
+def viewkeys(mapping):
+    """
+    Get a key view to a mapping
+
+    :type mapping: dict
+    """
+    try:
+        return mapping.viewkeys()
+    except AttributeError:
+        return mapping.keys()
+
+
+def viewvalues(mapping):
+    """
+    Get a value view to a mapping
+
+    :type mapping: dict
+    """
+    try:
+        return mapping.viewvalues()
+    except AttributeError:
+        return mapping.keys()
+
+
+def viewitems(mapping):
+    """
+    Get an item view to a mapping
+
+    :type mapping: dict
+    """
+    try:
+        return mapping.viewitems()
+    except AttributeError:
+        return mapping.keys()
+
+
 # limit names we export to not expose implementation details
 __all__ = [
     'compat_version',
-    'collections_abc', 'ABCBase'
+    'collections_abc', 'ABCBase',
+    'viewkeys', 'viewvalues', 'viewitems',
 ]
