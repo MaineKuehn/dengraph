@@ -88,3 +88,8 @@ class DistanceGraph(graph.Graph):
         else:
             neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
         return neighbours
+
+    def __add__(self, other):
+        if isinstance(self, other.__class__) and self.distance == other.distance:
+            return self.__class__(self._nodes.union(other), self.distance, self.symmetric and other.symmetric)
+        return NotImplemented
