@@ -66,6 +66,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
+        print("_____________________")
         self.assertEqual(0, len(io_graph.clusters))
         for node in nodes:
             io_graph[node] = {}
