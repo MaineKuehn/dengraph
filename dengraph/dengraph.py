@@ -44,7 +44,9 @@ class DenGraphIO(dengraph.graph.Graph):
             this_cluster.categorize_node(node, this_cluster.CORE_NODE)
             # stack of neighbours we must inspect
             # any neighbour belongs to the cluster, by definition.
-            unchecked = collections.deque([neighbour for neighbour in neighbours if neighbour not in self._finalized_cores])
+            unchecked = collections.deque(
+                neighbour for neighbour in neighbours if neighbour not in self._finalized_cores
+            )
             checked = set()
             # A core's neighbour is automatically part of the cluster.
             # We recurse neighbour-to-neighbour to find the entire cluster.
@@ -57,10 +59,12 @@ class DenGraphIO(dengraph.graph.Graph):
                 if len(neighbours) >= self.core_neighbours:
                     self._finalized_cores.add(neighbour)
                     this_cluster.categorize_node(neighbour, this_cluster.CORE_NODE)
-                    unchecked.extend(nnode for nnode in neighbours
-                                     if nnode not in self._finalized_cores and
-                                     nnode not in checked and
-                                     nnode not in unchecked)
+                    unchecked.extend(
+                        nnode for nnode in neighbours
+                        if nnode not in self._finalized_cores and
+                        nnode not in checked and
+                        nnode not in unchecked
+                    )
                 else:
                     this_cluster.categorize_node(neighbour, this_cluster.BORDER_NODE)
             self.clusters.append(this_cluster)
@@ -71,8 +75,6 @@ class DenGraphIO(dengraph.graph.Graph):
         # Avoid nodes for which a decision has been made:
         # - Core nodes can only belong to one cluster; once a node is a cluster
         #   core node, it cannot change state.
-        # - Junk can NEVER be close to core or border nodes, so it will never
-        #   show up again as neighbour.
         # - Border nodes may belong to multiple clusters, we WANT to inspect
         #   them again for each cluster.
         for node in self.graph:  # nodes from single iteration over graph
