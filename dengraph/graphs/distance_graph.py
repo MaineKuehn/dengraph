@@ -69,10 +69,10 @@ class DistanceGraph(graph.Graph):
             else:
                 # clean up all stored distances
                 for node in self:
-                    self._distance_values.pop(item, node)
+                    self._distance_values.pop((item, node), None)
                     if self.symmetric:
                         continue
-                    self._distance_values.pop(node, item)
+                    self._distance_values.pop((node, item), None)
 
     def _compute_distance(self, node_from, node_to, force=False):
         if not force and (node_from, node_to) in self._distance_values:
