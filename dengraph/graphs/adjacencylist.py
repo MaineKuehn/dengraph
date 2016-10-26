@@ -70,6 +70,23 @@ class AdjacencyGraph(dengraph.graph.Graph):
         else:
             raise TypeError('Not an edge: %s' % item)
 
+    def __setitem__(self, item, value):
+        # a:b -> slice -> edge
+        if isinstance(item, slice):
+            node_from, node_to = item.start, item.stop
+            if node_to not in self._adjacency:
+                raise dengraph.graph.NoSuchEdge  # second edge node
+            try:
+                self._adjacency[node_from][node_to] = value
+            except KeyError:
+                raise dengraph.graph.NoSuchEdge  # first edge node
+        # g[a] = {b: 3, c:4, d:6}
+        else:
+            if item not in self._adjacency:
+                self._adjacency[item] = value.copy()
+            else:
+                self._adjacency[item].update(value)
+
     def __iter__(self):
         return iter(self._adjacency)
 
