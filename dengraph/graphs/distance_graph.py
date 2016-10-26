@@ -93,3 +93,12 @@ class DistanceGraph(graph.Graph):
         if isinstance(self, other.__class__) and self.distance == other.distance:
             return self.__class__(self._nodes.union(other), self.distance, self.symmetric and other.symmetric)
         return NotImplemented
+
+    def __repr__(self):
+        return '%s(distance=%r, symmetric=%r, nodes=%s)' % (
+            self.__class__.__name__,
+            self.distance,
+            self.symmetric,
+            '{}' if not self._nodes else
+            '{%s, ..., <%d elements>}' % (next(iter(self._nodes)), len(self._nodes))
+        )
