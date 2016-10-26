@@ -88,15 +88,3 @@ class DistanceGraph(graph.Graph):
         else:
             neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
         return neighbours
-
-    def insert_node(self, node):
-        self._nodes.add(node)
-
-    def insert_edge(self, *args, **kwargs):
-        raise TypeError('%s does not implement %s' % (self.__class__.__name__, 'insert_edge'))
-
-    def remove_edge(self, *args, **kwargs):
-        raise TypeError('%s does not implement %s' % (self.__class__.__name__, 'remove_edge'))
-
-    def modify_edge(self, *args, **kwargs):
-        raise TypeError('%s does not implement %s' % (self.__class__.__name__, 'modify_edge'))
