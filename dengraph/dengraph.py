@@ -60,7 +60,7 @@ class DenGraphIO(dengraph.graph.Graph):
         for cluster in self.clusters:
             if node in cluster.core_nodes:
                 return cluster
-        raise NoSuchCluster()
+        raise NoSuchCluster
 
     def _clusters_for_node(self, node):
         result = []
@@ -94,7 +94,7 @@ class DenGraphIO(dengraph.graph.Graph):
         this_cluster.categorize_node(node, this_cluster.CORE_NODE)
         # remember node as finalized
         self._finalized_cores.add(node)
-
+        # iterate over chained neighbours
         unchecked = set(neighbours)
         while unchecked:
             current_node = unchecked.pop()
@@ -262,18 +262,3 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def get_neighbours(self, node, distance):
         raise NotImplementedError  # TODO: find closest nodes
-
-    def insert_node(self, node, *args, **kwargs):
-        raise NotImplementedError
-
-    def remove_node(self, node, *args, **kwargs):
-        raise NotImplementedError
-
-    def insert_edge(self, node, *args, **kwargs):
-        raise NotImplementedError
-
-    def remove_edge(self, node, *args, **kwargs):
-        raise NotImplementedError
-
-    def modify_edge(self, node, *args, **kwargs):
-        raise NotImplementedError
