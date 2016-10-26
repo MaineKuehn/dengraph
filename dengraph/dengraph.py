@@ -155,9 +155,6 @@ class DenGraphIO(dengraph.graph.Graph):
         self.clusters.extend(new_clusters)
 
     def _remove_incremental_node(self, node, neighbours, clusters, former_node_type=None):
-        print(node)
-        print(neighbours)
-        print("%s" % [(cluster.core_nodes, cluster.border_nodes) for cluster in clusters])
         if node in self.noise:
             # nothing needs to be done here... just remove from noise
             self.noise.discard(node)
