@@ -27,7 +27,7 @@ class DenGraphIO(dengraph.graph.Graph):
         self.cluster_distance = cluster_distance
         self.core_neighbours = core_neighbours
         self.clusters = []
-        self.noise = None
+        self.noise = set()
         self._finalized_cores = set()
         self._init_cluster()
 
@@ -79,13 +79,17 @@ class DenGraphIO(dengraph.graph.Graph):
             cluster.categorize_node(node, cluster.BORDER_NODE)
         return cluster
 
+    def _add_node_to_cluster(self, node, cluster, state):
+        cluster.categorize_node(node, state)
+        self.noise.discard(node)
+
     def _grow_cluster_from_seed(self, node, neighbours, checked=None):
         checked = checked or set()
         # create a new cluster and save it to known clusters
         this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
         self.clusters.append(this_cluster)
         # as the current node has been determined to become a core, save it to the current cluster
-        this_cluster.categorize_node(node, this_cluster.CORE_NODE)
+        self._add_node_to_cluster(node, this_cluster, this_cluster.CORE_NODE)
         # remember node as finalized
         self._finalized_cores.add(node)
         # iterate over chained neighbours
@@ -110,13 +114,13 @@ class DenGraphIO(dengraph.graph.Graph):
                 # Next neighbouring node also builds a new core node, so we need to also
                 # prepare its neighbouring nodes by recursing into the current method.
                 self._finalized_cores.add(current_node)
-                this_cluster.categorize_node(current_node, this_cluster.CORE_NODE)
+                self._add_node_to_cluster(current_node, this_cluster, this_cluster.CORE_NODE)
                 unchecked.update([node for node in neighbouring_nodes if
                                     node not in checked and
                                     node != current_node])
             else:
                 # However, at least each node belongs to the new clusters
-                this_cluster.categorize_node(current_node, this_cluster.BORDER_NODE)
+                self._add_node_to_cluster(current_node, this_cluster, this_cluster.BORDER_NODE)
         return this_cluster
 
     def _test_change_to_core(self, node):
@@ -188,13 +192,12 @@ class DenGraphIO(dengraph.graph.Graph):
 
         :param node: The node that was just added
         """
-        integrated = False
+        self.noise.add(node)
         # determine neighbours of the node, if any and check its state
         is_new_core, neighbours = self._test_change_to_core(node=node)
         if is_new_core:
             # we got a core node and should insert it into the maybe already existing cluster
             self._grow_cluster_from_seed(node=node, neighbours=neighbours)
-            integrated = True
         else:
             # The node might be a border node, or even junk
             for neighbour in neighbours:
@@ -213,15 +216,11 @@ class DenGraphIO(dengraph.graph.Graph):
                     neighbour_is_new_core, _ = self._test_change_to_core(node=neighbour)
                     if neighbour_is_new_core:
                         self._grow_cluster_from_seed(node=node, neighbours=neighbours)
-                        integrated = True
                     # Node was a border or noise node, that is not going to change, so stop here.
                 else:
-                    cluster.categorize_node(node, cluster.BORDER_NODE)
-                    integrated = True
+                    self._add_node_to_cluster(node, cluster, cluster.BORDER_NODE)
                     # Nothing needs to happen from here, because the related core node cannot
                     # get better. And the node itself is a border node
-        if not integrated:
-            self.noise.add(node)
         self.clusters.sort(key=lambda clstr: len(clstr))
 
     def _process_node(self, node):
