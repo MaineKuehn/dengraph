@@ -118,9 +118,11 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
+        self.assertTrue(all([node in io_graph.noise for node in remove_nodes]))
         for node in remove_nodes:
             del io_graph[node]
         self._validate_cluster_equality(validation_io_graph.clusters, io_graph.clusters)
+        self.assertTrue(all([node not in io_graph.noise for node in remove_nodes]))
 
     def test_remove_incremental_behaviour(self):
         complete_nodes = [1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17]
