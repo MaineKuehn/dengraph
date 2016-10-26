@@ -137,6 +137,48 @@ class DenGraphIO(dengraph.graph.Graph):
         # return the current result and also the neighbours for further reference
         return result, neighbours
 
+    def _test_change_from_core(self, node):
+        result = False
+        neighbours = self.graph.get_neighbours(node, self.cluster_distance)
+        if node in self._finalized_cores:
+            if len(neighbours) < self.core_neighbours:
+                result = True
+        return result, neighbours
+
+    def _recluster(self, cluster):
+        new_clusters = DenGraphIO(
+            base_graph=cluster,
+            cluster_distance=self.cluster_distance,
+            core_neighbours=self.core_neighbours
+        ).clusters
+        self.clusters.remove(cluster)
+        self.clusters.extend(new_clusters)
+
+    def _remove_incremental_node(self, node, neighbours, clusters, former_node_type=None):
+        print(node)
+        print(neighbours)
+        print("%s" % [(cluster.core_nodes, cluster.border_nodes) for cluster in clusters])
+        if node in self.noise:
+            # nothing needs to be done here... just remove from noise
+            self.noise.discard(node)
+            return
+        if node in self._finalized_cores:
+            # node was a core node, so initiate reclustering
+            cluster = clusters[0]
+            self._finalized_cores.discard(node)
+            cluster.core_nodes.discard(node)
+            self._recluster(cluster=cluster)
+        else:
+            # node has just been a border node, so remove from current clusters
+            for cluster in clusters:
+                cluster.border_nodes.discard(node)
+        # also check each of the nodes neighbours for downgrading
+        # TODO: does this need to be done or is it performed automatically when reclustering?
+        for neighbour in neighbours:
+            downgrade_core, neighbouring_neighbours = self._test_change_from_core(neighbour)
+            if downgrade_core:
+                raise NotImplementedError
+
     def _process_incremental_node(self, node):
         """
         Method calculates for a newly added node, how it influences the current clustering.
@@ -252,7 +294,10 @@ class DenGraphIO(dengraph.graph.Graph):
         if isinstance(item, slice):
             raise NotImplementedError  # TODO: remove edge
         else:
-            raise NotImplementedError  # TODO: remove node
+            neighbours = self.graph.get_neighbours(node=item, distance=self.cluster_distance)
+            clusters = self._clusters_for_node(item)
+            del self.graph[item]
+            self._remove_incremental_node(node=item, neighbours=neighbours, clusters=clusters)
 
     def __iter__(self):
         for node in self.graph:
