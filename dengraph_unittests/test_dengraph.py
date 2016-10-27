@@ -166,6 +166,27 @@ class TestDenGraphIO(unittest.TestCase):
             del io_graph[node]
             self.assertEqual(validation_io_graph, io_graph)
 
+    def test_remove_cluster(self):
+        base_nodes = [1, 2, 3, 4, 5]
+        remove_nodes = [6]
+        validation_io_graph = self._validation_graph_for_nodes(
+            nodes=base_nodes,
+            distance=self.distance_cls,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        io_graph = DenGraphIO(
+            base_graph=DistanceGraph(
+                nodes=base_nodes + remove_nodes,
+                distance=self.distance_cls(),
+                symmetric=True),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        for node in remove_nodes:
+            del io_graph[node]
+        self.assertEqual(validation_io_graph, io_graph)
+
     def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=DistanceGraph):
         graph = graph_type(
             nodes=nodes,
