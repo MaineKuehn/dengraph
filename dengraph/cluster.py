@@ -2,6 +2,10 @@ from __future__ import absolute_import
 import dengraph.graph
 
 
+class GraphError(Exception):
+    pass
+
+
 class DenGraphCluster(dengraph.graph.Graph):
     """
     Cluster in a DenGraph
@@ -47,5 +51,30 @@ class DenGraphCluster(dengraph.graph.Graph):
             return self.core_nodes != other.core_nodes or self.border_nodes != other.border_nodes
         return NotImplemented
 
+    def __iadd__(self, other):
+        if isinstance(self, other.__class__):
+            if self.graph != other.graph:
+                return GraphError
+            if self == other:
+                return self
+            self.core_nodes.update(other.core_nodes)
+            self.border_nodes.update(other.border_nodes)
+            # ensure that none of the core nodes are in list of border nodes
+            self.border_nodes = self.border_nodes - self.core_nodes
+            return self
+        return NotImplemented
+
+    def __add__(self, other):
+        if isinstance(self, other.__class__):
+            if self.graph != other.graph:
+                return GraphError
+            graph = DenGraphCluster(self.graph)
+            graph.border_nodes = self.border_nodes.union(other.border_nodes)
+            graph.core_nodes = self.core_nodes.union(other.core_nodes)
+            graph.border_nodes = graph.border_nodes - graph.core_nodes
+            return graph
+        return NotImplemented
+
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
-        return [neighbour for neighbour in self.graph.get_neighbours(node, distance) if neighbour in self]
+        return [neighbour for neighbour in self.graph.get_neighbours(node, distance)
+                if neighbour in self]

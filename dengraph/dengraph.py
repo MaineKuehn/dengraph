@@ -32,11 +32,9 @@ class DenGraphIO(dengraph.graph.Graph):
         self._init_cluster()
 
     def _merge_clusters(self, base_cluster, cluster):
+        base_cluster += cluster
         if base_cluster == cluster:
             return base_cluster
-        base_cluster.border_nodes.update(cluster.border_nodes)
-        base_cluster.core_nodes.update(cluster.core_nodes)
-        base_cluster.border_nodes = base_cluster.border_nodes - base_cluster.core_nodes
         try:
             self.clusters.remove(cluster)
         except ValueError:
