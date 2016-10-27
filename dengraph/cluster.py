@@ -54,7 +54,7 @@ class DenGraphCluster(dengraph.graph.Graph):
     def __iadd__(self, other):
         if isinstance(self, other.__class__):
             if self.graph != other.graph:
-                return GraphError
+                raise GraphError
             if self == other:
                 return self
             self.core_nodes.update(other.core_nodes)
@@ -67,7 +67,7 @@ class DenGraphCluster(dengraph.graph.Graph):
     def __add__(self, other):
         if isinstance(self, other.__class__):
             if self.graph != other.graph:
-                return GraphError
+                raise GraphError
             graph = DenGraphCluster(self.graph)
             graph.border_nodes = self.border_nodes.union(other.border_nodes)
             graph.core_nodes = self.core_nodes.union(other.core_nodes)
