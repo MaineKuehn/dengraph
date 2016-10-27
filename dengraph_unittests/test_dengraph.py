@@ -1,8 +1,13 @@
 import unittest
 import random
+import csv
+import os
+import zipfile
 
 from dengraph.dengraph import DenGraphIO
 from dengraph.graphs.distance_graph import DistanceGraph
+
+import dengraph_unittests
 
 
 class DeltaDistance(object):
@@ -203,6 +208,46 @@ class TestDenGraphIO(unittest.TestCase):
         for node in remove_nodes:
             del io_graph[node]
         self.assertEqual(validation_io_graph, io_graph)
+
+    def test_real_world_example(self):
+        class DistanceMatrixDistance(object):
+            is_symmetric = True
+            matrix = []
+
+            def __call__(self, a, b):
+                return self.matrix[a-1][b-1]
+
+        file_path = os.path.join(
+            os.path.dirname(dengraph_unittests.__file__),
+            "data/tree_distances.csv.zip"
+        )
+        distance = DistanceMatrixDistance()
+        nodes = None
+        zipped_data = zipfile.ZipFile(file_path)
+        with zipped_data.open("tree_distances.csv") as tree_file:
+            csvreader = csv.reader(tree_file, delimiter=",")
+            header_initialized = False
+            for row in csvreader:
+                try:
+                    if row[0].startswith("#"):
+                        continue
+                except IndexError:
+                    pass
+                if not header_initialized:
+                    nodes = [int(element) for element in row]
+                    header_initialized = True
+                    continue
+                distance.matrix.append([float(element) for element in row])
+        dengraph = DenGraphIO(
+            base_graph=DistanceGraph(
+                nodes=nodes,
+                distance=distance,
+                symmetric=True
+            ),
+            core_neighbours=5,
+            cluster_distance=.00001
+        )
+        print(len(dengraph.clusters))
 
     def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=DistanceGraph):
         graph = graph_type(
