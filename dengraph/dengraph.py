@@ -309,7 +309,6 @@ class DenGraphIO(dengraph.graph.Graph):
                     break
 
     def __eq__(self, other):
-        checked = set()
         if isinstance(self, other.__class__):
             if (
                 len(self) != len(other) or
