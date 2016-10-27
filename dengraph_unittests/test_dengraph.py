@@ -95,6 +95,23 @@ class TestDenGraphIO(unittest.TestCase):
             io_graph[node] = {}
         self.assertEqual(validation_io_graph, io_graph)
 
+    def test_simple_noise(self):
+        io_graph = DenGraphIO(
+            base_graph=DistanceGraph(
+                nodes=[1, 2, 3, 4, 5, 6],
+                distance=self.distance_cls(),
+                symmetric=True
+            ),
+            core_neighbours=5,
+            cluster_distance=5
+        )
+        self.assertEqual(1, len(io_graph.clusters))
+        self.assertEqual(set(), io_graph.noise)
+
+        io_graph._recluster(io_graph.clusters[0])
+        self.assertEqual(1, len(io_graph.clusters))
+        self.assertEqual(set(), io_graph.noise)
+
     def test_noise_removal(self):
         base_nodes = [1, 2, 3, 4, 5, 6, 7, 8]
         remove_nodes = [30, 31]

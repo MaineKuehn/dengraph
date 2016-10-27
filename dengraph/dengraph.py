@@ -150,13 +150,14 @@ class DenGraphIO(dengraph.graph.Graph):
         return result, neighbours
 
     def _recluster(self, cluster):
-        new_clusters = DenGraphIO(
+        clustering = DenGraphIO(
             base_graph=cluster,
             cluster_distance=self.cluster_distance,
             core_neighbours=self.core_neighbours
-        ).clusters
+        )
+        self.noise.update(clustering.noise)
         self.clusters.remove(cluster)
-        self.clusters.extend(new_clusters)
+        self.clusters.extend(clustering.clusters)
 
     def _remove_incremental_node(self, node, neighbours, clusters, former_node_type=None):
         if node in self.noise:
