@@ -22,13 +22,15 @@ class TestDistanceGraph(unittest.TestCase):
     def random_nodes(length):
         return [random.randint(-length * 10, length * 10) for _ in range(length)]
 
+    def make_node_samples(self, lengths=range(5, 101, 20)):
+        yield [1, 2, 3, 10]
+        for length in lengths:
+            yield self.random_nodes(length)
+
     def test_symmetric(self):
         if not self.distance_cls.is_symmetric:
             self.skipTest('Distance is not symmetric')
-        for nodes in (
-                nodes_factory() for nodes_factory in (
-                    lambda: [1, 2, 3], lambda: self.random_nodes(5), lambda: self.random_nodes(20)
-        )):
+        for nodes in self.make_node_samples():
             distance = self.distance_cls()
             graph = dengraph.graphs.distance_graph.DistanceGraph(
                 nodes,
@@ -42,10 +44,7 @@ class TestDistanceGraph(unittest.TestCase):
     def test_diagonal(self):
         if not self.distance_cls.is_symmetric:
             self.skipTest('Distance is not symmetric')
-        for nodes in (
-                nodes_factory() for nodes_factory in (
-                    lambda: [1, 2, 3], lambda: self.random_nodes(5), lambda: self.random_nodes(20)
-        )):
+        for nodes in self.make_node_samples():
             distance = self.distance_cls()
             graph = dengraph.graphs.distance_graph.DistanceGraph(
                 nodes,
@@ -57,10 +56,7 @@ class TestDistanceGraph(unittest.TestCase):
                 self.assertEqual(distance(node, node), graph[node:node])
 
     def test_attributes(self):
-        for nodes in (
-                nodes_factory() for nodes_factory in (
-                    lambda: [1, 2, 3], lambda: self.random_nodes(5), lambda: self.random_nodes(20)
-        )):
+        for nodes in self.make_node_samples():
             distance = self.distance_cls()
             graph = dengraph.graphs.distance_graph.DistanceGraph(
                 nodes,
@@ -79,7 +75,7 @@ class TestDistanceGraph(unittest.TestCase):
     def test_neighbors(self):
         maximum = 20
         threshold = 1
-        nodes = [node for node in range(maximum)]
+        nodes = list(range(maximum))
         distance = self.distance_cls()
         graph = dengraph.graphs.distance_graph.DistanceGraph(
             nodes,
