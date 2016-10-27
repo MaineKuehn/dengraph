@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from dengraph import graph
+import dengraph.utilities.pretty
 
 
 class DistanceGraph(graph.Graph):
@@ -99,6 +100,5 @@ class DistanceGraph(graph.Graph):
             self.__class__.__name__,
             self.distance,
             self.symmetric,
-            '{}' if not self._nodes else
-            '{%s, ..., <%d elements>}' % (next(iter(self._nodes)), len(self._nodes))
+            dengraph.utilities.pretty.repr_container(self._nodes)
         )

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import itertools
 import dengraph.graph
 import dengraph.utilities.iterutils
+import dengraph.utilities.pretty
 import dengraph.compat
 
 
@@ -139,3 +140,9 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 new_adjacency[node] = other_adjacency
             return self.__class__(new_adjacency)
         return NotImplemented
+
+    def __repr__(self):
+        return '%s(adjacency=%s)' % (
+            self.__class__.__name__,
+            dengraph.utilities.pretty.repr_container(self._adjacency)
+        )

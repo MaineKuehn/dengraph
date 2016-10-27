@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import collections
 import dengraph.graph
 import dengraph.cluster
+import dengraph.utilities.pretty
 
 
 class NoSuchCluster(Exception):
@@ -323,12 +324,12 @@ class DenGraphIO(dengraph.graph.Graph):
                 return all(my_clst in other.clusters for my_clst in self.clusters)
 
     def __repr__(self):
-        return '%s(cluster_distance=%s, core_neighbours=%s, clusters=%d, noise=%d)' % (
+        return '%s(cluster_distance=%s, core_neighbours=%s, clusters=%s, noise=%s)' % (
             self.__class__.__name__,
             self.cluster_distance,
             self.core_neighbours,
-            len(self.clusters),
-            len(self.noise),
+            dengraph.utilities.pretty.repr_container(self.clusters),
+            dengraph.utilities.pretty.repr_container(self.noise),
         )
 
     def get_neighbours(self, node, distance):

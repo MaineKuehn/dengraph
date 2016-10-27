@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import dengraph.graph
+import dengraph.utilities.pretty
 
 
 class DenGraphCluster(dengraph.graph.Graph):
@@ -49,3 +50,11 @@ class DenGraphCluster(dengraph.graph.Graph):
 
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
         return [neighbour for neighbour in self.graph.get_neighbours(node, distance) if neighbour in self]
+
+    def __repr__(self):
+        return '%s(graph=%s, core_nodes=%s, border_nodes=%s)' % (
+            self.__class__.__name__,
+            self.graph,
+            dengraph.utilities.pretty.repr_container(self.core_nodes),
+            dengraph.utilities.pretty.repr_container(self.border_nodes),
+        )
