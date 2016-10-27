@@ -3,6 +3,8 @@ import random
 import csv
 import os
 import zipfile
+import sys
+import io
 
 from dengraph.dengraph import DenGraphIO
 from dengraph.graphs.distance_graph import DistanceGraph
@@ -223,21 +225,23 @@ class TestDenGraphIO(unittest.TestCase):
         )
         distance = DistanceMatrixDistance()
         nodes = None
-        zipped_data = zipfile.ZipFile(file_path)
-        with zipped_data.open("tree_distances.csv") as tree_file:
-            csvreader = csv.reader(tree_file, delimiter=",")
-            header_initialized = False
-            for row in csvreader:
-                try:
-                    if row[0].startswith("#"):
+        with zipfile.ZipFile(file_path) as zipped_data:
+            with zipped_data.open("tree_distances.csv") as tree_file:
+                if sys.version_info >= (3,):
+                    tree_file = io.TextIOWrapper(tree_file)
+                csvreader = csv.reader(tree_file, delimiter=",")
+                header_initialized = False
+                for row in csvreader:
+                    try:
+                        if row[0].startswith("#"):
+                            continue
+                    except IndexError:
+                        pass
+                    if not header_initialized:
+                        nodes = [int(element) for element in row]
+                        header_initialized = True
                         continue
-                except IndexError:
-                    pass
-                if not header_initialized:
-                    nodes = [int(element) for element in row]
-                    header_initialized = True
-                    continue
-                distance.matrix.append([float(element) for element in row])
+                    distance.matrix.append([float(element) for element in row])
         dengraph = DenGraphIO(
             base_graph=DistanceGraph(
                 nodes=nodes,
