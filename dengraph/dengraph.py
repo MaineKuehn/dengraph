@@ -42,16 +42,16 @@ class DenGraphIO(dengraph.graph.Graph):
             pass
         return base_cluster
 
-    def _current_core_cluster(self, node):
+    def _current_core_cluster(self, core_node):
         """
         Method determines the current clusters a node belongs to and is labeled as core node.
 
-        :param node: the node to check cluster for
+        :param core_node: the core node to check cluster for
         :return: Cluster
         :raise: NoSuchCluster
         """
         for cluster in self.clusters:
-            if node in cluster.core_nodes:
+            if core_node in cluster.core_nodes:
                 return cluster
         raise NoSuchCluster
 
@@ -76,6 +76,23 @@ class DenGraphIO(dengraph.graph.Graph):
             cluster.categorize_node(node, cluster.BORDER_NODE)
         return cluster
 
+    def _merge_all_neighbouring_clusters(self, core_node, neighbours):
+        # we got a core node that was recently changed to core, so it might trigger merging of
+        # neighbouring clusters it belongs to
+        clusters = self._clusters_for_node(node=core_node)
+        try:
+            the_cluster = next(clusters)
+        except StopIteration:
+            # node is currently in no other cluster, so it builds a new one
+            the_cluster = self._grow_cluster_from_seed(node=core_node, neighbours=neighbours)
+        else:
+            for cluster in clusters:
+                the_cluster = self._merge_clusters(the_cluster, cluster)
+            self._add_node_to_cluster(node=core_node,
+                                      cluster=the_cluster,
+                                      state=the_cluster.CORE_NODE)
+        return the_cluster
+
     def _add_node_to_cluster(self, node, cluster, state):
         cluster.categorize_node(node, state)
         self.noise.discard(node)
@@ -98,8 +115,10 @@ class DenGraphIO(dengraph.graph.Graph):
             if current_node in self._finalized_cores:
                 # If we merged with an already existing node, it means we do not have to perform
                 # further changes and can just drop operation. Neighbouring nodes should already
-                # be marked as border nodes.
-                this_cluster = self._check_for_merge(cluster=this_cluster, node=current_node)
+                # be marked as border nodes.)
+                this_cluster = self._merge_clusters(
+                    base_cluster=this_cluster,
+                    cluster=self._current_core_cluster(core_node=current_node))
                 checked.add(current_node)
                 continue
             checked.add(current_node)
@@ -195,21 +214,10 @@ class DenGraphIO(dengraph.graph.Graph):
         is_new_core, neighbours = self._test_change_to_core(node=node)
         if is_new_core:
             # we got a core node and should insert it into the maybe already existing cluster
-            clusters = self._clusters_for_node(node=node)
-            try:
-                the_cluster = next(clusters)
-            except StopIteration:
-                # node is currently in no other cluster, so it builds a new one
-                self._grow_cluster_from_seed(node=node, neighbours=neighbours)
-            else:
-                for cluster in clusters:
-                    the_cluster = self._merge_clusters(the_cluster, cluster)
-                self._add_node_to_cluster(
-                    node=node,
-                    cluster=the_cluster,
-                    state=the_cluster.CORE_NODE)
+            self._merge_all_neighbouring_clusters(core_node=node, neighbours=neighbours)
         else:
-            # The node might be a border node, or even noise
+            # The node might be a border node, or even noise, so check if additional edge
+            # implicates the change of a node to a better class
             for neighbour in neighbours:
                 # check if neighbour itself is a core node
                 try:
@@ -223,9 +231,11 @@ class DenGraphIO(dengraph.graph.Graph):
                     # If it is a border node, it might belong to several clusters. This means,
                     # we might have to perform a merge of those clusters if we are exceeding
                     # current distance thresholds.
-                    neighbour_is_new_core, _ = self._test_change_to_core(node=neighbour)
+                    neighbour_is_new_core, neighbouring_neighbors = self._test_change_to_core(
+                        node=neighbour)
                     if neighbour_is_new_core:
-                        self._grow_cluster_from_seed(node=node, neighbours=neighbours)
+                        self._merge_all_neighbouring_clusters(core_node=node,
+                                                              neighbours=neighbouring_neighbors)
                     # Node was a border or noise node, that is not going to change, so stop here.
                 else:
                     self._add_node_to_cluster(node, cluster, cluster.BORDER_NODE)
