@@ -73,7 +73,7 @@ class DenGraphIO(dengraph.graph.Graph):
         except NoSuchCluster:
             # Node was not part of a cluster, so it can be treated as a border node for the
             # current cluster
-            cluster.categorize_node(node, cluster.BORDER_NODE)
+            self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
         return cluster
 
     def _merge_all_neighbouring_clusters(self, core_node, neighbours):
@@ -200,7 +200,9 @@ class DenGraphIO(dengraph.graph.Graph):
                 except NoSuchCluster:
                     pass
                 else:
-                    cluster.categorize_node(neighbour, cluster.BORDER_NODE)
+                    self._add_node_to_cluster(node=neighbour,
+                                              cluster=cluster,
+                                              state=cluster.BORDER_NODE)
 
     def _add_incremental_node(self, node):
         """
