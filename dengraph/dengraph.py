@@ -56,11 +56,9 @@ class DenGraphIO(dengraph.graph.Graph):
         raise NoSuchCluster
 
     def _clusters_for_node(self, node):
-        result = []
         for cluster in self.clusters:
             if node in cluster:
-                result.append(cluster)
-        return result
+                yield cluster
 
     def _check_for_merge(self, cluster, node):
         # Check all children for possible merging of clusters. If one of the neighbours is already
@@ -165,7 +163,7 @@ class DenGraphIO(dengraph.graph.Graph):
             return
         if node in self._finalized_cores:
             # node was a core node, so initiate reclustering
-            cluster = clusters[0]
+            cluster = next(clusters)
             self._finalized_cores.discard(node)
             cluster.core_nodes.discard(node)
             self._recluster(cluster=cluster)
@@ -197,9 +195,21 @@ class DenGraphIO(dengraph.graph.Graph):
         is_new_core, neighbours = self._test_change_to_core(node=node)
         if is_new_core:
             # we got a core node and should insert it into the maybe already existing cluster
-            self._grow_cluster_from_seed(node=node, neighbours=neighbours)
+            clusters = self._clusters_for_node(node=node)
+            try:
+                the_cluster = next(clusters)
+            except StopIteration:
+                # node is currently in no other cluster, so it builds a new one
+                self._grow_cluster_from_seed(node=node, neighbours=neighbours)
+            else:
+                for cluster in clusters:
+                    the_cluster = self._merge_clusters(the_cluster, cluster)
+                self._add_node_to_cluster(
+                    node=node,
+                    cluster=the_cluster,
+                    state=the_cluster.CORE_NODE)
         else:
-            # The node might be a border node, or even junk
+            # The node might be a border node, or even noise
             for neighbour in neighbours:
                 # check if neighbour itself is a core node
                 try:
