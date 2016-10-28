@@ -185,7 +185,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 else:
                     cluster.categorize_node(neighbour, cluster.BORDER_NODE)
 
-    def _process_incremental_node(self, node):
+    def _add_incremental_node(self, node):
         """
         Method calculates for a newly added node, how it influences the current clustering.
         The node might become core, border, or even junk.
@@ -288,7 +288,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 nodes = [key]
             for node in nodes:
                 if node not in self._finalized_cores:
-                    self._process_incremental_node(node)
+                    self._add_incremental_node(node)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
