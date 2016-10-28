@@ -96,6 +96,7 @@ class DenGraphIO(dengraph.graph.Graph):
     def _add_node_to_cluster(self, node, cluster, state):
         cluster.categorize_node(node, state)
         self.noise.discard(node)
+        self._finalized_cores.add(node)
 
     def _grow_cluster_from_seed(self, node, neighbours, checked=None):
         checked = checked or set()
@@ -104,24 +105,19 @@ class DenGraphIO(dengraph.graph.Graph):
         self.clusters.append(this_cluster)
         # as the current node has been determined to become a core, save it to the current cluster
         self._add_node_to_cluster(node, this_cluster, this_cluster.CORE_NODE)
-        # remember node as finalized
-        self._finalized_cores.add(node)
         # iterate over chained neighbours
         unchecked = set(neighbours)
         while unchecked:
             current_node = unchecked.pop()
             if current_node in checked:
                 continue
+            checked.add(current_node)
             if current_node in self._finalized_cores:
                 # If we merged with an already existing node, it means we do not have to perform
                 # further changes and can just drop operation. Neighbouring nodes should already
                 # be marked as border nodes.)
-                this_cluster = self._merge_clusters(
-                    base_cluster=this_cluster,
-                    cluster=self._current_core_cluster(core_node=current_node))
-                checked.add(current_node)
+                this_cluster = self._check_for_merge(cluster=this_cluster, node=current_node)
                 continue
-            checked.add(current_node)
             # Whenever we inserted a new node that become a new core, it can also happen,
             # that the next neighbouring node becomes a core. Thus it is connecting to
             # another cluster.
@@ -129,7 +125,6 @@ class DenGraphIO(dengraph.graph.Graph):
             if is_new_core:
                 # Next neighbouring node also builds a new core node, so we need to also
                 # prepare its neighbouring nodes by recursing into the current method.
-                self._finalized_cores.add(current_node)
                 self._add_node_to_cluster(current_node, this_cluster, this_cluster.CORE_NODE)
                 unchecked.update([node for node in neighbouring_nodes if
                                     node not in checked and
@@ -150,19 +145,23 @@ class DenGraphIO(dengraph.graph.Graph):
         result = False
         # determine the neighbours of current node
         neighbours = self.graph.get_neighbours(node, self.cluster_distance)
-        if node not in self._finalized_cores:
-            # check if current node becomes a core node
-            if len(neighbours) >= self.core_neighbours:
-                result = True
+        try:
+            cluster = self._current_core_cluster(core_node=node)
+        except NoSuchCluster:
+            result = len(neighbours) >= self.core_neighbours
         # return the current result and also the neighbours for further reference
         return result, neighbours
 
     def _test_change_from_core(self, node):
         result = False
         neighbours = self.graph.get_neighbours(node, self.cluster_distance)
-        if node in self._finalized_cores:
-            if len(neighbours) < self.core_neighbours:
-                result = True
+        try:
+            self._current_core_cluster(core_node=node)
+        except NoSuchCluster:
+            # node was no core before, so False is returned
+            pass
+        else:
+            result = len(neighbours) < self.core_neighbours
         return result, neighbours
 
     def _recluster(self, cluster):
@@ -180,16 +179,20 @@ class DenGraphIO(dengraph.graph.Graph):
             # nothing needs to be done here... just remove from noise
             self.noise.discard(node)
             return
-        if node in self._finalized_cores:
-            # node was a core node, so initiate reclustering
+        try:
             cluster = next(clusters)
-            self._finalized_cores.discard(node)
-            cluster.core_nodes.discard(node)
-            self._recluster(cluster=cluster)
-        else:
-            # node has just been a border node, so remove from current clusters
-            for cluster in clusters:
+            if node in cluster.core_nodes:
+                # node was a core node, so initiate reclustering
+                self._finalized_cores.discard(node)
+                cluster.core_nodes.discard(node)
+                self._recluster(cluster=cluster)
+            else:
+                # node has just been a border node, so remove from current clusters
                 cluster.border_nodes.discard(node)
+                for cluster in clusters:
+                    cluster.border_nodes.discard(node)
+        except StopIteration:
+            pass
         self.clusters.sort(key=lambda clstr: len(clstr))
         # also check each of the nodes neighbours for downgrading
         for neighbour in neighbours:
@@ -252,8 +255,8 @@ class DenGraphIO(dengraph.graph.Graph):
 
         :param node: A node to be processed for clustering
         """
-        is_new_core, neighbours = self._test_change_to_core(node=node)
         # We haven't seen it, so it cannot be touched by any existing
+        is_new_core, neighbours = self._test_change_to_core(node=node)
         # cluster. If it's a core node, it MUST form a new cluster.
         # If it's not a core node, either a core will claim it or it's
         # junk. We just leave it to be claimed or remain junk.
@@ -266,14 +269,12 @@ class DenGraphIO(dengraph.graph.Graph):
         # Avoid nodes for which a decision has been made:
         # - Core nodes can only belong to one cluster; once a node is a cluster
         #   core node, it cannot change state.
-        # - Border nodes may belong to multiple clusters, we WANT to inspect
-        #   them again for each cluster.
+        # - Border nodes are treated when clusters are created, so we can skip them
+        self.noise = set(self.graph)
         for node in self.graph:  # nodes from single iteration over graph
             if node in self._finalized_cores:
                 continue
             self._process_node(node)
-        # preprocess noise
-        self.noise = set(self.graph) - set(self)
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
@@ -309,8 +310,7 @@ class DenGraphIO(dengraph.graph.Graph):
             else:
                 nodes = [key]
             for node in nodes:
-                if node not in self._finalized_cores:
-                    self._add_incremental_node(node)
+                self._add_incremental_node(node)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
