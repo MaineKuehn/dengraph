@@ -16,14 +16,17 @@ class AdjacencyGraph(dengraph.graph.Graph):
 
     There are multiple formats to provide adjacency information via `source`:
 
-    Adjacency Mapping
+    Adjacency :py:class:`Mapping`
         The most straightforward way for initialization is to provide adjacency
         in a mapping format with `distance = source[node_from][node_to]`.
 
-    Graph
+    :py:class:`~dengraph.graph.Graph`
         Any subclass of :py:class:`~dengraph.graph.Graph`; complexity depends
         on the graph's implementation of `iter(graph)`, `graph.get_neighbours`
         and `graph[node_from:node_to]`.
+
+    :py:const:`None`
+        Initialize the graph as empty.
 
     :note: :py:class:`~AdjacencyGraph` does not store `max_distance`. It is not
            checked when adding edges or merging other graphs.
@@ -90,8 +93,10 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 self._adjacency[node_from][node_to] = value
             except KeyError:
                 raise dengraph.graph.NoSuchEdge  # first edge node
-        # g[a] = {b: 3, c: 4, d: 6}
         else:
+            # g[a] = None
+            value = value if value else {}
+            # g[a] = {b: 3, c: 4, d: 6}
             if item not in self._adjacency:
                 self._adjacency[item] = value.copy()
             else:
