@@ -28,12 +28,17 @@ class AdjacencyGraph(dengraph.graph.Graph):
     :note: :py:class:`~AdjacencyGraph` does not store `max_distance`. It is not
            checked when adding edges or merging other graphs.
     """
-    def __init__(self, source, max_distance=dengraph.graph.ANY_DISTANCE):
+    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE):
         self._adjacency = {}  # {node: {neighbour: distance, neighbour: distance, ...}, ...}
         if isinstance(source, dengraph.graph.Graph):
             self._adjacency.update(self._adjacency_from_graph(source, max_distance))
         elif isinstance(source, dengraph.compat.collections_abc.Mapping):
             self._adjacency.update(self._adjacency_from_dict(source, max_distance))
+        elif source is None:
+            # initialize empty graph
+            pass
+        else:
+            raise TypeError("parameter 'source' must be an instance of Graph, a Mapping or None")
 
     @staticmethod
     def _adjacency_from_graph(graph, max_distance):
