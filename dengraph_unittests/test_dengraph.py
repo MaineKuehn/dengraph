@@ -53,6 +53,33 @@ class TestDenGraphIO(unittest.TestCase):
         )
         self.assertEqual(2, len(io_graph.clusters))
 
+    def test_core_count(self):
+        nodes = [1, 2, 3, 4, 5, 6, 9, 14, 15, 16, 17, 18, 19, 20]
+        graph = self._validation_graph_for_nodes(
+            nodes=nodes,
+            distance=self.distance_cls,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        # determine count of cores manually
+        core_count = 0
+        for node in graph.graph:
+            if len(graph.graph.get_neighbours(node, distance=graph.cluster_distance)) >= graph.core_neighbours:
+                core_count += 1
+        self.assertEqual(core_count, sum([len(cluster.core_nodes) for cluster in graph.clusters]))
+
+    def test_overlapping_clusters(self):
+        nodes = [1, 2, 3, 4, 5, 6, 9, 14, 15, 16, 17, 18, 19, 20]
+        graph = self._validation_graph_for_nodes(
+            nodes=nodes,
+            distance=self.distance_cls,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        self.assertEqual([4, 5, 6, 14], graph.graph.get_neighbours(9, 5))
+        self.assertEqual(2, len(graph.clusters))
+        self.assertEqual([set([9]), set([9])], [cluster.border_nodes for cluster in graph.clusters])
+
     def test_simple_incremental_behaviour(self):
         nodes = [1, 2, 3, 4, 5, 6]
         validation_io_graph = self._validation_graph_for_nodes(
