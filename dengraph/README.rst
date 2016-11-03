@@ -48,7 +48,7 @@ We provide several implementations and tools for the ``Graph`` interface:
 
 - Create a graph from a list of nodes and a distance function via ``dengraph.graphs.distance_graph.DistanceGraph``
 
-- Create a graph fro adjacency lists via ``dengraph.graphs.adjacency_graph.AdjacencyGraph``
+- Create a graph from adjacency lists via ``dengraph.graphs.adjacency_graph.AdjacencyGraph``
 
 - Read a distance matrix to a graph via ``dengraph.graphs.graph_io.csv_graph_reader``
 
@@ -78,6 +78,6 @@ Acknowledgement
 
 This module is based on several publications:
 
-.. admonition:: DenGraph-HO: a density-based hierarchical graph clustering algorithm
+- **DenGraph-HO: a density-based hierarchical graph clustering algorithm**
 
-    by Nico Schlitter, Tanja Falkowski and Jörg Lässig
+  by Nico Schlitter, Tanja Falkowski and Jörg Lässig
