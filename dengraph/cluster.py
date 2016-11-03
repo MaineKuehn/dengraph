@@ -14,10 +14,10 @@ class DenGraphCluster(dengraph.graph.Graph):
     CORE_NODE = 1
     BORDER_NODE = 2
 
-    def __init__(self, graph):
+    def __init__(self, graph, core_nodes=None, border_nodes=None):
         self.graph = graph
-        self.core_nodes = set()
-        self.border_nodes = set()
+        self.core_nodes = set(core_nodes) if core_nodes is not None else set()
+        self.border_nodes = set(border_nodes) if border_nodes is not None else set()
 
     def categorize_node(self, node, state):
         if state == self.CORE_NODE:
@@ -89,3 +89,32 @@ class DenGraphCluster(dengraph.graph.Graph):
             dengraph.utilities.pretty.repr_container(self.core_nodes),
             dengraph.utilities.pretty.repr_container(self.border_nodes),
         )
+
+    def __hash__(self):
+        return hash((self.__class__, id(self)))
+
+
+class FrozenDenGraphCluster(DenGraphCluster):
+    """
+    Immutable, hashable cluster in a DenGraph
+
+    Clusters of this type cannot be modified but behave properly in `dict` and other mappings.
+    """
+    def __init__(self, graph, core_nodes=None, border_nodes=None):
+        if isinstance(graph, DenGraphCluster):
+            assert core_nodes is None and border_nodes is None, "Cloning takes only one argument"
+            core_nodes = graph.core_nodes
+            border_nodes = graph.border_nodes
+            graph = graph.graph
+        super(FrozenDenGraphCluster, self).__init__(graph, core_nodes=core_nodes, border_nodes=border_nodes)
+        self.core_nodes = frozenset(self.core_nodes)
+        self.border_nodes = frozenset(self.border_nodes)
+
+    def __hash__(self):
+        return hash((self.__class__, self.core_nodes, self.border_nodes))
+
+    def categorize_node(self, node, state):
+        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
+
+    def __iadd__(self, other):
+        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
