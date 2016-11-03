@@ -5,13 +5,7 @@ import itertools
 
 import dengraph.graphs.distance_graph
 from dengraph.graph import NoSuchNode
-
-
-class DeltaDistance(object):
-    is_symmetric = True
-
-    def __call__(self, a, b):
-        return abs(a - b)
+from dengraph.distances.delta_distance import DeltaDistance
 
 
 class TestDistanceGraph(unittest.TestCase):

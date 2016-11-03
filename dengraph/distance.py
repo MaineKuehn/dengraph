@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import dengraph.compat
 
 
@@ -45,33 +47,9 @@ class Distance(dengraph.compat.ABCBase):
        representation to return if the provided iterable is empty. If the iterable is empty and
        *default* is not provided, a :exc:`ValueError` is raised.
 
-    .. function:: min(iterable, *[, default])
-                  min(arg1, arg2, *args[, default]
-
-       Return the minimum distance in an iterable or the minimum distance of two or more arguments.
-
-       If one positional argument is provided, it should be an :term:`iterable`.
-       The minimum distance based on the given edge representation is returned. If two or more
-       positional arguments are provided, the minimum distance of the given edges is returned.
-
-       There is one optional keyword-only argument. The *default* argument specifies a distance to
-       return if the provided iterable is empty. If the iterable is emtpy and *default* is not
-       provided, a :exc:`ValueError` is raised.
-
-    .. function:: max(iterable, *[, default])
-                  max(arg1, arg2, *args[, default])
-
-       Return the maximum distance in an iterable or the maximum distance of two or more arguments.
-
-       If one positional argument is provided, it should be an :term:`iterable`.
-       The maximum distance based on the given edge representations is returned. If two or more
-       positional arguments are provided, the maximum distance of the given edges is returned.
-
-       There is one optional keyword-only argument. The *default* argument specifies a distance to
-       return if the provided iterable is empty. If the iterable is empty and *default* is not
-       provided, a :exc:`ValueError` is raised.
-
     """
+    is_symmetric = True
+
     def __call__(self, x, y, default=None):
         raise NotImplementedError
 
@@ -79,10 +57,4 @@ class Distance(dengraph.compat.ABCBase):
         raise NotImplementedError
 
     def median(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def max(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def min(self, *args, **kwargs):
         raise NotImplementedError
