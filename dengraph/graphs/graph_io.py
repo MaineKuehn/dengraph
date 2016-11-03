@@ -30,6 +30,8 @@ class DistanceMatrixLiteral(csv.Dialect):
     escapechar = "\\"
     #: allow for alignment with arbitrary whitespace
     skipinitialspace = True
+    quoting = csv.QUOTE_MINIMAL
+    lineterminator = '\n'
 
 
 def stripped_literal(literal):
