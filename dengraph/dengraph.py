@@ -353,3 +353,6 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def get_neighbours(self, node, distance):
         raise NotImplementedError  # TODO: find closest nodes
+
+#: alias to have a separate name for future optimizations
+DenGraphO = DenGraphIO
