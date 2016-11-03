@@ -23,8 +23,8 @@ class TestDeltaDistance(unittest.TestCase):
 
     def test_median_iterator(self):
         distance = DeltaDistance()
-        self.assertEqual(6, distance.median(range(10, 0, step=-1)))
-        self.assertEqual(6, distance.median(range(10, 1, step=-1)))
+        self.assertEqual(6, distance.median(range(10, 0, -1)))
+        self.assertEqual(6, distance.median(range(10, 1, -1)))
 
     def test_median_args(self):
         distance = DeltaDistance()

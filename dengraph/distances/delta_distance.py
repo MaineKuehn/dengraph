@@ -21,7 +21,7 @@ class DeltaDistance(distance.Distance):
         if len(args) == 1:
             args = args[0]
         try:
-            return sorted(args)[len(args)/2]
+            return sorted(args)[int(len(args)/2)]
         except IndexError:
             if "default" in kwargs:
                 return kwargs.get("default")
