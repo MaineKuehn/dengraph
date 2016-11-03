@@ -10,7 +10,30 @@ import dengraph.graph
 import dengraph.graphs.adjacency_graph
 
 
+class DistanceMatrixLiteral(csv.Dialect):
+    """
+    CSV dialect for a Graph Matrix Literal, suitable for numeric data
+
+    ```
+     a   b   c
+     0   2   1
+     2   0  .5
+    16  .5   1
+    ```
+    """
+    #: no explicit delimeters required
+    delimiter = ' '
+    #: string literals can be written as "foo"
+    quotechar = "'"
+    doublequote = False
+    #: use regular escaping
+    escapechar = "\\"
+    #: allow for alignment with arbitrary whitespace
+    skipinitialspace = True
+
+
 def stripped_literal(literal):
+    """interpreter for literals, ignoring leading/trailing whitespace"""
     return ast.literal_eval(literal.strip())
 
 
