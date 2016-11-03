@@ -48,6 +48,8 @@ class Distance(dengraph.compat.ABCBase):
        *default* is not provided, a :exc:`ValueError` is raised.
 
     """
+    is_symmetric = True
+
     def __call__(self, x, y, default=None):
         raise NotImplementedError
 
