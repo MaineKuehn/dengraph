@@ -33,7 +33,7 @@ def format_sequence(seq):
 
 def format_clustering(seq, dgraph):
     """Format by cluster key, e.g. '   aAAAa bBBB-CCCd'"""
-    keys = {cluster: chr(ord('a') + idx) for idx, cluster in enumerate(sorted(dgraph.clusters))}
+    keys = {cluster: chr(ord('a') + idx) for idx, cluster in enumerate(sorted(dgraph.clusters, key=lambda clst: len(clst)))}
     fmt = ''
     for elem in range(min(seq), max(seq) + 1):
         elem_key = None
