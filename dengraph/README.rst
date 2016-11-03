@@ -16,21 +16,20 @@ To use `dengraph` for clustering your data, two steps are required:
 
 - The graph must be fed to `dengraph.dengraph.DenGraphIO`.
 
-```python
-from dengraph.graphs.distance_graph import DistanceGraph
-from dengraph.dengraph import DenGraphIO
+.. code:: python
+    from dengraph.graphs.distance_graph import DistanceGraph
+    from dengraph.dengraph import DenGraphIO
 
-# Graph with defined nodes, edges from distance function
-graph = DistanceGraph(
-    nodes=(1, 2, 3, 4, 5, 10, 11, 13, 14, 15, 17, 22, 23, 24, 25, 28, 29, 30, 31),
-    distance=lambda node_from, node_to: abs(node_from - node_to)
-)
-# Cluster the graph
-clustered_data = DenGraphIO(graph, cluster_distance=2, core_neighbours=3).clusters
-# And print clusters
-for cluster in sorted(clustered_data, key=lambda clstr: min(clstr)):
-    print(sorted(cluster))
-```
+    # Graph with defined nodes, edges from distance function
+    graph = DistanceGraph(
+        nodes=(1, 2, 3, 4, 5, 10, 11, 13, 14, 15, 17, 22, 23, 24, 25, 28, 29, 30, 31),
+        distance=lambda node_from, node_to: abs(node_from - node_to)
+    )
+    # Cluster the graph
+    clustered_data = DenGraphIO(graph, cluster_distance=2, core_neighbours=3).clusters
+    # And print clusters
+    for cluster in sorted(clustered_data, key=lambda clstr: min(clstr)):
+        print(sorted(cluster))
 
 Further Information
 -------------------
