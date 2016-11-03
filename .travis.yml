@@ -1,0 +1,33 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "pypy"
+  - "pypy3"
+  - "3.5-dev" # 3.5 development branch
+  - "3.6-dev" # 3.6 development branch
+  - "nightly" # currently points to 3.7-dev
+os:
+  - linux
+#  - osx  # osx+python installation fails
+matrix:
+  # ignore all but the most recent, stable releases
+  allow_failures:
+  - python: "2.6"
+  - python: "3.2"
+  - python: "3.3"
+  - python: "3.5-dev"
+  - python: "3.6-dev"
+  - python: "nightly"
+before_script:
+  - if [[ $TRAVIS_PYTHON_VERSION != "3.2" ]]; then COVERAGE_SUPPORTED="Yes"; echo "coverage reports enabled"; fi
+  - if [[ -n "$COVERAGE_SUPPORTED" ]]; then pip install codecov; fi
+  - export COVERAGE_PROCESS_START=$(pwd)/.coveragerc
+script:
+  - if [[ -n "$COVERAGE_SUPPORTED" ]]; then coverage run setup.py test; else python setup.py test; fi
+after_success:
+  - if [[ -n "$COVERAGE_SUPPORTED" ]]; then coverage report && codecov; fi
