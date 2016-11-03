@@ -17,6 +17,7 @@ To use `dengraph` for clustering your data, two steps are required:
 - The graph must be fed to `dengraph.dengraph.DenGraphIO`.
 
 .. code:: python
+
     from dengraph.graphs.distance_graph import DistanceGraph
     from dengraph.dengraph import DenGraphIO
 
