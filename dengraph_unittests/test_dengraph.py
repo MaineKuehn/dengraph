@@ -1,3 +1,4 @@
+import textwrap
 import unittest
 import random
 import csv
@@ -5,6 +6,8 @@ import os
 import zipfile
 import sys
 import io
+
+import dengraph.graphs.graph_io
 
 from dengraph.dengraph import DenGraphIO
 from dengraph.graphs.distance_graph import DistanceGraph
@@ -101,7 +104,6 @@ class TestDenGraphIO(unittest.TestCase):
         self.assertEqual(0, len(io_graph.clusters))
         for node in nodes:
             io_graph[node] = {}
-
         self.assertEqual(len(validation_io_graph.clusters), len(io_graph.clusters))
         self.assertEqual(validation_io_graph, io_graph)
 
@@ -236,6 +238,88 @@ class TestDenGraphIO(unittest.TestCase):
         )
         for node in remove_nodes:
             del io_graph[node]
+        for cluster in io_graph.clusters:
+            print("cores: %s, borders: %s" % (cluster.core_nodes, cluster.border_nodes))
+        self.assertEqual(validation_io_graph, io_graph)
+
+    def test_remove_no_border_on_core(self):
+        literal = textwrap.dedent("""
+        1,2,3,4,5,6,7,8,9,10,11
+        0,1,1,1,1,1,0,0,0,1,1
+        1,0,0,0,0,0,1,1,1,1,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        1,1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        """.strip())
+        validation_literal = textwrap.dedent("""
+        1,3,4,5,6,7,8,9,10,11
+        0,1,1,1,1,0,8,9,1,1
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        """.strip())
+        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines())
+        io_graph = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=1,
+            core_neighbours=5)
+        del io_graph["2"]
+        validation_io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            cluster_distance=1,
+            core_neighbours=5)
+        self.assertEqual(validation_io_graph, io_graph)
+
+    def test_remove_border_on_core(self):
+        literal = textwrap.dedent("""
+        1,2,3,4,5,6,7,8,9,10,11
+        0,1,1,1,1,1,0,0,0,0,1
+        1,0,0,0,0,0,1,1,1,1,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        0,1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0,0
+        """.strip())
+        validation_literal = textwrap.dedent("""
+        1,3,4,5,6,7,8,9,10,11
+        0,1,1,1,1,0,8,9,0,1
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0,0,0
+        """.strip())
+        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines())
+        io_graph = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=1,
+            core_neighbours=5)
+        del io_graph["2"]
+        validation_io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            cluster_distance=1,
+            core_neighbours=5)
         self.assertEqual(validation_io_graph, io_graph)
 
     def test_real_world_example(self):
