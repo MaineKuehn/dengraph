@@ -62,9 +62,9 @@ Frequently Asked Questions
 
 - Why is there no ``DenGraph`` class?
 
-  We consider the original DenGraph algorithm to be broken.
+  The original DenGraph algorithm is unstable for unordered graphs.
   Since border nodes can belong to only one cluster, the first cluster wins - results depend on iteration order.
-  The ``DenGraphIO`` algorithm does not have this issue and perform equally well.
+  The ``DenGraphIO`` algorithm does not have this issue and performs equally well.
 
 - Why is ``DenGraphO`` the same class as ``DenGraphIO``?
 
