@@ -396,6 +396,38 @@ class TestDenGraphIO(unittest.TestCase):
         )
         self.assertEqual(validation_io_graph, io_graph)
 
+    def test_remove_edge_to_delete_cluster(self):
+        literal = textwrap.dedent("""
+        1,2,3,4,5,6
+        0,1,1,1,1,1
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        """.strip())
+        validation_literal = textwrap.dedent("""
+        1,2,3,4,5,6
+        0,1,1,1,1,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        1,0,0,0,0,0
+        0,0,0,0,0,0
+        """.strip())
+        io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines()),
+            cluster_distance=1,
+            core_neighbours=5
+        )
+        del io_graph["1":"6"]
+        validation_io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            cluster_distance=1,
+            core_neighbours=5
+        )
+        self.assertEqual(validation_io_graph, io_graph)
+
     def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=DistanceGraph):
         graph = graph_type(
             nodes=nodes,

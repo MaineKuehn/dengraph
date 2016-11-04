@@ -113,7 +113,10 @@ class DenGraphIO(dengraph.graph.Graph):
             if len(list(clusters)) <= 1:
                 self.noise.add(node)
                 self._finalized_cores.discard(node)
-        self.clusters.remove(cluster)
+        try:
+            self.clusters.remove(cluster)
+        except ValueError:
+            pass
 
     def _edge_removed(self, node, base, removed=False):
         is_downgraded, cluster, neighbours = self._test_change_from_core(node=node)
@@ -148,6 +151,11 @@ class DenGraphIO(dengraph.graph.Graph):
                     if degrades:
                         missing_cores.discard(core)
                         missing_borders.add(core)
+                for core in current_cores:
+                    degrades, cluster, neighbours = self._test_change_from_core(node=core)
+                    if degrades:
+                        current_cores.discard(core)
+                        current_borders.add(core)
                 if len(current_cores) == 0:
                     self._cluster_removed(cluster=cluster)
                 else:
@@ -277,12 +285,13 @@ class DenGraphIO(dengraph.graph.Graph):
     def __delitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
+            del self.graph[item]
             self._edge_removed(node=item.start, base=item.stop)
         else:
             neighbours = self.graph.get_neighbours(node=item, distance=self.cluster_distance)
             clusters = self._clusters_for_node(item)
             self._node_removed(node=item, neighbours=neighbours, clusters=clusters)
-        del self.graph[item]
+            del self.graph[item]
 
     def __iter__(self):
         for node in self.graph:
