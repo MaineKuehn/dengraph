@@ -238,8 +238,6 @@ class TestDenGraphIO(unittest.TestCase):
         )
         for node in remove_nodes:
             del io_graph[node]
-        for cluster in io_graph.clusters:
-            print("cores: %s, borders: %s" % (cluster.core_nodes, cluster.border_nodes))
         self.assertEqual(validation_io_graph, io_graph)
 
     def test_remove_no_border_on_core(self):

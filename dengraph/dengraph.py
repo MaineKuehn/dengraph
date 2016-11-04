@@ -107,13 +107,62 @@ class DenGraphIO(dengraph.graph.Graph):
         self.clusters.remove(cluster)
         self.clusters.extend(clustering.clusters)
 
-    def _edge_removed(self, nodes, removed_node=None):
-        for node in nodes:
-            is_downgraded, cluster, neighbours = self._test_change_from_core(node=node)
-            if is_downgraded:
-                self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
-                # TODO: border nodes need to be removed from cluster but only, if they don't have
-                # another core node that connects it to the current cluster
+    def _cluster_removed(self, cluster):
+        for node in cluster.border_nodes:
+            clusters = self._clusters_for_node(node=node)
+            if len(list(clusters)) <= 1:
+                self.noise.add(node)
+                self._finalized_cores.discard(node)
+        self.clusters.remove(cluster)
+
+    def _edge_removed(self, node, base, removed=False):
+        is_downgraded, cluster, neighbours = self._test_change_from_core(node=node)
+        if is_downgraded:
+            self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
+        if cluster:
+            if len(cluster.core_nodes) == 0:
+                # remove cluster
+                self._cluster_removed(cluster=cluster)
+            if base in cluster.core_nodes or base in cluster.border_nodes:
+                checked = set(neighbours + [base])
+                unchecked = set([node for node in neighbours if node != base])
+                current_cores = set()
+                current_borders = set()
+                while unchecked:
+                    checking = unchecked.pop()
+                    if not removed and checking == base:
+                        return
+                    if checking in cluster:
+                        neighbouring_neighbours = self.graph.get_neighbours(node=checking, distance=self.cluster_distance)
+                        if len(neighbouring_neighbours) >= self.core_neighbours:
+                            current_cores.add(checking)
+                        else:
+                            current_borders.add(checking)
+                        self._expand_unchecked(unchecked=unchecked, neighbours=neighbouring_neighbours, checked=checked)
+                missing_cores = cluster.core_nodes - current_cores
+                if removed:
+                    missing_cores.discard(base)
+                missing_borders = cluster.border_nodes - current_borders
+                for core in missing_cores:
+                    degrades, cluster, neighbours = self._test_change_from_core(node=core)
+                    if degrades:
+                        missing_cores.discard(core)
+                        missing_borders.add(core)
+                if len(current_cores) == 0:
+                    self._cluster_removed(cluster=cluster)
+                else:
+                    cluster.core_nodes = current_cores
+                    cluster.border_nodes = current_borders
+                if len(missing_cores) > 0:
+                    this_cluster = dengraph.cluster.DenGraphCluster(graph=self.graph)
+                    self.clusters.append(this_cluster)
+                    this_cluster.core_nodes = missing_cores
+                    this_cluster.border_nodes = missing_borders
+                else:
+                    for node in missing_borders:
+                        if len(list(self._clusters_for_node(node=node))) == 0:
+                            self.noise.add(node)
+                # TODO: we might still have border that belong to both clusters
 
     def _node_removed(self, node, neighbours, clusters):
         if node in self.noise:
@@ -121,13 +170,9 @@ class DenGraphIO(dengraph.graph.Graph):
             self.noise.discard(node)
         else:
             self._finalized_cores.discard(node)
-            for cluster in clusters:
-                if node in cluster.core_nodes:
-                    cluster.core_nodes.discard(node)
-                    self._recluster(cluster=cluster)
-                else:
-                    cluster.border_nodes.discard(node)
-            self._edge_removed(nodes=neighbours)
+            for neighbour in neighbours:
+                del self.graph[neighbour:node]
+                self._edge_removed(node=neighbour, base=node, removed=True)
 
     def _merge_neighbours(self, neighbours, cluster):
         for neighbour in neighbours:
@@ -232,13 +277,12 @@ class DenGraphIO(dengraph.graph.Graph):
     def __delitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
-            del self.graph[item]
-            self._edge_removed([item.start, item.stop])
+            self._edge_removed(node=item.start, base=item.stop)
         else:
             neighbours = self.graph.get_neighbours(node=item, distance=self.cluster_distance)
             clusters = self._clusters_for_node(item)
-            del self.graph[item]
             self._node_removed(node=item, neighbours=neighbours, clusters=clusters)
+        del self.graph[item]
 
     def __iter__(self):
         for node in self.graph:
