@@ -61,7 +61,13 @@ class DistanceGraph(graph.Graph):
     def __delitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
-            raise TypeError('%s does not support edge deletion' % self.__class__.__name__)
+            node_from, node_to = item.start, item.stop
+            if self.symmetric and hash(node_to) > hash(node_from):
+                node_to, node_from = node_from, node_to
+            try:
+                self._distance_values[node_from, node_to] = float("Inf")
+            except KeyError:
+                print("Error when removing edge...")
         else:
             try:
                 self._nodes.remove(item)

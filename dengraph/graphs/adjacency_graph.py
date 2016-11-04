@@ -110,14 +110,15 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 del self._adjacency[node_from][node_to]
             except KeyError:
                 raise dengraph.graph.NoSuchEdge
-        try:
-            del self._adjacency[item]
-        except KeyError:
-            raise dengraph.graph.NoSuchNode
         else:
-            # clean up all edges to this node
-            for node in self:
-                self._adjacency[node].pop(item, None)
+            try:
+                del self._adjacency[item]
+            except KeyError:
+                raise dengraph.graph.NoSuchNode
+            else:
+                # clean up all edges to this node
+                for node in self:
+                    self._adjacency[node].pop(item, None)
 
     def __iter__(self):
         return iter(self._adjacency)
