@@ -115,6 +115,7 @@ class Graph(dengraph.compat.ABCBase):
         :param node: node from which edges originate.
         :param distance: maximum allowed distance to other nodes.
         :return: list of neighbouring nodes
+        :raises NoSuchNode: if ``node`` not in graph
 
         :note: The result never includes `node`, even if there is an edge
                `graph[node:node] < distance`.

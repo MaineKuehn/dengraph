@@ -62,12 +62,13 @@ class DistanceGraph(graph.Graph):
         # a:b -> slice -> edge
         if isinstance(item, slice):
             node_from, node_to = item.start, item.stop
+            if node_from not in self._nodes:
+                raise graph.NoSuchEdge  # first edge node
+            elif node_to not in self._nodes:
+                raise graph.NoSuchEdge  # second edge node
             if self.symmetric and hash(node_to) > hash(node_from):
                 node_to, node_from = node_from, node_to
-            try:
-                self._distance_values[node_from, node_to] = float("Inf")
-            except KeyError:
-                print("Error when removing edge...")
+            self._distance_values[node_from, node_to] = float("Inf")
         else:
             try:
                 self._nodes.remove(item)
@@ -81,8 +82,8 @@ class DistanceGraph(graph.Graph):
                         continue
                     self._distance_values.pop((node, item), None)
 
-    def _compute_distance(self, node_from, node_to, force=False):
-        if not force and (node_from, node_to) in self._distance_values:
+    def _compute_distance(self, node_from, node_to):
+        if (node_from, node_to) in self._distance_values:
             return
         self._distance_values[node_from, node_to] = self.distance(node_from, node_to)
 
@@ -90,8 +91,11 @@ class DistanceGraph(graph.Graph):
         return iter(self._nodes)
 
     def get_neighbours(self, node, distance=graph.ANY_DISTANCE):
+        if node not in self._nodes:
+            raise graph.NoSuchNode
         if distance is graph.ANY_DISTANCE:
-            neighbours = list(self._nodes)
+            neighbours = self._nodes.copy()
+            neighbours.remove(node)
         else:
             neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
         return neighbours

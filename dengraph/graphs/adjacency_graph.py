@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import itertools
 import dengraph.graph
-import dengraph.utilities.iterutils
 import dengraph.utilities.pretty
 import dengraph.compat
 
@@ -53,7 +52,7 @@ class AdjacencyGraph(dengraph.graph.Graph):
     @staticmethod
     def _adjacency_from_dict(adjacency_dict, max_distance):
         adjacency = {}
-        for node, neighbours in dengraph.utilities.iterutils.iteritems(adjacency_dict):
+        for node, neighbours in dengraph.compat.viewitems(adjacency_dict):
             if max_distance is dengraph.graph.ANY_DISTANCE:
                 adjacency[node] = {other: neighbours[other] for other in neighbours}
             else:
