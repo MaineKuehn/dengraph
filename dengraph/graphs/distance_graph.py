@@ -91,8 +91,11 @@ class DistanceGraph(graph.Graph):
         return iter(self._nodes)
 
     def get_neighbours(self, node, distance=graph.ANY_DISTANCE):
+        if node not in self._nodes:
+            raise graph.NoSuchNode
         if distance is graph.ANY_DISTANCE:
-            neighbours = list(self._nodes)
+            neighbours = self._nodes.copy()
+            neighbours.remove(node)
         else:
             neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
         return neighbours
