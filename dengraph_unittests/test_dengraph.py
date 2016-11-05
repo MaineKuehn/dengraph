@@ -268,14 +268,14 @@ class TestDenGraphIO(unittest.TestCase):
         1,0,0,0,0,0,0,0,0,0
         1,0,0,0,0,0,0,0,0,0
         """.strip())
-        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines())
+        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True)
         io_graph = DenGraphIO(
             base_graph=graph,
             cluster_distance=1,
             core_neighbours=5)
         del io_graph["2"]
         validation_io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5)
         self.assertEqual(validation_io_graph, io_graph)
@@ -308,14 +308,14 @@ class TestDenGraphIO(unittest.TestCase):
         0,0,0,0,0,0,0,0,0,0
         1,0,0,0,0,0,0,0,0,0
         """.strip())
-        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines())
+        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True)
         io_graph = DenGraphIO(
             base_graph=graph,
             cluster_distance=1,
             core_neighbours=5)
         del io_graph["2"]
         validation_io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5)
         self.assertEqual(validation_io_graph, io_graph)
@@ -384,13 +384,13 @@ class TestDenGraphIO(unittest.TestCase):
         0,0,0,0,0,0,0
         """.strip())
         io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5
         )
         del io_graph["1":"7"]
         validation_io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5
         )
@@ -416,13 +416,13 @@ class TestDenGraphIO(unittest.TestCase):
         0,0,0,0,0,0
         """.strip())
         io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5
         )
         del io_graph["1":"6"]
         validation_io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=5
         )
@@ -456,12 +456,12 @@ class TestDenGraphIO(unittest.TestCase):
         0,0,0,0,0,1,0,0
         """.strip())
         io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=3
         )
         validation_io_graph = DenGraphIO(
-            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines()),
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
             cluster_distance=1,
             core_neighbours=3
         )

@@ -1,17 +1,20 @@
-dengraph - Density based Graph Clustering
+dengraph - Density-based Graph Clustering
 =========================================
 
-DenGraph clusters data based on point-to-point distance.
-It uses a density based approach:
-large groups of items which are close to each other form clusters.
-Isolated, distinct and uncommon items are left unclustered.
+DenGraph performs a density-based graph clustering.
+The algorithm was proposed as an extension for DBSCAN to support overlapping clusters.
+The approach is based around the neighbourhood of a node.
+The neighbourhood is defined by the *number* of reachable nodes within a given *distance*.
+Therefore, large groups of items which are close to each other form clusters.
+As DenGraph is a non-partitioning approach, isolated, distinct and uncommon items are left unclustered.
+Instead, they are treated as noise.
 
 Quick Overview
 --------------
 
 To use ``dengraph`` for clustering your data, two steps are required:
 
-- Your data must provided via the ``dengraph.graph.Graph`` interface.
+- Your data must be provided via the ``dengraph.graph.Graph`` interface.
   See the ``dengraph.graphs`` module for appropriate containers and examples.
 
 - The graph must be fed to ``dengraph.dengraph.DenGraphIO``.
@@ -62,22 +65,22 @@ Frequently Asked Questions
 
 - Why is there no ``DenGraph`` class?
 
-  The original DenGraph algorithm is unstable for unordered graphs.
+  The original DenGraph algorithm is non-deterministic for unordered graphs.
   Since border nodes can belong to only one cluster, the first cluster wins - results depend on iteration order.
   The ``DenGraphIO`` algorithm does not have this issue and performs equally well.
 
 - Why is ``DenGraphO`` the same class as ``DenGraphIO``?
 
   Algorithmically, ``DenGraphIO`` is basically ``DenGraphO`` *plus* the option to insert/remove/modify nodes/edges.
-  In the static case (just initialization), both are equivalent.
+  In the static case (just initialisation), both are equivalent.
   At the moment, we don't have any optimisations based on immutability of ``DenGraphO``.
-  The alias exists so that applications can distinguish between the two, possibly benefiting from future optimizations.
+  The alias exists so that applications can distinguish between the two, possibly benefiting from future optimisations.
 
 Acknowledgement
 ---------------
 
 This module is based on several publications:
 
-- **DenGraph-HO: a density-based hierarchical graph clustering algorithm**
-
-  by Nico Schlitter, Tanja Falkowski and Jörg Lässig
+- T. Falkowski, A. Barth, and M. Spiliopoulou, "DENGRAPH: A Density-based Community Detection Algorithm," presented at the IEEE/WIC/ACM International Conference on Web Intelligence (WI'07), 2007, pp. 112–115.
+- T. Falkowski, A. Barth, and M. Spiliopoulou, “Studying community dynamics with an incremental graph mining algorithm,” AMCIS 2008 Proceedings, 2008.
+- N. Schlitter, T. Falkowski, and J. Lässig, "DenGraph-HO - a density-based hierarchical graph clustering algorithm.," Expert Systems, vol. 31, no. 5, pp. 469–479, 2014.

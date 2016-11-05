@@ -39,6 +39,10 @@ class DenGraphCluster(dengraph.graph.Graph):
     def __getitem__(self, a_b):
         return self.graph[a_b]
 
+    def __delitem__(self, key):
+        self.core_nodes.discard(key)
+        self.border_nodes.discard(key)
+
     def __contains__(self, node):
         return node in self.border_nodes or node in self.core_nodes
 
