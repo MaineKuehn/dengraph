@@ -68,10 +68,7 @@ class DistanceGraph(graph.Graph):
                 raise graph.NoSuchEdge  # second edge node
             if self.symmetric and hash(node_to) > hash(node_from):
                 node_to, node_from = node_from, node_to
-            try:
-                self._distance_values[node_from, node_to] = float("Inf")
-            except KeyError:
-                print("Error when removing edge...")
+            self._distance_values[node_from, node_to] = float("Inf")
         else:
             try:
                 self._nodes.remove(item)
