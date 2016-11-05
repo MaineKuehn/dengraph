@@ -172,6 +172,14 @@ class TestDistanceGraph(unittest.TestCase):
                 with self.assertRaises(NoSuchNode):
                     graph.get_neighbours(node)
 
+    def test_add(self):
+        """Distance Graph: addition of graphs"""
+        for nodes in self.make_node_samples():
+            nodes_a, nodes_b = nodes[len(nodes) // 2:], nodes[:len(nodes) // 2]
+            distance = self.distance_cls()
+            graph_a, graph_b = self.graph_cls(nodes_a, distance), self.graph_cls(nodes_b, distance)
+            self.assertEqual(set(graph_a + graph_b), set(graph_b + graph_a))
+
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
