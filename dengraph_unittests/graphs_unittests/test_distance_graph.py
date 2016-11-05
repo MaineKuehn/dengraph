@@ -1,4 +1,3 @@
-import unittest
 import random
 import itertools
 
@@ -6,6 +5,8 @@ import itertools
 import dengraph.graphs.distance_graph
 from dengraph.graph import NoSuchNode, NoSuchEdge
 from dengraph.distances.delta_distance import DeltaDistance
+
+from dengraph_unittests.utility import unittest
 
 
 class TestDistanceGraph(unittest.TestCase):
