@@ -9,7 +9,7 @@ class Distance(dengraph.compat.ABCBase):
 
     All implementations of this ABC guarantee the following operators:
 
-    .. describe:: __call__(x, y, *[, default])
+    .. describe:: __call__(first, second, *[, default])
 
        Return the distance between node representations *x* and *y*.
 
@@ -50,7 +50,7 @@ class Distance(dengraph.compat.ABCBase):
     """
     is_symmetric = True
 
-    def __call__(self, x, y, default=None):
+    def __call__(self, first, second, default=None):
         raise NotImplementedError
 
     def mean(self, *args, **kwargs):
