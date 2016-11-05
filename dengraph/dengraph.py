@@ -228,7 +228,8 @@ class DenGraphIO(dengraph.graph.Graph):
         neighbours = self.graph.get_neighbours(node=node, distance=self.cluster_distance)
         self._edge_added(neighbours + [node], new_node=node)
 
-    def _expand_unchecked(self, unchecked, neighbours, checked=None):
+    @staticmethod
+    def _expand_unchecked(unchecked, neighbours, checked=None):
         to_be_checked = set(neighbours) - checked
         unchecked.update(to_be_checked)
         checked.update(to_be_checked)
