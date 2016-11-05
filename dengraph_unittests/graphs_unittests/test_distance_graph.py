@@ -15,8 +15,8 @@ class TestDistanceGraph(unittest.TestCase):
     graph_cls = dengraph.graphs.distance_graph.DistanceGraph
 
     @staticmethod
-    def random_nodes(length):
-        return [random.randint(-length * 10, length * 10) for _ in range(length)]
+    def random_nodes(length_hint):
+        return list({random.randint(-length_hint * 10, length_hint * 10) for _ in range(length_hint)})
 
     def make_node_samples(self, lengths=range(5, 101, 20)):
         yield [1, 2, 3, 10]
