@@ -256,7 +256,7 @@ class DenGraphIO(dengraph.graph.Graph):
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
-        self.clusters.sort(key=lambda clstr: len(clstr))
+        self.clusters.sort(key=len)
 
     def __contains__(self, item):
         for cluster in self.clusters:
@@ -288,7 +288,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 self._edge_added(nodes)
             else:
                 self._node_added(key)
-            self.clusters.sort(key=lambda clstr: len(clstr))
+            self.clusters.sort(key=len)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
