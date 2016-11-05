@@ -63,7 +63,7 @@ def viewvalues(mapping):
     try:
         return mapping.viewvalues()
     except AttributeError:
-        return mapping.keys()
+        return mapping.values()
 
 
 def viewitems(mapping):
@@ -75,7 +75,7 @@ def viewitems(mapping):
     try:
         return mapping.viewitems()
     except AttributeError:
-        return mapping.keys()
+        return mapping.items()
 
 
 # limit names we export to not expose implementation details
