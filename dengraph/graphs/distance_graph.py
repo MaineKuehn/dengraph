@@ -82,8 +82,8 @@ class DistanceGraph(graph.Graph):
                         continue
                     self._distance_values.pop((node, item), None)
 
-    def _compute_distance(self, node_from, node_to, force=False):
-        if not force and (node_from, node_to) in self._distance_values:
+    def _compute_distance(self, node_from, node_to):
+        if (node_from, node_to) in self._distance_values:
             return
         self._distance_values[node_from, node_to] = self.distance(node_from, node_to)
 
