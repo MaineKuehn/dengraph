@@ -72,6 +72,7 @@ class TestDistanceGraph(unittest.TestCase):
                 self.assertNotIn(slice(node_b, node_a), graph)
 
     def test_getitem_edge(self):
+        """Distance Graph: only edges for contained nodes"""
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for nodes in self.make_node_samples():
@@ -93,6 +94,31 @@ class TestDistanceGraph(unittest.TestCase):
             for node in nodes:
                 with self.assertRaises(TypeError):
                     graph[node]
+
+    def test_setitem_edge(self):
+        """Distance Graph: cannot set edges"""
+        for nodes in self.make_node_samples():
+            distance = self.distance_cls()
+            graph = self.graph_cls(nodes, distance)
+            for node_a, node_b in itertools.product(nodes, nodes):
+                with self.assertRaises(TypeError):
+                    graph[node_a:node_b] = 0
+            for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                with self.assertRaises(TypeError):
+                    graph[node_a:node_b] = 0
+                with self.assertRaises(TypeError):
+                    graph[node_b:node_a] = 0
+
+    def test_setitem_node(self):
+        """Distance Graph: set nodes"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls([], self.distance_cls())
+            last_len = 0
+            for node in nodes:
+                self.assertEqual(len(graph), last_len)
+                last_len += 1
+                graph[node] = {}
+            self.assertEqual(len(graph), last_len)
 
     def test_attributes(self):
         for nodes in self.make_node_samples():
