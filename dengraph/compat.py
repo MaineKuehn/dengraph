@@ -1,7 +1,7 @@
 """
 Compatibility for different python versions
 """
-# pylint: disable=invalid-name,undefined-variable
+# pylint: disable=invalid-name,undefined-variable,redefined-builtin
 from __future__ import absolute_import
 import sys
 import abc as _abc
