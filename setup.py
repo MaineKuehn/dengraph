@@ -56,4 +56,6 @@ if __name__ == '__main__':
         },
         # unit tests
         test_suite='dengraph_unittests',
+        # use unittest backport to have subTest etc.
+        tests_require=['unittest2'] if sys.version_info < (3, 4) else [],
     )
