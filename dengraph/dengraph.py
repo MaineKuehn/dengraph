@@ -118,69 +118,52 @@ class DenGraphIO(dengraph.graph.Graph):
         except ValueError:
             pass
 
+    def _validate_cluster(self, cluster, nodes, base=None):
+        unchecked, checked = set(nodes), set(nodes + [base])
+        tmp_cluster = dengraph.cluster.DenGraphCluster(graph=self.graph)
+        while unchecked:
+            checking = unchecked.pop()
+            if checking == base:
+                return
+            neighbours = cluster.get_neighbours(node=checking,
+                                                distance=self.cluster_distance)
+            if len(neighbours) >= self.core_neighbours:
+                tmp_cluster.categorize_node(node=checking, state=tmp_cluster.CORE_NODE)
+                self._expand_unchecked(unchecked=unchecked, checked=checked, neighbours=neighbours)
+            else:
+                tmp_cluster.categorize_node(node=checking, state=tmp_cluster.BORDER_NODE)
+        return tmp_cluster
+
     def _edge_removed(self, node, base, node_removed=False):
-        current_cores, current_borders = set(), set()
         is_downgraded, cluster, neighbours = self._test_change_from_core(node=node)
         if is_downgraded:
             self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
-            current_borders.add(node)
             if len(cluster.core_nodes) == 0:
                 # remove cluster
                 self._cluster_removed(cluster=cluster)
-        else:
-            current_cores.add(node)
         if cluster and base in cluster:
-            checked = set(neighbours + [node, base])
-            unchecked = set(neighbours)
-            while unchecked:
-                checking = unchecked.pop()
-                if checking == base:
-                    return
-                neighbouring_neighbours = cluster.get_neighbours(node=checking,
-                                                                 distance=self.cluster_distance)
-                if len(neighbouring_neighbours) >= self.core_neighbours:
-                    current_cores.add(checking)
-                    self._expand_unchecked(unchecked=unchecked,
-                                           neighbours=neighbouring_neighbours,
-                                           checked=checked)
-                else:
-                    current_borders.add(checking)
-            noise = cluster.core_nodes.union(cluster.border_nodes) - current_cores - current_borders
+            new_cluster = self._validate_cluster(cluster=cluster, nodes=neighbours + [node], base=base)
+            noise = cluster.core_nodes.union(cluster.border_nodes) - new_cluster.core_nodes - new_cluster.border_nodes
             # determine possible second cluster
             if node_removed and base in cluster.core_nodes:
-                condition = len(current_cores) < len(cluster.core_nodes) - 1
+                condition = len(new_cluster.core_nodes) < len(cluster.core_nodes) - 1
             else:
-                condition = len(current_cores) < len(cluster.core_nodes)
+                condition = len(new_cluster.core_nodes) < len(cluster.core_nodes)
             if condition:
-                checked = set([base])
-                unchecked = set([base])
-                split_cores, split_borders = set(), set()
-                while unchecked:
-                    checking = unchecked.pop()
-                    neighbouring_neighbours = cluster.get_neighbours(node=checking,
-                                                                     distance=self.cluster_distance)
-                    if len(neighbouring_neighbours) >= self.core_neighbours:
-                        split_cores.add(checking)
-                    else:
-                        split_borders.add(checking)
-                    self._expand_unchecked(unchecked=unchecked,
-                                           neighbours=neighbouring_neighbours,
-                                           checked=checked)
-                if len(split_cores) > 0:
-                    this_cluster = dengraph.cluster.DenGraphCluster(graph=self.graph)
-                    self.clusters.append(this_cluster)
-                    this_cluster.core_nodes = split_cores
-                    this_cluster.border_nodes = split_borders
-                    noise -= split_cores
-                    noise -= split_borders
+                neighbours = cluster.get_neighbours(node=base, distance=self.cluster_distance)
+                split_cluster = self._validate_cluster(cluster=cluster, nodes=neighbours + [base])
+                if len(split_cluster.core_nodes) > 0:
+                    self.clusters.append(split_cluster)
+                    noise -= split_cluster.core_nodes
+                    noise -= split_cluster.border_nodes
 
-            if len(current_cores) == 0:
+            if len(new_cluster.core_nodes) == 0:
                 self._cluster_removed(cluster=cluster)
             else:
                 if node_removed:
                     del cluster[base]
-                cluster.core_nodes = current_cores
-                cluster.border_nodes = current_borders
+                cluster.core_nodes = new_cluster.core_nodes
+                cluster.border_nodes = new_cluster.border_nodes
             # update noise
             for node in noise:
                 clusters = self._clusters_for_node(node=node)
