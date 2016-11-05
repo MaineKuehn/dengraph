@@ -38,7 +38,8 @@ if sys.version_info < (3, 3):
     import backports.range  # py2.X requires range backport
     range = backports.range.range
 else:
-    range = __builtins__.range
+    import builtins
+    range = builtins.range
 
 def viewkeys(mapping):
     """
