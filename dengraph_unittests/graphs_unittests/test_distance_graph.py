@@ -120,6 +120,41 @@ class TestDistanceGraph(unittest.TestCase):
                 graph[node] = {}
             self.assertEqual(len(graph), last_len)
 
+    def test_delitem_edge(self):
+        """Distance Graph: remove edges"""
+        for symmetric in (True, False):
+            with self.subTest(symmetric=symmetric):
+                for nodes in self.make_node_samples():
+                    distance = self.distance_cls()
+                    graph = self.graph_cls(nodes, distance, symmetric=symmetric)
+                    for node_a, node_b in itertools.product(nodes, nodes):
+                        del graph[node_a:node_b]
+                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                        with self.assertRaises(NoSuchEdge):
+                            del graph[node_a:node_b]
+                        with self.assertRaises(NoSuchEdge):
+                            del graph[node_b:node_a]
+
+    def test_delitem_node(self):
+        """Distance Graph: remove nodes"""
+        for symmetric in (True, False):
+            with self.subTest(symmetric=symmetric):
+                for nodes in self.make_node_samples():
+                    graph = self.graph_cls(nodes, self.distance_cls(), symmetric=symmetric)
+                    for node in (object(), None, max(nodes) + 1, min(nodes) - 1):
+                        with self.assertRaises(NoSuchNode):
+                            del graph[node]
+                    last_len = len(nodes)
+                    for node in nodes:
+                        self.assertEqual(len(graph), last_len)
+                        last_len -= 1
+                        del graph[node]
+                        with self.assertRaises(NoSuchNode):
+                            del graph[node]
+                    for node in (object(), None, max(nodes) + 1, min(nodes) - 1):
+                        with self.assertRaises(NoSuchNode):
+                            del graph[node]
+
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()

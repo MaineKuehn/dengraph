@@ -62,6 +62,10 @@ class DistanceGraph(graph.Graph):
         # a:b -> slice -> edge
         if isinstance(item, slice):
             node_from, node_to = item.start, item.stop
+            if node_from not in self._nodes:
+                raise graph.NoSuchEdge  # first edge node
+            elif node_to not in self._nodes:
+                raise graph.NoSuchEdge  # second edge node
             if self.symmetric and hash(node_to) > hash(node_from):
                 node_to, node_from = node_from, node_to
             try:
