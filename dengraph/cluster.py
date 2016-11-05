@@ -76,11 +76,38 @@ class DenGraphCluster(dengraph.graph.Graph):
         if isinstance(self, other.__class__):
             if self.graph != other.graph:
                 raise GraphError
-            graph = DenGraphCluster(self.graph)
-            graph.border_nodes = self.border_nodes.union(other.border_nodes)
-            graph.core_nodes = self.core_nodes.union(other.core_nodes)
-            graph.border_nodes = graph.border_nodes - graph.core_nodes
-            return graph
+            cluster = DenGraphCluster(self.graph)
+            cluster.border_nodes = self.border_nodes.union(other.border_nodes)
+            cluster.core_nodes = self.core_nodes.union(other.core_nodes)
+            cluster.border_nodes = cluster.border_nodes - cluster.core_nodes
+            return cluster
+        return NotImplemented
+
+    def __isub__(self, other):
+        if isinstance(self, other.__class__):
+            if self.graph != other.graph:
+                raise GraphError
+            if self == other:
+                return self
+            for node in other:
+                if node not in self:
+                    raise dengraph.graph.NoSuchNode
+            self.core_nodes = self.core_nodes - other.core_nodes
+            self.border_nodes = self.border_nodes - other.border_nodes
+            return self
+        return NotImplemented
+
+    def __sub__(self, other):
+        if isinstance(self, other.__class__):
+            if self.graph != other.graph:
+                raise GraphError
+            for node in other:
+                if node not in self:
+                    raise dengraph.graph.NoSuchNode
+            cluster = DenGraphCluster(self.graph)
+            cluster.border_nodes = self.border_nodes - other.border_nodes
+            cluster.core_nodes = self.core_nodes - other.core_nodes
+            return cluster
         return NotImplemented
 
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
