@@ -310,9 +310,9 @@ class DenGraphIO(dengraph.graph.Graph):
     def __eq__(self, other):
         if isinstance(self, other.__class__):
             if (
-                                len(self) != len(other) or
-                                self.cluster_distance != other.cluster_distance or
-                            self.core_neighbours != other.core_neighbours
+                len(self) != len(other) or
+                self.cluster_distance != other.cluster_distance or
+                self.core_neighbours != other.core_neighbours
             ):
                 return False
             elif self.noise != other.noise:
