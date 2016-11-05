@@ -89,9 +89,9 @@ class DenGraphCluster(dengraph.graph.Graph):
                 raise GraphError
             if self == other:
                 return self
-            for node in other:
-                if node not in self:
-                    raise dengraph.graph.NoSuchNode
+            if not (other.core_nodes.issubset(self.core_nodes) and
+                    other.border_nodes.issubset(self.border_nodes)):
+                raise dengraph.graph.NoSuchNode
             self.core_nodes = self.core_nodes - other.core_nodes
             self.border_nodes = self.border_nodes - other.border_nodes
             return self
@@ -101,9 +101,9 @@ class DenGraphCluster(dengraph.graph.Graph):
         if isinstance(self, other.__class__):
             if self.graph != other.graph:
                 raise GraphError
-            for node in other:
-                if node not in self:
-                    raise dengraph.graph.NoSuchNode
+            if not (other.core_nodes.issubset(self.core_nodes) and
+                    other.border_nodes.issubset(self.border_nodes)):
+                raise dengraph.graph.NoSuchNode
             cluster = DenGraphCluster(self.graph)
             cluster.border_nodes = self.border_nodes - other.border_nodes
             cluster.core_nodes = self.core_nodes - other.core_nodes
