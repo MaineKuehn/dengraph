@@ -20,8 +20,7 @@ class GraphIOTest(unittest.TestCase):
         return literal
 
     def test_default(self):
-        """
-        Test evaluation using default settings
+        """CSV GraphIO: using default settings
 
         string header, literals, any distance, ignore bool-False edges, asymmetric
         """
@@ -59,8 +58,16 @@ class GraphIOTest(unittest.TestCase):
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             graph['d':'c']
 
+    def test_header_invalid(self):
+        """CSV GraphIO: invalid header"""
+        literals = ["a,b", "0,1", "1,0"]
+        with self.assertRaises(TypeError):
+            graph = dengraph.graphs.graph_io.csv_graph_reader(
+                literals, nodes_header=None
+            )
+
     def test_header_none(self):
-        """Test default, enumerated header"""
+        """CSV GraphIO: default, enumerated header"""
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for size in (1, 5, 10, 20):
@@ -71,7 +78,7 @@ class GraphIOTest(unittest.TestCase):
                     self.assertHeaderMatrixGraph(list(range(size)), graph)
 
     def test_header_iterable(self):
-        """Test header from iterable"""
+        """CSV GraphIO: header from iterable"""
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for size in (1, 5, 10, 20):
@@ -83,7 +90,7 @@ class GraphIOTest(unittest.TestCase):
                     self.assertHeaderMatrixGraph(header, graph)
 
     def test_header_strings(self):
-        """Test header from first line as strings"""
+        """CSV GraphIO: header from first line as strings"""
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for size in (1, 5, 10, 20):
@@ -95,7 +102,7 @@ class GraphIOTest(unittest.TestCase):
                     self.assertHeaderMatrixGraph(header, graph)
 
     def test_header_call(self):
-        """Test header from first line as strings"""
+        """CSV GraphIO: header from first line as strings"""
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for size in (1, 5, 10, 20):
