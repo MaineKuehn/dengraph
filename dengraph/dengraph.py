@@ -329,7 +329,7 @@ class DenGraphIO(dengraph.graph.Graph):
             dengraph.utilities.pretty.repr_container(self.noise),
         )
 
-    def get_neighbours(self, node, distance):
+    def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
         raise NotImplementedError  # TODO: find closest nodes
 
 #: alias to have a separate name for future optimizations
