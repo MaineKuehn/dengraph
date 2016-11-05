@@ -11,6 +11,8 @@ from dengraph.distances.delta_distance import DeltaDistance
 class TestDistanceGraph(unittest.TestCase):
     #: the distance function/class with which to test
     distance_cls = DeltaDistance
+    #: distance graph class to test
+    graph_cls = dengraph.graphs.distance_graph.DistanceGraph
 
     @staticmethod
     def random_nodes(length):
@@ -22,11 +24,12 @@ class TestDistanceGraph(unittest.TestCase):
             yield self.random_nodes(length)
 
     def test_symmetric(self):
+        """Distance Graph: symmetric elements for symmetric distance"""
         if not self.distance_cls.is_symmetric:
             self.skipTest('Distance is not symmetric')
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
-            graph = dengraph.graphs.distance_graph.DistanceGraph(
+            graph = self.graph_cls(
                 nodes,
                 distance,
                 symmetric=True
@@ -52,7 +55,7 @@ class TestDistanceGraph(unittest.TestCase):
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
-            graph = dengraph.graphs.distance_graph.DistanceGraph(
+            graph = self.graph_cls(
                 nodes,
                 distance,
                 symmetric=True
@@ -71,7 +74,7 @@ class TestDistanceGraph(unittest.TestCase):
         threshold = 1
         nodes = list(range(maximum))
         distance = self.distance_cls()
-        graph = dengraph.graphs.distance_graph.DistanceGraph(
+        graph = self.graph_cls(
             nodes,
             distance,
             symmetric=True
@@ -82,7 +85,7 @@ class TestDistanceGraph(unittest.TestCase):
                               if elem != node and 0 <= elem < maximum])
 
     def test_exception(self):
-        graph = dengraph.graphs.distance_graph.DistanceGraph(
+        graph = self.graph_cls(
             nodes=[],
             distance=None,
             symmetric=True
