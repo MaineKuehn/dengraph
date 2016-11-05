@@ -1,6 +1,8 @@
 dengraph - Density-based Graph Clustering
 =========================================
 
+|travis| |codecov|
+
 DenGraph performs a density-based graph clustering.
 The algorithm was proposed as an extension for DBSCAN to support overlapping clusters.
 The approach is based around the neighbourhood of a node.
@@ -84,3 +86,12 @@ This module is based on several publications:
 - [1] T. Falkowski, A. Barth, and M. Spiliopoulou, "DENGRAPH: A Density-based Community Detection Algorithm," presented at the IEEE/WIC/ACM International Conference on Web Intelligence (WI'07), 2007, pp. 112–115.
 - [2] T. Falkowski, A. Barth, and M. Spiliopoulou, “Studying community dynamics with an incremental graph mining algorithm,” AMCIS 2008 Proceedings, 2008.
 - [3] N. Schlitter, T. Falkowski, and J. Lässig, "DenGraph-HO - a density-based hierarchical graph clustering algorithm.," Expert Systems, vol. 31, no. 5, pp. 469–479, 2014.
+
+
+.. |travis| image:: https://travis-ci.org/MaineKuehn/dengraph.svg?branch=master
+    :target: https://travis-ci.org/MaineKuehn/dengraph
+    :alt: Unit Tests
+
+.. |codecov| image:: https://codecov.io/gh/MaineKuehn/dengraph/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/MaineKuehn/dengraph
+  :alt: Code Coverage
