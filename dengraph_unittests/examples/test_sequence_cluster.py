@@ -48,9 +48,10 @@ def format_clustering(seq, dgraph):
             fmt += ' ' if elem_key is None else elem_key
     return fmt
 
-last_nbs = None
-for nbs, dist, dgrph in clusterings:
-    if nbs != last_nbs:
-        print('nbs-dst', format_sequence(sequence))
-        last_nbs = nbs
-    print('%3d %3d' % (nbs, dist), format_clustering(sequence, dgrph))
+if __name__ == "__main__":
+    last_nbs = None
+    for nbs, dist, dgrph in clusterings:
+        if nbs != last_nbs:
+            print('nbs-dst', format_sequence(sequence))
+            last_nbs = nbs
+        print('%3d %3d' % (nbs, dist), format_clustering(sequence, dgrph))
