@@ -4,7 +4,7 @@ import itertools
 
 
 import dengraph.graphs.distance_graph
-from dengraph.graph import NoSuchNode
+from dengraph.graph import NoSuchNode, NoSuchEdge
 from dengraph.distances.delta_distance import DeltaDistance
 
 
@@ -69,6 +69,30 @@ class TestDistanceGraph(unittest.TestCase):
                 self.assertIn(slice(node_a, node_b), graph)
             for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
                 self.assertNotIn(slice(node_a, node_b), graph)
+                self.assertNotIn(slice(node_b, node_a), graph)
+
+    def test_getitem_edge(self):
+        for symmetric in (True, False):
+            with self.subTest(symmetric=symmetric):
+                for nodes in self.make_node_samples():
+                    distance = self.distance_cls()
+                    graph = self.graph_cls(nodes, distance)
+                    for node_a, node_b in itertools.product(nodes, nodes):
+                        self.assertEqual(distance(node_a, node_b), graph[node_a:node_b])
+                        self.assertEqual(distance(node_a, node_b), graph[slice(node_a, node_b)])
+                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                        with self.assertRaises(NoSuchEdge):
+                            graph[node_a:node_b]
+                        with self.assertRaises(NoSuchEdge):
+                            graph[node_b:node_a]
+
+    def test_getitem_node(self):
+        """Distance Graph: cannot get nodes"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls(nodes, self.distance_cls())
+            for node in nodes:
+                with self.assertRaises(TypeError):
+                    graph[node]
 
     def test_attributes(self):
         for nodes in self.make_node_samples():
