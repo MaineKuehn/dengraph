@@ -81,6 +81,6 @@ Acknowledgement
 
 This module is based on several publications:
 
-- T. Falkowski, A. Barth, and M. Spiliopoulou, "DENGRAPH: A Density-based Community Detection Algorithm," presented at the IEEE/WIC/ACM International Conference on Web Intelligence (WI'07), 2007, pp. 112–115.
-- T. Falkowski, A. Barth, and M. Spiliopoulou, “Studying community dynamics with an incremental graph mining algorithm,” AMCIS 2008 Proceedings, 2008.
-- N. Schlitter, T. Falkowski, and J. Lässig, "DenGraph-HO - a density-based hierarchical graph clustering algorithm.," Expert Systems, vol. 31, no. 5, pp. 469–479, 2014.
+- [1] T. Falkowski, A. Barth, and M. Spiliopoulou, "DENGRAPH: A Density-based Community Detection Algorithm," presented at the IEEE/WIC/ACM International Conference on Web Intelligence (WI'07), 2007, pp. 112–115.
+- [2] T. Falkowski, A. Barth, and M. Spiliopoulou, “Studying community dynamics with an incremental graph mining algorithm,” AMCIS 2008 Proceedings, 2008.
+- [3] N. Schlitter, T. Falkowski, and J. Lässig, "DenGraph-HO - a density-based hierarchical graph clustering algorithm.," Expert Systems, vol. 31, no. 5, pp. 469–479, 2014.
