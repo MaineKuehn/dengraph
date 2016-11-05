@@ -57,7 +57,9 @@ class AdjacencyGraph(dengraph.graph.Graph):
             if max_distance is dengraph.graph.ANY_DISTANCE:
                 adjacency[node] = {other: neighbours[other] for other in neighbours}
             else:
-                adjacency[node] = {other: neighbours[other] for other in neighbours if neighbours[other] <= max_distance}
+                adjacency[node] = {
+                    other: neighbours[other] for other in neighbours if neighbours[other] <= max_distance
+                }
         return adjacency
 
     def __contains__(self, item):

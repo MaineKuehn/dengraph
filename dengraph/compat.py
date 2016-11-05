@@ -41,6 +41,7 @@ else:
     import builtins
     range = builtins.range
 
+
 def viewkeys(mapping):
     """
     Get a key view to a mapping

@@ -27,10 +27,10 @@ def repr_container(container, max_elements=1, max_chars=10):
     else:  # elif isinstance(container, (set, frozenset, list, tuple)):
         citer = iter(container)
         item_repr = ', '.join(repr(next(citer)) for _ in range(max_elements))
-    start, stop = container_symbols.get(type(container), '<>')
+    start, stop = CONTAINER_SYMBOLS.get(type(container), '<>')
     return start + item_repr + ', <%d elements>' % (len(container) - max_elements) + stop
 
-container_symbols = {
+CONTAINER_SYMBOLS = {
     list: '[]',
     tuple: '()',
     dict: '{}',

@@ -143,9 +143,10 @@ def csv_graph_reader(
         raise TypeError("parameter 'nodes_header' must be True, False, an iterable or a callable")
     # merge edge conditions to reduce checks
     if max_distance is dengraph.graph.ANY_DISTANCE:
-        _valid_edge = lambda edge: valid_edge(edge)
+        _valid_edge = valid_edge
     else:
-        _valid_edge = lambda edge: valid_edge(edge) and edge <= max_distance
+        def _valid_edge(this_edge):
+            return valid_edge(this_edge) and this_edge <= max_distance
     # fill graph with nodes
     graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(dict.fromkeys(nodes, {}))
     # still need to consume the first line as content if not unset
