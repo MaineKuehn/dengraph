@@ -156,6 +156,22 @@ class TestDistanceGraph(unittest.TestCase):
                         with self.assertRaises(NoSuchNode):
                             del graph[node]
 
+    def test_neighbours_any(self):
+        """Distance Graph: get all neighbour nodes"""
+        for nodes in self.make_node_samples():
+            distance = self.distance_cls()
+            graph = self.graph_cls(nodes, distance)
+            for node in nodes:
+                neighbours = graph.get_neighbours(node)
+                self.assertNotIn(node, neighbours)
+                self.assertEqual(len(neighbours), len(graph) - 1)
+                expected = set(nodes)
+                expected.remove(node)
+                self.assertSetEqual(neighbours, expected)
+            for node in (object(), None, max(nodes) + 1, min(nodes) - 1):
+                with self.assertRaises(NoSuchNode):
+                    graph.get_neighbours(node)
+
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
@@ -184,9 +200,13 @@ class TestDistanceGraph(unittest.TestCase):
             symmetric=True
         )
         for node in nodes:
-            self.assertEqual(graph.get_neighbours(node, distance=threshold),
-                             [elem for elem in range(node-threshold, node+threshold+1)
-                              if elem != node and 0 <= elem < maximum])
+            self.assertEqual(
+                graph.get_neighbours(node, distance=threshold),
+                [
+                    elem for elem in range(node-threshold, node+threshold+1)
+                    if elem != node and 0 <= elem < maximum
+                ]
+            )
 
     def test_exception(self):
         graph = self.graph_cls(
