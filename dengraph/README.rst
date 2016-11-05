@@ -1,7 +1,7 @@
 dengraph - Density-based Graph Clustering
 =========================================
 
-|travis| |codecov|
+|travis| |codecov| |landscape|
 
 DenGraph performs a density-based graph clustering.
 The algorithm was proposed as an extension for DBSCAN to support overlapping clusters.
@@ -95,3 +95,7 @@ This module is based on several publications:
 .. |codecov| image:: https://codecov.io/gh/MaineKuehn/dengraph/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/MaineKuehn/dengraph
   :alt: Code Coverage
+
+.. |landscape| image:: https://landscape.io/github/MaineKuehn/dengraph/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/MaineKuehn/dengraph/master
+   :alt: Code Health
