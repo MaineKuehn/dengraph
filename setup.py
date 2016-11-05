@@ -3,8 +3,8 @@ Setup for building, installing and testing the :py:mod:`dengraph` package
 
 All unittests can be run via `python setup.py test`.
 """
-
 import os
+import sys
 from setuptools import setup, find_packages
 
 repo_base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -12,6 +12,13 @@ repo_base_dir = os.path.abspath(os.path.dirname(__file__))
 package_about = {}
 with open(os.path.join(repo_base_dir, "dengraph", "__about__.py")) as f:
     exec(f.read(), package_about)
+
+
+# other modules/packages required
+dependencies = []  # 'matplotlib', 'package', 'package',
+if sys.version_info < (3, 3):
+    dependencies.append('backports.range')
+
 
 if __name__ == '__main__':
     setup(
@@ -42,9 +49,7 @@ if __name__ == '__main__':
         # what we provide               V but not any of these
         packages=find_packages(exclude=('dengraph_*',)),
         # what we need
-        install_requires=[
-            # 'matplotlib', 'package', 'package',
-        ],
+        install_requires=dependencies,
         # what we need for special things
         extras_require={
             # 'feature': ['package', 'package'], 'feature': []

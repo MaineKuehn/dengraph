@@ -34,6 +34,12 @@ except AttributeError:
         __metaclass__ = _abc.ABCMeta
 
 
+if sys.version_info < (3, 3):
+    import backports.range  # py2.X requires range backport
+    range = backports.range.range
+else:
+    range = __builtins__.range
+
 def viewkeys(mapping):
     """
     Get a key view to a mapping
@@ -74,5 +80,6 @@ def viewitems(mapping):
 __all__ = [
     'compat_version',
     'collections_abc', 'ABCBase',
+    'range',
     'viewkeys', 'viewvalues', 'viewitems',
 ]
