@@ -136,10 +136,13 @@ class DenGraphIO(dengraph.graph.Graph):
                 checking = unchecked.pop()
                 if checking == base:
                     return
-                neighbouring_neighbours = cluster.get_neighbours(node=checking, distance=self.cluster_distance)
+                neighbouring_neighbours = cluster.get_neighbours(node=checking,
+                                                                 distance=self.cluster_distance)
                 if len(neighbouring_neighbours) >= self.core_neighbours:
                     current_cores.add(checking)
-                    self._expand_unchecked(unchecked=unchecked, neighbours=neighbouring_neighbours, checked=checked)
+                    self._expand_unchecked(unchecked=unchecked,
+                                           neighbours=neighbouring_neighbours,
+                                           checked=checked)
                 else:
                     current_borders.add(checking)
             noise = cluster.core_nodes.union(cluster.border_nodes) - current_cores - current_borders
@@ -154,12 +157,15 @@ class DenGraphIO(dengraph.graph.Graph):
                 split_cores, split_borders = set(), set()
                 while unchecked:
                     checking = unchecked.pop()
-                    neighbouring_neighbours = cluster.get_neighbours(node=checking, distance=self.cluster_distance)
+                    neighbouring_neighbours = cluster.get_neighbours(node=checking,
+                                                                     distance=self.cluster_distance)
                     if len(neighbouring_neighbours) >= self.core_neighbours:
                         split_cores.add(checking)
                     else:
                         split_borders.add(checking)
-                    self._expand_unchecked(unchecked=unchecked, neighbours=neighbouring_neighbours, checked=checked)
+                    self._expand_unchecked(unchecked=unchecked,
+                                           neighbours=neighbouring_neighbours,
+                                           checked=checked)
                 if len(split_cores) > 0:
                     this_cluster = dengraph.cluster.DenGraphCluster(graph=self.graph)
                     self.clusters.append(this_cluster)
@@ -243,16 +249,23 @@ class DenGraphIO(dengraph.graph.Graph):
                     checked = set([node])
                     this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
                     self.clusters.append(this_cluster)
-                    self._add_node_to_cluster(node=node, cluster=this_cluster, state=this_cluster.CORE_NODE)
+                    self._add_node_to_cluster(node=node,
+                                              cluster=this_cluster,
+                                              state=this_cluster.CORE_NODE)
                     self._expand_unchecked(unchecked, neighbours, checked)
                     while unchecked:
                         checking = unchecked.pop()
-                        neighbours = self.graph.get_neighbours(node=checking, distance=self.cluster_distance)
+                        neighbours = self.graph.get_neighbours(node=checking,
+                                                               distance=self.cluster_distance)
                         if len(neighbours) >= self.core_neighbours:
-                            self._add_node_to_cluster(node=checking, cluster=this_cluster, state=this_cluster.CORE_NODE)
+                            self._add_node_to_cluster(node=checking,
+                                                      cluster=this_cluster,
+                                                      state=this_cluster.CORE_NODE)
                             self._expand_unchecked(unchecked, neighbours, checked)
                         else:
-                            self._add_node_to_cluster(node=checking, cluster=this_cluster, state=this_cluster.BORDER_NODE)
+                            self._add_node_to_cluster(node=checking,
+                                                      cluster=this_cluster,
+                                                      state=this_cluster.BORDER_NODE)
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
