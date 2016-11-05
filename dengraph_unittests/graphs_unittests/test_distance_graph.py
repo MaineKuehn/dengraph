@@ -38,6 +38,38 @@ class TestDistanceGraph(unittest.TestCase):
                 self.assertEqual(distance(node_a, node_b), graph[node_a:node_b])
                 self.assertEqual(graph[node_a:node_b], graph[node_b:node_a])
 
+    def test_len(self):
+        """Distance Graph: length is node count"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls(nodes, self.distance_cls())
+            self.assertEqual(len(graph), len(nodes))
+
+    def test_iter(self):
+        """Distance Graph: iter produces all nodes"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls(nodes, self.distance_cls())
+            self.assertSetEqual(set(iter(graph)), set(nodes))
+
+    def test_contains_node(self):
+        """Distance Graph: node in graph"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls(nodes, self.distance_cls())
+            for node in nodes:
+                self.assertIn(node, graph)
+            self.assertNotIn(object(), graph)
+            self.assertNotIn(None, graph)
+            self.assertNotIn(max(nodes) + 1, graph)
+            self.assertNotIn(min(nodes) - 1, graph)
+
+    def test_contains_edge(self):
+        """Distance Graph: edge in graph"""
+        for nodes in self.make_node_samples():
+            graph = self.graph_cls(nodes, self.distance_cls())
+            for node_a, node_b in itertools.product(nodes, nodes):
+                self.assertIn(slice(node_a, node_b), graph)
+            for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                self.assertNotIn(slice(node_a, node_b), graph)
+
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
