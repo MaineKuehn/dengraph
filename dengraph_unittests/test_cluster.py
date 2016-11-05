@@ -1,5 +1,7 @@
 import unittest
 
+import dengraph.graph
+
 from dengraph.cluster import DenGraphCluster, GraphError
 from dengraph.graphs.distance_graph import DistanceGraph
 
@@ -68,3 +70,57 @@ class TestDenGraphCluster(unittest.TestCase):
         cluster_a += cluster_b
         self.assertEqual(set([1, 2]), cluster_a.core_nodes)
         self.assertEqual(set([3, 4]), cluster_a.border_nodes)
+
+    def test_sub_differing_graphs(self):
+        cluster_a = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        ))
+        cluster_b = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        ))
+        with self.assertRaises(GraphError):
+            cluster_a - cluster_b
+        with self.assertRaises(GraphError):
+            cluster_a -= cluster_b
+
+    def test_sub(self):
+        graph = DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        )
+        cluster_a = DenGraphCluster(graph=graph)
+        cluster_b = DenGraphCluster(graph=graph)
+        cluster_a.border_nodes = set([2, 3])
+        cluster_a.core_nodes = set([1])
+        cluster_b.border_nodes = set([3])
+        cluster_b.core_nodes = set([])
+
+        cluster_c = cluster_a - cluster_b
+        self.assertNotEqual(cluster_c, cluster_a)
+        self.assertNotEqual(cluster_c, cluster_b)
+        self.assertEqual(set([1]), cluster_c.core_nodes)
+        self.assertEqual(set([2]), cluster_c.border_nodes)
+
+        cluster_a -= cluster_b
+        self.assertEqual(cluster_a, cluster_c)
+
+    def test_sub_no_node(self):
+        graph = DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        )
+        cluster_a = DenGraphCluster(graph=graph)
+        cluster_a.core_nodes = set([1,2])
+        cluster_b = DenGraphCluster(graph=graph)
+        cluster_b.core_nodes = set([2, 3])
+
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            cluster_a - cluster_b
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            cluster_a -= cluster_b
