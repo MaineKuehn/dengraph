@@ -43,6 +43,9 @@ class DenGraphCluster(dengraph.graph.Graph):
         self.core_nodes.discard(key)
         self.border_nodes.discard(key)
 
+    def __setitem__(self, key, value):
+        raise TypeError('Cannot add new nodes/edges to cluster')
+
     def __contains__(self, node):
         return node in self.border_nodes or node in self.core_nodes
 
