@@ -29,7 +29,6 @@ class DenGraphIO(dengraph.graph.Graph):
         self.core_neighbours = core_neighbours
         self.clusters = []
         self.noise = set()
-        self._finalized_cores = set()
         self._init_cluster()
 
     def _merge_clusters(self, base_cluster, cluster):
@@ -63,7 +62,6 @@ class DenGraphIO(dengraph.graph.Graph):
     def _add_node_to_cluster(self, node, cluster, state):
         cluster.categorize_node(node, state)
         self.noise.discard(node)
-        self._finalized_cores.add(node)
 
     def _test_change_to_core(self, node):
         """
@@ -172,7 +170,6 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def _node_removed(self, node, neighbours):
         if node not in self.noise:
-            self._finalized_cores.discard(node)
             for neighbour in neighbours:
                 del self.graph[neighbour:node]
                 del self.graph[node:neighbour]
