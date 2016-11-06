@@ -21,6 +21,19 @@ class TestDenGraphCluster(unittest.TestCase):
         cluster.categorize_node(1, cluster.BORDER_NODE)
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
 
+    def test_recategorisation(self):
+        cluster = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1,2,3,4],
+            distance=None,
+            symmetric=True
+        ))
+        cluster.categorize_node(1, cluster.CORE_NODE)
+        self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
+        cluster.categorize_node(1, cluster.BORDER_NODE)
+        self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
+        cluster.categorize_node(1, cluster.CORE_NODE)
+        self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
+
     def test_add_differing_graphs(self):
         cluster_a = DenGraphCluster(graph=DistanceGraph(
             nodes=[1, 2, 3],
