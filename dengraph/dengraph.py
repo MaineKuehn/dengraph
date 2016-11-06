@@ -254,9 +254,12 @@ class DenGraphIO(dengraph.graph.Graph):
         self.clusters.sort(key=len)
 
     def __contains__(self, item):
-        for cluster in self.clusters:
-            if item in cluster:
-                return True
+        if isinstance(item, slice):
+            return item.start in self and item.stop in self
+        else:
+            for cluster in self.clusters:
+                if item in cluster:
+                    return True
         return False
 
     def __len__(self):
