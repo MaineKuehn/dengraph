@@ -4,6 +4,7 @@ import dengraph.graph
 
 from dengraph.cluster import DenGraphCluster, GraphError
 from dengraph.graphs.distance_graph import DistanceGraph
+from dengraph.distances.delta_distance import DeltaDistance
 
 
 class TestDenGraphCluster(unittest.TestCase):
@@ -33,6 +34,22 @@ class TestDenGraphCluster(unittest.TestCase):
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
         cluster.categorize_node(1, cluster.CORE_NODE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
+
+    def test_get(self):
+        cluster = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1,2,3,4],
+            distance=DeltaDistance(),
+            symmetric=True
+        ))
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            cluster[1:2]
+        cluster.categorize_node(1, cluster.CORE_NODE)
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            cluster[1:2]
+        cluster.categorize_node(2, cluster.BORDER_NODE)
+        self.assertEqual(1, cluster[1:2])
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            cluster[3:2]
 
     def test_add_differing_graphs(self):
         cluster_a = DenGraphCluster(graph=DistanceGraph(
