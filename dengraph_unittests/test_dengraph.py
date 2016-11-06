@@ -30,6 +30,23 @@ class TestDenGraphIO(unittest.TestCase):
     def random_nodes(length, base):
         return [random.randint(base, 2*base) for _ in range(length)]
 
+    def test_containment(self):
+        io_graph = DenGraphIO(
+            base_graph=CachedDistanceGraph(
+                nodes=[1, 2, 3, 4],
+                distance=self.distance_cls(),
+                symmetric=True
+            ),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        self.assertFalse(1 in io_graph)
+        self.assertFalse(slice(1, 2) in io_graph)
+        io_graph[5] = {}
+        io_graph[6] = {}
+        self.assertTrue(1 in io_graph)
+        self.assertTrue(slice(1, 2) in io_graph)
+
     def test_noise(self):
         graph = CachedDistanceGraph(
             nodes=[1, 2, 3, 4, 5, 6, 20],
