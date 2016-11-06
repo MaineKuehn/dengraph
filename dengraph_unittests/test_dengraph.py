@@ -10,7 +10,7 @@ import io
 import dengraph.graphs.graph_io
 
 from dengraph.dengraph import DenGraphIO
-from dengraph.graphs.distance_graph import DistanceGraph
+from dengraph.graphs.distance_graph import CachedDistanceGraph
 
 import dengraph_unittests
 
@@ -31,7 +31,7 @@ class TestDenGraphIO(unittest.TestCase):
         return [random.randint(base, 2*base) for _ in range(length)]
 
     def test_noise(self):
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=[1, 2, 3, 4, 5, 6, 20],
             distance=self.distance_cls(),
             symmetric=True
@@ -44,7 +44,7 @@ class TestDenGraphIO(unittest.TestCase):
         self.assertEqual(set([20]), io_graph.noise)
 
     def test_simple_graph(self):
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=self.random_nodes(100, 10) + self.random_nodes(100, 40),
             distance=self.distance_cls(),
             symmetric=True
@@ -91,7 +91,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5)
 
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=[],
             distance=self.distance_cls(),
             symmetric=True
@@ -117,7 +117,7 @@ class TestDenGraphIO(unittest.TestCase):
             core_neighbours=5
         )
 
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=base_nodes,
             distance=self.distance_cls(),
             symmetric=True
@@ -133,7 +133,7 @@ class TestDenGraphIO(unittest.TestCase):
 
     def test_simple_noise(self):
         io_graph = DenGraphIO(
-            base_graph=DistanceGraph(
+            base_graph=CachedDistanceGraph(
                 nodes=[1, 2, 3, 4, 5, 6],
                 distance=self.distance_cls(),
                 symmetric=True
@@ -157,7 +157,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=base_nodes+remove_nodes,
             distance=self.distance_cls(),
             symmetric=True
@@ -182,7 +182,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=base_nodes + remove_nodes,
             distance=self.distance_cls(),
             symmetric=True
@@ -205,7 +205,7 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        graph = DistanceGraph(
+        graph = CachedDistanceGraph(
             nodes=base_nodes + remove_nodes,
             distance=self.distance_cls(),
             symmetric=True
@@ -229,7 +229,7 @@ class TestDenGraphIO(unittest.TestCase):
             core_neighbours=5
         )
         io_graph = DenGraphIO(
-            base_graph=DistanceGraph(
+            base_graph=CachedDistanceGraph(
                 nodes=base_nodes + remove_nodes,
                 distance=self.distance_cls(),
                 symmetric=True),
@@ -352,7 +352,7 @@ class TestDenGraphIO(unittest.TestCase):
                         continue
                     distance.matrix.append([float(element) for element in row])
         dengraph = DenGraphIO(
-            base_graph=DistanceGraph(
+            base_graph=CachedDistanceGraph(
                 nodes=nodes,
                 distance=distance,
                 symmetric=True
@@ -468,7 +468,7 @@ class TestDenGraphIO(unittest.TestCase):
         del io_graph["5"]
         self.assertEqual(validation_io_graph, io_graph)
 
-    def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=DistanceGraph):
+    def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=CachedDistanceGraph):
         graph = graph_type(
             nodes=nodes,
             distance=distance(),

@@ -128,12 +128,15 @@ class TestDistanceGraph(unittest.TestCase):
                 for nodes in self.make_node_samples():
                     distance = self.distance_cls()
                     graph = self.graph_cls(nodes, distance, symmetric=symmetric)
+                    # cannot remove existing edges
                     for node_a, node_b in itertools.product(nodes, nodes):
-                        del graph[node_a:node_b]
-                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
-                        with self.assertRaises(NoSuchEdge):
+                        with self.assertRaises(TypeError):
                             del graph[node_a:node_b]
-                        with self.assertRaises(NoSuchEdge):
+                    # cannot remove invalid edges
+                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                        with self.assertRaises(TypeError):
+                            del graph[node_a:node_b]
+                        with self.assertRaises(TypeError):
                             del graph[node_b:node_a]
 
     def test_delitem_node(self):
@@ -225,3 +228,25 @@ class TestDistanceGraph(unittest.TestCase):
         self.assertIsNotNone(graph)
         with self.assertRaises(NoSuchNode):
             del graph[1]
+
+
+class TestCachedDistanceGraph(TestDistanceGraph):
+    #: the distance function/class with which to test
+    distance_cls = DeltaDistance
+    #: distance graph class to test
+    graph_cls = dengraph.graphs.distance_graph.CachedDistanceGraph
+
+    def test_delitem_edge(self):
+        """Distance Graph: remove edges"""
+        for symmetric in (True, False):
+            with self.subTest(symmetric=symmetric):
+                for nodes in self.make_node_samples():
+                    distance = self.distance_cls()
+                    graph = self.graph_cls(nodes, distance, symmetric=symmetric)
+                    for node_a, node_b in itertools.product(nodes, nodes):
+                        del graph[node_a:node_b]
+                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                        with self.assertRaises(NoSuchEdge):
+                            del graph[node_a:node_b]
+                        with self.assertRaises(NoSuchEdge):
+                            del graph[node_b:node_a]
