@@ -37,7 +37,14 @@ class DenGraphCluster(dengraph.graph.Graph):
             yield node
 
     def __getitem__(self, a_b):
-        return self.graph[a_b]
+        if isinstance(a_b, slice):
+            node_a, node_b = a_b.start, a_b.stop
+            if node_a not in self:
+                raise dengraph.graph.NoSuchEdge
+            if node_b not in self:
+                raise dengraph.graph.NoSuchEdge
+            return self.graph[a_b]
+        return NotImplemented
 
     def __delitem__(self, key):
         self.core_nodes.discard(key)
