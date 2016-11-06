@@ -75,6 +75,8 @@ class TestDenGraphCluster(unittest.TestCase):
         ))
         with self.assertRaises(GraphError):
             cluster_a + cluster_b
+        with self.assertRaises(GraphError):
+            cluster_a += cluster_b
 
     def test_add(self):
         graph = DistanceGraph(
