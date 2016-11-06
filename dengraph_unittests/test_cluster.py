@@ -152,6 +152,10 @@ class TestDenGraphCluster(unittest.TestCase):
         cluster_a -= cluster_b
         self.assertEqual(cluster_a, cluster_c)
 
+        cluster_a -= cluster_a
+        self.assertEqual(set([]), cluster_a.core_nodes)
+        self.assertEqual(set([]), cluster_a.border_nodes)
+
     def test_sub_no_node(self):
         graph = DistanceGraph(
             nodes=[1, 2, 3, 4],
