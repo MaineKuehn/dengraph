@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import, division
 import dengraph.compat
 
@@ -37,3 +38,26 @@ CONTAINER_SYMBOLS = {
     set: '{}',
     frozenset: ('f{', '}'),
 }
+
+
+def str_time(seconds):
+    """
+    Format time in seconds to a three-digit + unit format
+
+    :param seconds: time in seconds
+    :return: `str` representation in appropriate unit
+    """
+    if seconds is None:
+        return '---  s'
+    if seconds == 0:
+        return '0.0  s'
+    e_power = 18
+    for t_power, prefix in enumerate(u'EPTGMk mμnpfa'):
+        power = e_power - t_power * 3
+        p_num = seconds / (10 ** power)
+        if 1E3 > p_num > 1.0:
+            if p_num > 100:
+                return '%3.0f %ss' % (p_num, prefix)
+            if p_num > 10:
+                return '%2.0f. %ss' % (p_num, prefix)
+            return '%3.1f %ss' % (p_num, prefix)
