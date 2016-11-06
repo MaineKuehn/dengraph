@@ -47,6 +47,8 @@ class DenGraphCluster(dengraph.graph.Graph):
         return NotImplemented
 
     def __delitem__(self, key):
+        if isinstance(key, slice):
+            return NotImplemented
         self.core_nodes.discard(key)
         self.border_nodes.discard(key)
 
