@@ -62,6 +62,17 @@ class TestDenGraphCluster(unittest.TestCase):
         with self.assertRaises(TypeError):
             cluster[1] = {}
 
+    def test_deletion(self):
+        cluster = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        ))
+        cluster.categorize_node(1, cluster.CORE_NODE)
+        self.assertTrue(1 in cluster)
+        del cluster[1]
+        self.assertFalse(1 in cluster)
+
     def test_add_differing_graphs(self):
         cluster_a = DenGraphCluster(graph=DistanceGraph(
             nodes=[1, 2, 3],
