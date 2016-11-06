@@ -86,6 +86,52 @@ class TestDenGraphIO(unittest.TestCase):
         node_set = set(iter(io_graph))
         self.assertEqual(set([1, 2, 3, 4, 5, 6]), node_set)
 
+    def test_equality(self):
+        graph = CachedDistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=self.distance_cls(),
+            symmetric=True
+        )
+        io_graph_a = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        io_graph_b = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        self.assertEqual(io_graph_a, io_graph_b)
+        io_graph_b = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=6,
+            core_neighbours=5
+        )
+        self.assertNotEqual(io_graph_a, io_graph_b)
+        io_graph_b = DenGraphIO(
+            base_graph=graph,
+            cluster_distance=5,
+            core_neighbours=6
+        )
+        self.assertNotEqual(io_graph_a, io_graph_b)
+        io_graph_a[5] = {}
+        io_graph_a[6] = {}
+        io_graph_b = DenGraphIO(
+            base_graph=CachedDistanceGraph(
+                nodes=[1, 2, 3, 4],
+                distance=self.distance_cls(),
+                symmetric=True
+            ),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        io_graph_b[5] = {}
+        io_graph_b[6] = {}
+        self.assertEqual(io_graph_a, io_graph_b)
+        io_graph_b[12] = {}
+        self.assertNotEqual(io_graph_a, io_graph_b)
+
     def test_noise(self):
         graph = CachedDistanceGraph(
             nodes=[1, 2, 3, 4, 5, 6, 20],
