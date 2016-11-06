@@ -95,6 +95,8 @@ class DenGraphCluster(dengraph.graph.Graph):
             if self.graph != other.graph:
                 raise GraphError
             if self == other:
+                self.core_nodes.clear()
+                self.border_nodes.clear()
                 return self
             if not (other.core_nodes.issubset(self.core_nodes) and
                     other.border_nodes.issubset(self.border_nodes)):
