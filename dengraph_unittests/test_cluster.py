@@ -51,6 +51,17 @@ class TestDenGraphCluster(unittest.TestCase):
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[3:2]
 
+    def test_set(self):
+        cluster = DenGraphCluster(graph=DistanceGraph(
+            nodes=[1,2,3,4],
+            distance=None,
+            symmetric=True
+        ))
+        with self.assertRaises(TypeError):
+            cluster[1:2] = 1
+        with self.assertRaises(TypeError):
+            cluster[1] = {}
+
     def test_add_differing_graphs(self):
         cluster_a = DenGraphCluster(graph=DistanceGraph(
             nodes=[1, 2, 3],
