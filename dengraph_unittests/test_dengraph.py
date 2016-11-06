@@ -68,6 +68,24 @@ class TestDenGraphIO(unittest.TestCase):
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             io_graph[1:7]
 
+    def test_iteration(self):
+        io_graph = DenGraphIO(
+            base_graph=CachedDistanceGraph(
+                nodes=[1, 2, 3, 4],
+                distance=self.distance_cls(),
+                symmetric=True
+            ),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        with self.assertRaises(StopIteration):
+            next(iter(io_graph))
+        io_graph[5] = {}
+        io_graph[6] = {}
+        io_graph[12] = {}
+        node_set = set(iter(io_graph))
+        self.assertEqual(set([1, 2, 3, 4, 5, 6]), node_set)
+
     def test_noise(self):
         graph = CachedDistanceGraph(
             nodes=[1, 2, 3, 4, 5, 6, 20],
