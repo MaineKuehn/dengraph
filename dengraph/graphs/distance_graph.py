@@ -4,7 +4,7 @@ import dengraph.utilities.pretty
 
 
 class DistanceGraph(graph.Graph):
-    """
+    r"""
     Graph of nodes connected by a distance function
 
     :param nodes: all nodes contained in the graph
