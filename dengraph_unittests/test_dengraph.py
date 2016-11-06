@@ -7,6 +7,7 @@ import zipfile
 import sys
 import io
 
+import dengraph.graph
 import dengraph.graphs.graph_io
 
 from dengraph.dengraph import DenGraphIO
@@ -46,6 +47,26 @@ class TestDenGraphIO(unittest.TestCase):
         io_graph[6] = {}
         self.assertTrue(1 in io_graph)
         self.assertTrue(slice(1, 2) in io_graph)
+
+    def test_get(self):
+        io_graph = DenGraphIO(
+            base_graph=CachedDistanceGraph(
+                nodes=[1, 2, 3, 4],
+                distance=self.distance_cls(),
+                symmetric=True
+            ),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            io_graph[1]
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            io_graph[1:2]
+        io_graph[5] = {}
+        io_graph[6] = {}
+        self.assertEqual(1, io_graph[1:2])
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            io_graph[1:7]
 
     def test_noise(self):
         graph = CachedDistanceGraph(
