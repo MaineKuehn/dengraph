@@ -108,3 +108,25 @@ class TestAdjacencyGraph(unittest.TestCase):
             graph[9:10]
         with self.assertRaises(TypeError):
             graph[8]
+
+    def test_set(self):
+        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+            1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
+            2: {1: 1},
+            3: {1: 1},
+            4: {1: 1},
+            5: {1: 1},
+            6: {1: 2, 7: 1},
+            7: {6: 1},
+            8: {1: 1}
+        }, max_distance=1)
+        self.assertFalse(slice(1, 6) in graph)
+        graph[1:6] = 2
+        self.assertEqual(2, graph[1:6])
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[1:9] = 1
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[9:1] = 1
+        graph[9] = {}
+        graph[9:1] = 1
+        self.assertEqual(1, graph[1:9])
