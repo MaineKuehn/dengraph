@@ -83,5 +83,14 @@ class IncrementalDistance(Distance):
        a :exc:`ValueError` is raised.
 
     """
+    def __call__(self, first, second, default=None):
+        raise NotImplementedError
+
+    def mean(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def median(self, *args, **kwargs):
+        raise NotImplementedError
+    
     def update(self, first, second, base_distance=0, default=None):
         raise NotImplemented
