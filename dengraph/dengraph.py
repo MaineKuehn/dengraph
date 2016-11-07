@@ -151,21 +151,23 @@ class DenGraphIO(dengraph.graph.Graph):
                 self._cluster_removed(cluster=cluster)
 
     def _check_cluster(self, nodes, core_cluster):
+        missing = set(nodes)
         try:
-            new_cluster = self._validate_cluster(cluster=core_cluster, nodes=[nodes[0]])
-            missing = set(nodes) - new_cluster.core_nodes
+            new_cluster = self._validate_cluster(cluster=core_cluster, nodes=[missing.pop()])
+            missing -= new_cluster.core_nodes
             noise = core_cluster.core_nodes.union(core_cluster.border_nodes) - \
                 new_cluster.core_nodes - new_cluster.border_nodes
-            if len(missing) > 0:
-                split_cluster = self._validate_cluster(cluster=core_cluster, nodes=list(missing))
+            while missing:
+                split_cluster = self._validate_cluster(cluster=core_cluster, nodes=[missing.pop()])
                 if len(split_cluster.core_nodes) > 0:
                     self._cluster_added(split_cluster)
                     noise -= split_cluster.core_nodes.union(split_cluster.border_nodes)
+                    missing -= split_cluster.core_nodes
             self._cluster_removed(cluster=core_cluster)
             if len(new_cluster.core_nodes) > 0:
                 self._cluster_added(new_cluster)
             self._remove_noise(candidates=noise)
-        except IndexError:
+        except KeyError:
             if len(core_cluster.core_nodes) <= 1:
                 self._cluster_removed(core_cluster)
 
