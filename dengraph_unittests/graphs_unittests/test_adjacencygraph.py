@@ -71,3 +71,20 @@ class TestAdjacencyGraph(unittest.TestCase):
         # create graph from wrong type
         with self.assertRaises(TypeError):
             dengraph.graphs.adjacency_graph.AdjacencyGraph(source=[1, 2, 3])
+
+    def test_containment(self):
+        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+            1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
+            2: {1: 1},
+            3: {1: 1},
+            4: {1: 1},
+            5: {1: 1},
+            6: {1: 2, 7: 1},
+            7: {6: 1},
+            8: {1: 1}
+        }, max_distance=1)
+        self.assertTrue(1 in graph)
+        self.assertTrue(6 in graph)
+        self.assertTrue(slice(6, 7) in graph)
+        self.assertFalse(slice(1, 6) in graph)
+        self.assertFalse(slice(6, 1) in graph)
