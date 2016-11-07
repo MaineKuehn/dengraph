@@ -163,3 +163,6 @@ class FrozenDenGraphCluster(DenGraphCluster):
 
     def __iadd__(self, other):
         raise TypeError('%s object does not support content modification' % self.__class__.__name__)
+
+    def __isub__(self, other):
+        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
