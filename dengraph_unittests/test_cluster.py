@@ -2,7 +2,7 @@ import unittest
 
 import dengraph.graph
 
-from dengraph.cluster import DenGraphCluster, GraphError
+from dengraph.cluster import DenGraphCluster, FrozenDenGraphCluster, GraphError
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.distances.delta_distance import DeltaDistance
 
@@ -182,3 +182,23 @@ class TestDenGraphCluster(unittest.TestCase):
             cluster_a - cluster_b
         with self.assertRaises(dengraph.graph.NoSuchNode):
             cluster_a -= cluster_b
+
+    def test_frozencluster(self):
+        graph = DistanceGraph(
+            nodes=[1, 2, 3, 4],
+            distance=None,
+            symmetric=True
+        )
+        cluster = DenGraphCluster(graph=graph)
+        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(2, cluster.BORDER_NODE)
+        cluster.categorize_node(3, cluster.BORDER_NODE)
+
+        frozen = FrozenDenGraphCluster(cluster)
+        with self.assertRaises(TypeError):
+            frozen.categorize_node(4, frozen.BORDER_NODE)
+        with self.assertRaises(TypeError):
+            frozen += cluster
+        with self.assertRaises(TypeError):
+            frozen -= cluster
+        self.assertIsNotNone({frozen: True})
