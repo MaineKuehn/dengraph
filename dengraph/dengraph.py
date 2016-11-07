@@ -121,7 +121,7 @@ class DenGraphIO(dengraph.graph.Graph):
         self.clusters.append(cluster)
 
     def _validate_cluster(self, cluster, nodes, base=None):
-        unchecked, checked = set(nodes), set(nodes + [base])
+        unchecked, checked = set(nodes), set(nodes)
         tmp_cluster = dengraph.cluster.DenGraphCluster(graph=self.graph)
         while unchecked:
             checking = unchecked.pop()
