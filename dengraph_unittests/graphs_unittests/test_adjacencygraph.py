@@ -150,3 +150,19 @@ class TestAdjacencyGraph(unittest.TestCase):
             del graph[6:7]
         with self.assertRaises(dengraph.graph.NoSuchNode):
             del graph[6]
+
+    def test_neighbours(self):
+        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+            1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
+            2: {1: 1},
+            3: {1: 1},
+            4: {1: 1},
+            5: {1: 1},
+            6: {1: 2, 7: 1},
+            7: {6: 1},
+            8: {1: 1}
+        })
+        self.assertEqual([2, 3, 4, 5, 6, 8], graph.get_neighbours(1))
+        self.assertEqual([2, 3, 4, 5, 8], graph.get_neighbours(1, distance=1))
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph.get_neighbours(9)
