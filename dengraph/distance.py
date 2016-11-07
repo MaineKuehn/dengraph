@@ -62,3 +62,26 @@ class Distance(dengraph.compat.ABCBase):
 
     def median(self, *args, **kwargs):
         raise NotImplementedError
+
+
+class IncrementalDistance(Distance):
+    """
+    An incremental distance provides the interface to efficiently calculate the distance between
+    two given objects. One of the objects is treated as a dynamic object. The distance therefore
+    builds upon a sequence of changes that are considered for updating the current distance value
+    based on the given changes.
+
+    .. function:: update(first, second, *[, base_distance, default])
+
+       Return the updated distance between node representations *first* and applied changes for
+       *second*.
+
+       There are two optional keyword-only argument. The *base_distance* is taken to apply the
+       distance changes to. If it is not given, a distance of 0 is considered. The *default*
+       argument specifies a distance to return if the distance for the given objects can not be
+       determined. If the distance can not be returned and *default* is not provided,
+       a :exc:`ValueError` is raised.
+
+    """
+    def update(self, first, second, base_distance=0, default=None):
+        raise NotImplemented
