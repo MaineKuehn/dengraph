@@ -49,6 +49,8 @@ class TestDenGraphVIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        self.assertEqual(2.5, next(io_graph.probe(1)))
+        _, distance = next(io_graph.probe(1))
+        self.assertEqual(2.5, distance)
         io_graph[7] = {}
-        self.assertEqual(3.0, next(io_graph.probe(1)))
+        _, distance = next(io_graph.probe(1))
+        self.assertEqual(3.0, distance)

@@ -29,7 +29,7 @@ class DenGraphVIO(DenGraphIO):
 
     def probe(self, virtual_node):
         for cluster in self.clusters:
-            yield self._distance_to_cluster(virtual_node, cluster)
+            yield cluster, self._distance_to_cluster(virtual_node, cluster)
 
     def _distance_to_cluster(self, node, cluster):
         distance = self.graph.distance
