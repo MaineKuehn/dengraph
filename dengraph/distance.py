@@ -91,6 +91,6 @@ class IncrementalDistance(Distance):
 
     def median(self, *args, **kwargs):
         raise NotImplementedError
-    
+
     def update(self, first, second, base_distance=0, default=None):
-        raise NotImplemented
+        raise NotImplementedError
