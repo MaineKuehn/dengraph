@@ -130,3 +130,23 @@ class TestAdjacencyGraph(unittest.TestCase):
         graph[9] = {}
         graph[9:1] = 1
         self.assertEqual(1, graph[1:9])
+
+    def test_deletion(self):
+        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+            1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
+            2: {1: 1},
+            3: {1: 1},
+            4: {1: 1},
+            5: {1: 1},
+            6: {1: 2, 7: 1},
+            7: {6: 1},
+            8: {1: 1}
+        }, max_distance=1)
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            del graph[1:6]
+        self.assertEqual(1, graph[6:7])
+        del graph[6]
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            del graph[6:7]
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            del graph[6]
