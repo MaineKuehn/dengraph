@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
-from dengraph import distance
+import dengraph.distance
 
 
-class DeltaDistance(distance.Distance):
+class DeltaDistance(dengraph.distance.Distance):
     def __call__(self, x, y, default=None):
         return abs(x - y)
 
@@ -26,3 +26,11 @@ class DeltaDistance(distance.Distance):
             if "default" in kwargs:
                 return kwargs.get("default")
             raise ValueError()
+
+
+class IncrementalDeltaDistance(DeltaDistance, dengraph.distance.IncrementalDistance):
+    def update(self, first, second, base_distance=0, default=None):
+        result = base_distance
+        for change in second:
+            result = self(base_distance, change)
+        return result
