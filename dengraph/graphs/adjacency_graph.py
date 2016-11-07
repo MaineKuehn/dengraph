@@ -130,7 +130,7 @@ class AdjacencyGraph(dengraph.graph.Graph):
         try:
             adjacency_list = self._adjacency[node]
         except KeyError:
-            return []
+            raise dengraph.graph.NoSuchNode
         else:
             if distance is dengraph.graph.ANY_DISTANCE:
                 return list(adjacency_list)
