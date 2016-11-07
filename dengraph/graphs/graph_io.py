@@ -149,6 +149,7 @@ def csv_graph_reader(
             return valid_edge(this_edge) and this_edge <= max_distance
     # fill graph with nodes
     graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(dict.fromkeys(nodes, {}))
+    graph.symmetric = symmetric
     # still need to consume the first line as content if not unset
     iter_rows = reader if first_line is None else itertools.chain([first_line], reader)
     for row_idx, row in enumerate(iter_rows):

@@ -92,8 +92,8 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 raise dengraph.graph.NoSuchNode  # second edge node
             try:
                 self._adjacency[node_from][node_to] = value
-                # TODO: we only support symmetric treatments, so it should be included to graph
-                self._adjacency[node_to][node_from] = value
+                if self.symmetric:
+                    self._adjacency[node_to][node_from] = value
             except KeyError:
                 raise dengraph.graph.NoSuchNode  # first edge node
         else:

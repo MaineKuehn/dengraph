@@ -29,6 +29,10 @@ class Graph(dengraph.compat.ABCBase):
               may *not* be of type :py:class:`slice` with two elements. Such
               nodes would be erroneously treated as edge identifiers.
 
+    Graphs that are used with :py:mod:`dengraph` implementations are expected
+    to be `symmetric`. Otherwise it is not guaranteed, that incremental behaviour
+    still creates valid clustering results.
+
     All implementations of this ABC guarantee the following operators:
 
     .. describe:: len(g)
@@ -78,6 +82,8 @@ class Graph(dengraph.compat.ABCBase):
     retrieving data must be implemented by all subclasses, methods for
     *modifying* data may not be applicable to certain graphs.
     """
+    symmetric = True
+
     def __len__(self):
         raise NotImplementedError
 
