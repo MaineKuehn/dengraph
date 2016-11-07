@@ -38,3 +38,17 @@ class TestDenGraphVIO(unittest.TestCase):
                 cluster_distance=5,
                 core_neighbours=5
             )
+
+    def test_simple(self):
+        io_graph = DenGraphVIO(
+            base_graph=DistanceGraph(
+                nodes=[1, 2, 3, 4, 5, 6],
+                distance=DeltaDistance(),
+                symmetric=True
+            ),
+            cluster_distance=5,
+            core_neighbours=5
+        )
+        self.assertEqual(2.5, next(io_graph.probe(1)))
+        io_graph[7] = {}
+        self.assertEqual(3.0, next(io_graph.probe(1)))
