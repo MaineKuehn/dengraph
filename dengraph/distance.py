@@ -3,6 +3,10 @@ from __future__ import absolute_import
 import dengraph.compat
 
 
+class NoDistanceSupport(Exception):
+    pass
+
+
 class Distance(dengraph.compat.ABCBase):
     """
     A distance provides the interface for calculation on arbitrary *node* objects.
