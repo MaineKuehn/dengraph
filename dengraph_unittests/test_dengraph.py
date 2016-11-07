@@ -570,6 +570,59 @@ class TestDenGraphIO(unittest.TestCase):
         del io_graph["5"]
         self.assertEqual(validation_io_graph, io_graph)
 
+    def test_split_to_several_clusters(self):
+        literal = textwrap.dedent("""
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+        0,1,0,0,0,1,0,0,0, 1, 1, 0, 0, 0, 0, 0, 0
+        1,0,1,1,1,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,0,0,0,0,0,1,1,1, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,0,0,0,0,0,0,0,0, 0, 0, 1, 1, 1, 0, 0, 1
+        1,0,0,0,0,0,0,0,0, 0, 0, 1, 0, 0, 1, 1, 1
+        0,0,0,0,0,0,0,0,0, 1, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0,0, 1, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0,0, 1, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0,0, 0, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0,0, 0, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0,0, 1, 1, 0, 0, 0, 0, 0, 0
+        """.strip())
+        validation_literal = textwrap.dedent("""
+        2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+        0,1,1,1,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,1,1,1, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,1,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 0, 0, 1, 1, 1, 0, 0, 1
+        0,0,0,0,0,0,0,0, 0, 0, 1, 0, 0, 1, 1, 1
+        0,0,0,0,0,0,0,0, 1, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 1, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 1, 0, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 0, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 0, 1, 0, 0, 0, 0, 0, 0
+        0,0,0,0,0,0,0,0, 1, 1, 0, 0, 0, 0, 0, 0
+        """.strip())
+        io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True),
+            cluster_distance=1,
+            core_neighbours=3
+        )
+        validation_io_graph = DenGraphIO(
+            base_graph=dengraph.graphs.graph_io.csv_graph_reader(validation_literal.splitlines(), symmetric=True),
+            cluster_distance=1,
+            core_neighbours=3
+        )
+        del io_graph["1"]
+        self.assertEqual(validation_io_graph, io_graph)
+
     def _validation_graph_for_nodes(self, distance, nodes, cluster_distance, core_neighbours, graph_type=CachedDistanceGraph):
         graph = graph_type(
             nodes=nodes,
