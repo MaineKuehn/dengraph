@@ -89,11 +89,11 @@ class AdjacencyGraph(dengraph.graph.Graph):
         if isinstance(item, slice):
             node_from, node_to = item.start, item.stop
             if node_to not in self._adjacency:
-                raise dengraph.graph.NoSuchEdge  # second edge node
+                raise dengraph.graph.NoSuchNode  # second edge node
             try:
                 self._adjacency[node_from][node_to] = value
             except KeyError:
-                raise dengraph.graph.NoSuchEdge  # first edge node
+                raise dengraph.graph.NoSuchNode  # first edge node
         else:
             # g[a] = None
             value = value if value else {}
