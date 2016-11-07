@@ -1,8 +1,12 @@
 import unittest
 import random
 import itertools
+import textwrap
 
 
+
+import dengraph.graph
+import dengraph.graphs.graph_io
 import dengraph.graphs.adjacency_graph
 from dengraph.graph import NoSuchNode
 
@@ -39,3 +43,31 @@ class TestAdjacencyGraph(unittest.TestCase):
 
     def test_construct_dict(self):
         pass
+
+    def test_creation(self):
+        literal = textwrap.dedent("""
+        1,2,3,4,5,6,7,8
+        0,1,1,1,1,2,0,1
+        1,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0
+        1,0,0,0,0,0,0,0
+        2,0,0,0,0,0,1,0
+        0,0,0,0,0,1,0,0
+        1,0,0,0,0,0,0,0
+        """.strip())
+        graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True)
+        self.assertTrue(slice("6", "1") in graph)
+        al_graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source=graph, max_distance=1)
+        self.assertEqual(1, al_graph["6":"7"])
+        self.assertEqual(1, al_graph["7":"6"])
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            al_graph["1":"6"]
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            al_graph["6":"1"]
+        # create empty graph
+        al_graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(max_distance=1)
+        self.assertIsNotNone(al_graph)
+        # create graph from wrong type
+        with self.assertRaises(TypeError):
+            dengraph.graphs.adjacency_graph.AdjacencyGraph(source=[1, 2, 3])
