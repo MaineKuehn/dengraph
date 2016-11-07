@@ -3,3 +3,4 @@ coverage:
     - dengraph_unittests
     - dengraph/__about__.py
     - dengraph/utilities/pretty.py
+    - dengraph/utilities/placeholder.py
