@@ -41,12 +41,12 @@ class DenGraphIO(dengraph.graph.Graph):
             pass
         return base_cluster
 
-    def _current_core_cluster(self, core_node):
+    def core_cluster_for_node(self, core_node):
         """
         Method determines the current clusters a node belongs to and is labeled as core node.
 
         :param core_node: the core node to check cluster for
-        :return: Cluster
+        :return: Cluster that nas node as a core node
         :raise: NoSuchCluster
         """
         for cluster in self.clusters:
@@ -54,7 +54,13 @@ class DenGraphIO(dengraph.graph.Graph):
                 return cluster
         raise NoSuchCluster
 
-    def _clusters_for_node(self, node):
+    def clusters_for_node(self, node):
+        """
+        Method yields all clusters the given node is part of.
+
+        :param node: the node to check clusters for
+        :return: Cluster generator
+        """
         for cluster in self.clusters:
             if node in cluster:
                 yield cluster
@@ -75,7 +81,7 @@ class DenGraphIO(dengraph.graph.Graph):
         # determine the neighbours of current node
         neighbours = self.graph.get_neighbours(node, self.cluster_distance)
         try:
-            cluster = self._current_core_cluster(core_node=node)
+            cluster = self.core_cluster_for_node(core_node=node)
         except NoSuchCluster:
             result = len(neighbours) >= self.core_neighbours
             cluster = None
@@ -86,7 +92,7 @@ class DenGraphIO(dengraph.graph.Graph):
         result = False
         neighbours = self.graph.get_neighbours(node, self.cluster_distance)
         try:
-            cluster = self._current_core_cluster(core_node=node)
+            cluster = self.core_cluster_for_node(core_node=node)
         except NoSuchCluster:
             # node was no core before, so False is returned
             cluster = None
@@ -107,7 +113,7 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def _cluster_removed(self, cluster):
         for node in cluster.border_nodes:
-            clusters = self._clusters_for_node(node=node)
+            clusters = self.clusters_for_node(node=node)
             if len(list(clusters)) <= 1:
                 self.noise.add(node)
         try:
@@ -138,7 +144,7 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def _remove_noise(self, candidates):
         for candidate in candidates:
-            clusters = self._clusters_for_node(node=candidate)
+            clusters = self.clusters_for_node(node=candidate)
             if len(list(clusters)) == 0:
                 self.noise.add(candidate)
 
@@ -177,7 +183,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 del self.graph[neighbour:node]
                 del self.graph[node:neighbour]
                 self._edge_removed(node=neighbour)
-            cluster = self._current_core_cluster(core_node=node)
+            cluster = self.core_cluster_for_node(core_node=node)
             self._check_cluster(
                 nodes=[neighbour for neighbour in neighbours if neighbour in cluster.core_nodes],
                 core_cluster=cluster)
@@ -186,7 +192,7 @@ class DenGraphIO(dengraph.graph.Graph):
     def _merge_neighbours(self, neighbours, cluster):
         for neighbour in neighbours:
             try:
-                neighbouring_cluster = self._current_core_cluster(core_node=neighbour)
+                neighbouring_cluster = self.core_cluster_for_node(core_node=neighbour)
                 cluster = self._merge_clusters(cluster, neighbouring_cluster)
             except NoSuchCluster:
                 # node is no core
@@ -301,10 +307,10 @@ class DenGraphIO(dengraph.graph.Graph):
             self._edge_removed(node=item.start)
             self._edge_removed(node=item.stop)
             try:
-                cluster = self._current_core_cluster(core_node=item.start)
+                cluster = self.core_cluster_for_node(core_node=item.start)
             except NoSuchCluster:
                 try:
-                    cluster = self._current_core_cluster(core_node=item.stop)
+                    cluster = self.core_cluster_for_node(core_node=item.stop)
                 except NoSuchCluster:
                     return
             self._check_cluster(nodes=[item.start, item.stop], core_cluster=cluster)
