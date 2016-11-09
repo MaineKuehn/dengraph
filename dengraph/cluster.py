@@ -36,9 +36,9 @@ class DenGraphCluster(dengraph.graph.Graph):
         return len(self.core_nodes) + len(self.border_nodes)
 
     def __iter__(self):
-        for node in self.border_nodes:
-            yield node
         for node in self.core_nodes:
+            yield node
+        for node in self.border_nodes:
             yield node
 
     def __getitem__(self, a_b):
