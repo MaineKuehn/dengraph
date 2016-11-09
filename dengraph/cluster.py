@@ -26,6 +26,11 @@ class DenGraphCluster(dengraph.graph.Graph):
         elif state == self.BORDER_NODE:
             self.core_nodes.discard(node)
             self.border_nodes.add(node)
+        else:
+            raise ValueError(
+                'invalid state %r, expected %r (%s.CORE_NODE) or %r (%s.BORDER_NODE)' % (
+                    state, self.CORE_NODE, self.__class__.__name__, self.BORDER_NODE, self.__class__.__name__
+                ))
 
     def __len__(self):
         return len(self.core_nodes) + len(self.border_nodes)
