@@ -92,7 +92,7 @@ class DistanceGraph(graph.Graph):
 
 
 class CachedDistanceGraph(DistanceGraph):
-    """
+    r"""
     Graph of nodes connected by a cached distance function
 
     Compared to :py:class:`~DistanceGraph`, each edge is computed only once and
