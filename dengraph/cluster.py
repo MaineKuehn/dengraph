@@ -10,6 +10,13 @@ class GraphError(Exception):
 class DenGraphCluster(dengraph.graph.Graph):
     """
     Cluster in a DenGraph
+
+    :param graph: underlying graph of which this cluster is a subgraph
+    :type graph: :py:class:`~dengraph.graph.Graph`
+    :param core_nodes: initial set of core nodes
+    :type core_nodes: set or None
+    :param border_nodes: initial set of border nodes
+    :type botder_nodes: set or None
     """
     CORE_NODE = 1
     BORDER_NODE = 2
@@ -20,6 +27,16 @@ class DenGraphCluster(dengraph.graph.Graph):
         self.border_nodes = set(border_nodes) if border_nodes is not None else set()
 
     def categorize_node(self, node, state):
+        """
+        Mark a node as core or border
+
+        Categorizes the node in a safe way. The node is guaranteed to be marked
+        *either* core or border, regardless of insertion history.
+
+        :param node: node to categorize
+        :param state: category of the node
+        :type state: :py:attr:`DenGraphCluster.CORE_NODE` or :py:attr:`DenGraphCluster.BORDER_NODE`
+        """
         if state == self.CORE_NODE:
             self.border_nodes.discard(node)
             self.core_nodes.add(node)
@@ -148,7 +165,7 @@ class FrozenDenGraphCluster(DenGraphCluster):
     """
     Immutable, hashable cluster in a DenGraph
 
-    Clusters of this type cannot be modified but behave properly in `dict` and other mappings.
+    Clusters of this type cannot be modified but behaves properly in `dict` and other mappings.
     """
     def __init__(self, graph, core_nodes=None, border_nodes=None):
         if isinstance(graph, DenGraphCluster):
