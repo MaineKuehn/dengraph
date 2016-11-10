@@ -320,11 +320,8 @@ class DenGraphIO(dengraph.graph.Graph):
             del self.graph[item]
 
     def __iter__(self):
-        for node in self.graph:
-            for cluster in self.clusters:
-                if node in cluster:
-                    yield node
-                    break
+        for cluster in self.clusters:
+            yield cluster
 
     def __eq__(self, other):
         if isinstance(self, other.__class__):
