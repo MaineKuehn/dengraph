@@ -83,7 +83,10 @@ class TestDenGraphIO(unittest.TestCase):
         io_graph[5] = {}
         io_graph[6] = {}
         io_graph[12] = {}
-        node_set = set(iter(io_graph))
+        node_set = set()
+        for cluster in io_graph:
+            for node in cluster:
+                node_set.add(node)
         self.assertEqual(set([1, 2, 3, 4, 5, 6]), node_set)
 
     def test_equality(self):
