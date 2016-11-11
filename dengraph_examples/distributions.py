@@ -91,7 +91,7 @@ class Square(Distribution):
     Create points on a square
 
     :param length: length of edges in `(X, Y)`
-    :type center: tuple[float, float]
+    :type length: tuple[float, float]
     :param center: center in `(X, Y)`
     :type center: tuple[float, float]
     """
@@ -111,6 +111,16 @@ class Square(Distribution):
 
 
 class Checkers(Distribution):
+    """
+    Create points on multiple squares
+
+    :param length: length of enclosing edges in `(X, Y)`
+    :type length: tuple[float, float]
+    :param count: number of squares per `(X, Y)`
+    :type count: tuple[int, int]
+    :param border: relative border size between squares
+    :type border: float
+    """
     def __init__(self, length=(1., 1.), count=(8, 8), border=0.2):
         self.length = length
         self.count = count
@@ -136,6 +146,14 @@ class Checkers(Distribution):
 
 
 class Gaussian(Distribution):
+    """
+    Create points of a gaussian
+
+    :param length: length of edges in `(X, Y)`
+    :type center: tuple[float, float]
+    :param deviation: width in `(X, Y)`
+    :type deviation: tuple[float, float]
+    """
     def __init__(self, center=(0, 0), deviation=(0.075, 0.075)):
         self.center = center
         self.deviation = deviation
