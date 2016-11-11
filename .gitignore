@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+### Sphinx
+dengraph_sphinx/build
+dengraph_sphinx/source/api
+
 ### Dropbox template
 # Dropbox settings and caches
 .dropbox
