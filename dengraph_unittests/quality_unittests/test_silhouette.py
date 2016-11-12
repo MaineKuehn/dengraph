@@ -1,8 +1,9 @@
 import dengraph.distance
+import dengraph.graph
 
 from dengraph_unittests.utility import unittest
 
-from dengraph.quality.silhouette import silhouette_score
+from dengraph.quality.silhouette import *
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.distances.delta_distance import DeltaDistance
 from dengraph.dengraph import DenGraphIO
@@ -82,3 +83,15 @@ class TestSilhouette(unittest.TestCase):
         )
         self.assertEqual(10, len(io_graph.clusters))
         self.assertEqual(1.0, silhouette_score(io_graph.clusters, io_graph.graph))
+
+    def test_node_not_in_cluster(self):
+        io_graph = DenGraphIO(
+            base_graph=DistanceGraph(
+                nodes=[(1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (2,1)],
+                distance=ListDistance(),
+                symmetric=True),
+            cluster_distance=.1,
+            core_neighbours=5
+        )
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            avg_inter_cluster_distance((2,1), io_graph.clusters[0], io_graph.graph)
