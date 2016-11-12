@@ -53,7 +53,7 @@ class TestCalinskiHarabasz(unittest.TestCase):
             cluster_distance=.1,
             core_neighbours=5
         )
-        self.assertEqual(3e+11, calinski_harabasz_score(io_graph.clusters, io_graph.graph))
+        self.assertEqual(float("inf"), calinski_harabasz_score(io_graph.clusters, io_graph.graph))
 
     def test_several_cluster(self):
         node_list = []
@@ -68,4 +68,4 @@ class TestCalinskiHarabasz(unittest.TestCase):
             cluster_distance=.1,
             core_neighbours=5
         )
-        self.assertEqual(8.25e+13, calinski_harabasz_score(io_graph.clusters, io_graph.graph))
+        self.assertEqual(float("inf"), calinski_harabasz_score(io_graph.clusters, io_graph.graph))
