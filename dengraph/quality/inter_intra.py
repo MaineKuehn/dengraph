@@ -10,11 +10,13 @@ def inter_cluster_mean_score(cluster, graph, mean=None):
     :return: Mean distances within the given cluster to its centroid
     """
     distance = 0
-    if mean is None:
-        mean = graph.distance.mean(list(cluster))
-    for node in cluster:
-        distance += graph.distance(mean, node)
-    return distance / float(len(list(cluster)))
+    if cluster:
+        if mean is None:
+            mean = graph.distance.mean(list(cluster))
+        for node in cluster:
+            distance += graph.distance(mean, node)
+        return distance / float(len(list(cluster)))
+    raise ValueError
 
 
 def intra_cluster_variance(clusters, graph):
