@@ -18,13 +18,19 @@ def silhouette_score(clusters, graph):
     :param graph: The underlying graph that offers distance function
     :return: Calculated Silhouette score
     """
-    score = 0
-    for cluster in clusters:
-        for node in cluster:
-            distance_a = avg_inter_cluster_distance(node, cluster, graph)
-            distance_b = min(avg_intra_cluster_distances(node, clusters, graph))
-            score += (distance_b - distance_a) / max(distance_a, distance_b)
-    return score / float(sum([len(cluster) for cluster in clusters]))
+    if len(clusters) > 0:
+        score = 0
+        for cluster in clusters:
+            for node in cluster:
+                distance_a = avg_inter_cluster_distance(node, cluster, graph)
+                try:
+                    distance_b = min(avg_intra_cluster_distances(node, clusters, graph))
+                except ValueError:
+                    distance_b = 0
+                maximum = max(distance_a, distance_b) or 1e-10
+                score += (distance_b - distance_a) / maximum
+        return score / float(sum([len(cluster) for cluster in clusters]))
+    raise ValueError
 
 
 def avg_inter_cluster_distance(sample, cluster, graph):
