@@ -46,9 +46,11 @@ def inter_cluster_variance(clusters, graph):
     :param graph: The underlying graph that offers a distance function
     :return: Sum of inter cluster variances for all given clusters
     """
-    result = 0
-    for cluster in clusters:
-        cluster_mean = graph.distance.mean(list(cluster))
-        for node in cluster:
-            result += graph.distance(cluster_mean, node)**2
-    return result
+    if len(clusters) > 0:
+        result = 0
+        for cluster in clusters:
+            cluster_mean = graph.distance.mean(list(cluster))
+            for node in cluster:
+                result += graph.distance(cluster_mean, node)**2
+        return result
+    return float("inf")
