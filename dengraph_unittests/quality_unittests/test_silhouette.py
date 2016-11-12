@@ -19,7 +19,7 @@ class ListDistance(dengraph.distance.Distance):
     def mean(self, *args, **kwargs):
         if len(args) == 1:
             args = [value_list[0] for value_list in args[0]]
-        return sum(args) / float(len(args))
+        return (sum(args) / float(len(args)),1)
 
 
 class TestSilhouette(unittest.TestCase):
