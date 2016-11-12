@@ -17,9 +17,10 @@ def calinski_harabasz_score(clusters, graph):
     :return: Calculated Calinski-Harabasz score
     """
     if len(clusters) > 1:
-        intra_variance = intra_cluster_variance(clusters, graph)
-        inter_variance = inter_cluster_variance(clusters, graph) or 1e-10
-        result = intra_variance / inter_variance * ((len(list(graph)) - len(clusters))
-                                                    / float(len(clusters) - 1))
+        try:
+            intra_inter = intra_cluster_variance(clusters, graph) / inter_cluster_variance(clusters, graph)
+        except ZeroDivisionError:
+            intra_inter = float("inf")
+        result = intra_inter * ((len(list(graph)) - len(clusters)) / float(len(clusters) - 1))
         return result
     raise ValueError
