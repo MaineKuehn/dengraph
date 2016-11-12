@@ -16,6 +16,10 @@ def calinski_harabasz_score(clusters, graph):
     :param graph: The underlying graph that offers distance function
     :return: Calculated Calinski-Harabasz score
     """
-    result = intra_cluster_variance(clusters, graph) / inter_cluster_variance(clusters, graph) * \
-             ((len(list(graph)) - len(clusters)) / float(len(clusters) - 1))
-    return result
+    if len(clusters) > 1:
+        intra_variance = intra_cluster_variance(clusters, graph)
+        inter_variance = inter_cluster_variance(clusters, graph) or 1e-10
+        result = intra_variance / inter_variance * ((len(list(graph)) - len(clusters))
+                                                    / float(len(clusters) - 1))
+        return result
+    raise ValueError
