@@ -17,35 +17,38 @@ except ImportError:
 try:
     ABCBase = _abc.ABC
 except AttributeError:
-    class ABCBase(object):
-        """
-        Helper class that provides a standard way to create an ABC using inheritance.
-
-        A helper class that has :class:`ABCMeta` as its metaclass.  With this class,
-        an abstract base class can be created by simply deriving from :class:`ABC`,
-        avoiding sometimes confusing metaclass usage.
-
-        Note that the type of :class:`ABC` is still :class:`ABCMeta`, therefore
-        inheriting from :class:`ABC` requires the usual precautions regarding metaclass
-        usage, as multiple inheritance may lead to metaclass conflicts.
-
-        .. versionadded:: 3.4
-
-        .. versionchanged:: 3.3
-           Subclasses can use :py:meth:`register` as a Decorator.
-        """
-        __metaclass__ = _abc.ABCMeta
-
-        @classmethod
-        def register(cls, subclass):
+    try:
+        from .compat3 import ABCBase
+    except SyntaxError:
+        class ABCBase(object):
             """
-            Register *subclass* as a "virtual subclass" of this ABC.
+            Helper class that provides a standard way to create an ABC using inheritance.
+
+            A helper class that has :class:`ABCMeta` as its metaclass.  With this class,
+            an abstract base class can be created by simply deriving from :class:`ABC`,
+            avoiding sometimes confusing metaclass usage.
+
+            Note that the type of :class:`ABC` is still :class:`ABCMeta`, therefore
+            inheriting from :class:`ABC` requires the usual precautions regarding metaclass
+            usage, as multiple inheritance may lead to metaclass conflicts.
+
+            .. versionadded:: 3.4
 
             .. versionchanged:: 3.3
-               Returns the registered subclass, to allow usage as a class decorator.
+               Subclasses can use :py:meth:`register` as a Decorator.
             """
-            cls.__metaclass__.register(cls, subclass)
-            return cls
+            __metaclass__ = _abc.ABCMeta
+
+            @classmethod
+            def register(cls, subclass):
+                """
+                Register *subclass* as a "virtual subclass" of this ABC.
+
+                .. versionchanged:: 3.3
+                   Returns the registered subclass, to allow usage as a class decorator.
+                """
+                cls.__metaclass__.register(cls, subclass)
+                return cls
 
 
 if sys.version_info < (3, 3):
