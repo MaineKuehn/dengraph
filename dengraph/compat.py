@@ -30,8 +30,22 @@ except AttributeError:
         usage, as multiple inheritance may lead to metaclass conflicts.
 
         .. versionadded:: 3.4
+
+        .. versionchanged:: 3.3
+           Subclasses can use :py:meth:`register` as a Decorator.
         """
         __metaclass__ = _abc.ABCMeta
+
+        @classmethod
+        def register(cls, subclass):
+            """
+            Register *subclass* as a "virtual subclass" of this ABC.
+
+            .. versionchanged:: 3.3
+               Returns the registered subclass, to allow usage as a class decorator.
+            """
+            cls.__metaclass__.register(cls, subclass)
+            return cls
 
 
 if sys.version_info < (3, 3):
