@@ -180,8 +180,8 @@ class TestAdjacencyGraph(unittest.TestCase):
             7: {6: 1},
             8: {1: 1}
         })
-        self.assertEqual([2, 3, 4, 5, 6, 8], graph.get_neighbours(1))
-        self.assertEqual([2, 3, 4, 5, 8], graph.get_neighbours(1, distance=1))
+        self.assertEqual({2, 3, 4, 5, 6, 8}, set(graph.get_neighbours(1)))
+        self.assertEqual({2, 3, 4, 5, 8}, set(graph.get_neighbours(1, distance=1)))
         with self.assertRaises(dengraph.graph.NoSuchNode):
             graph.get_neighbours(9)
 

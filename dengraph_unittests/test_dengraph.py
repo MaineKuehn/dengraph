@@ -172,7 +172,7 @@ class TestDenGraphIO(unittest.TestCase):
         # determine count of cores manually
         core_count = 0
         for node in graph.graph:
-            if len(graph.graph.get_neighbours(node, distance=graph.cluster_distance)) >= graph.core_neighbours:
+            if len(list(graph.graph.get_neighbours(node, distance=graph.cluster_distance))) >= graph.core_neighbours:
                 core_count += 1
         self.assertEqual(core_count, sum([len(cluster.core_nodes) for cluster in graph.clusters]))
 
@@ -184,9 +184,9 @@ class TestDenGraphIO(unittest.TestCase):
             cluster_distance=5,
             core_neighbours=5
         )
-        self.assertEqual([4, 5, 6, 14], graph.graph.get_neighbours(9, 5))
+        self.assertEqual({4, 5, 6, 14}, set(graph.graph.get_neighbours(9, 5)))
         self.assertEqual(2, len(graph.clusters))
-        self.assertEqual([set([9]), set([9])], [cluster.border_nodes for cluster in graph.clusters])
+        self.assertEqual([{9}, {9}], [cluster.border_nodes for cluster in graph.clusters])
 
     def test_simple_incremental_behaviour(self):
         nodes = [1, 2, 3, 4, 5, 6]

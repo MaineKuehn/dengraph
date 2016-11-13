@@ -71,11 +71,9 @@ class DistanceGraph(graph.Graph):
         if node not in self._nodes:
             raise graph.NoSuchNode
         if distance is graph.ANY_DISTANCE:
-            neighbours = self._nodes.copy()
-            neighbours.remove(node)
+            return (candidate for candidate in self if candidate != node)
         else:
-            neighbours = [candidate for candidate in self if self[node:candidate] <= distance and candidate != node]
-        return neighbours
+            return (candidate for candidate in self if self[node:candidate] <= distance and candidate != node)
 
     def __add__(self, other):
         if isinstance(self, other.__class__) and self.distance == other.distance:

@@ -133,8 +133,8 @@ class AdjacencyGraph(dengraph.graph.Graph):
             raise dengraph.graph.NoSuchNode
         else:
             if distance is dengraph.graph.ANY_DISTANCE:
-                return list(adjacency_list)
-            return [neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance]
+                return iter(adjacency_list)
+            return (neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance)
 
     def __add__(self, other):
         if isinstance(other, dengraph.graph.Graph):
@@ -202,5 +202,5 @@ class BoundedAdjacencyGraph(AdjacencyGraph):
                     self._max_distance <= distance
                 )
             ):
-                return list(adjacency_list)
-            return [neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance]
+                return iter(adjacency_list)
+            return (neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance)

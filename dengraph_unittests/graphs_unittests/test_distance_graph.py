@@ -165,7 +165,7 @@ class TestDistanceGraph(unittest.TestCase):
             distance = self.distance_cls()
             graph = self.graph_cls(nodes, distance)
             for node in nodes:
-                neighbours = graph.get_neighbours(node)
+                neighbours = set(graph.get_neighbours(node))
                 self.assertNotIn(node, neighbours)
                 self.assertEqual(len(neighbours), len(graph) - 1)
                 expected = set(nodes)
@@ -212,11 +212,11 @@ class TestDistanceGraph(unittest.TestCase):
         )
         for node in nodes:
             self.assertEqual(
-                graph.get_neighbours(node, distance=threshold),
-                [
+                set(graph.get_neighbours(node, distance=threshold)),
+                {
                     elem for elem in range(node-threshold, node+threshold+1)
                     if elem != node and 0 <= elem < maximum
-                ]
+                }
             )
 
     def test_exception(self):
