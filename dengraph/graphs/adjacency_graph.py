@@ -160,3 +160,47 @@ class AdjacencyGraph(dengraph.graph.Graph):
             self.__class__.__name__,
             dengraph.utilities.pretty.repr_container(self._adjacency)
         )
+
+
+class BoundedAdjacencyGraph(AdjacencyGraph):
+    """
+    Graph storing distances via bounded adjacency lists
+
+    :param source: adjacency mapping or graph
+    :param max_distance: maximum allowed distance
+
+    :see: :py:class:`~AdjacencyGraph` for formats of the `source` parameter.
+
+    Instances of this class store their `max_distance` parameter. It is used
+    to optimize memory and lookups. Any edges bigger than `max_distance` are
+    silently ignored when trying to insert them. Querying for neighbours via
+    :py:meth:`get_neighbours` is optimized if the search distance is higher
+    than the graph's bound.
+    """
+    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE):
+        self._max_distance = max_distance
+        self._effective_bound = None
+        super(BoundedAdjacencyGraph, self).__init__(source=source, max_distance=max_distance)
+
+    def __setitem__(self, item, value):
+        # a:b -> slice -> edge
+        if isinstance(item, slice):
+            # do not add edges exceeding our maximum distance
+            if self._max_distance is not dengraph.graph.ANY_DISTANCE and self._max_distance < value:
+                return
+        super(BoundedAdjacencyGraph, self).__setitem__(item, value)
+
+    def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
+        try:
+            adjacency_list = self._adjacency[node]
+        except KeyError:
+            raise dengraph.graph.NoSuchNode
+        else:
+            if (
+                distance is dengraph.graph.ANY_DISTANCE or (
+                    self._max_distance is not dengraph.graph.ANY_DISTANCE and
+                    self._max_distance <= distance
+                )
+            ):
+                return list(adjacency_list)
+            return [neighbour for neighbour in adjacency_list if adjacency_list[neighbour] <= distance]

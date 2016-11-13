@@ -184,3 +184,33 @@ class TestAdjacencyGraph(unittest.TestCase):
         self.assertEqual([2, 3, 4, 5, 8], graph.get_neighbours(1, distance=1))
         with self.assertRaises(dengraph.graph.NoSuchNode):
             graph.get_neighbours(9)
+
+
+class TestBoundedAdjacencyGraph(TestAdjacencyGraph):
+    #: distance graph class to test
+    graph_cls = dengraph.graphs.adjacency_graph.BoundedAdjacencyGraph
+
+    def test_set(self):
+        graph = self.graph_cls(source={
+            1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
+            2: {1: 1},
+            3: {1: 1},
+            4: {1: 1},
+            5: {1: 1},
+            6: {1: 2, 7: 1},
+            7: {6: 1},
+            8: {1: 1}
+        }, max_distance=1)
+        self.assertFalse(slice(1, 6) in graph)
+        graph[1:6] = 2
+        with self.assertRaises(dengraph.graph.NoSuchEdge):
+            graph[1:6]
+        graph[1:6] = 1
+        self.assertEqual(1, graph[1:6])
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[1:9] = 1
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[9:1] = 1
+        graph[9] = {}
+        graph[9:1] = 1
+        self.assertEqual(1, graph[1:9])
