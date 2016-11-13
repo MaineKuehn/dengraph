@@ -11,7 +11,7 @@ class NoSuchCluster(Exception):
 
 class DenGraphIO(dengraph.graph.Graph):
     """
-    Density Graph allowing for Overlap and Incremental updates.
+    Density Graph Clustering allowing for Overlap and Incremental updates.
 
     :param base_graph: the underlying graph
     :param cluster_distance: maximum distance for nodes to be considered as neighbours (ε)
@@ -65,6 +65,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 yield cluster
 
     def _add_node_to_cluster(self, node, cluster, state):
+        """Mark a node as belonging to a specific cluster"""
         cluster.categorize_node(node, state)
         self.noise.discard(node)
 
@@ -234,7 +235,7 @@ class DenGraphIO(dengraph.graph.Graph):
         checked.update(to_be_checked)
 
     def _init_cluster(self):
-        """Perform initial cluster"""
+        """Perform initial clustering"""
         self.clusters = type(self.clusters)()
         # Avoid nodes for which a decision has been made:
         # - Core nodes can only belong to one cluster; once a node is a cluster
@@ -245,27 +246,37 @@ class DenGraphIO(dengraph.graph.Graph):
             if node in self.noise:
                 neighbours = self.graph.get_neighbours(node=node, distance=self.cluster_distance)
                 if len(neighbours) >= self.core_neighbours:
-                    unchecked = set()
-                    checked = {node}
+                    # node forms a new cluster
                     this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
                     self.clusters.append(this_cluster)
-                    self._add_node_to_cluster(node=node,
-                                              cluster=this_cluster,
-                                              state=this_cluster.CORE_NODE)
-                    self._expand_unchecked(unchecked, neighbours, checked)
-                    while unchecked:
-                        checking = unchecked.pop()
-                        neighbours = self.graph.get_neighbours(node=checking,
-                                                               distance=self.cluster_distance)
+                    self._add_node_to_cluster(
+                        node=node,
+                        cluster=this_cluster,
+                        state=this_cluster.CORE_NODE
+                    )
+                    outstanding_nodes = set()  # nodes which still need categorizing
+                    connected_nodes = {node}  # nodes which need not be scheduled for categorizing again
+                    outstanding_nodes.update(neighbours)
+                    connected_nodes.update(neighbours)
+                    while outstanding_nodes:
+                        checking = outstanding_nodes.pop()
+                        neighbours = self.graph.get_neighbours(
+                            node=checking,
+                            distance=self.cluster_distance
+                        )
                         if len(neighbours) >= self.core_neighbours:
-                            self._add_node_to_cluster(node=checking,
-                                                      cluster=this_cluster,
-                                                      state=this_cluster.CORE_NODE)
-                            self._expand_unchecked(unchecked, neighbours, checked)
+                            self._add_node_to_cluster(
+                                node=checking,
+                                cluster=this_cluster,
+                                state=this_cluster.CORE_NODE
+                            )
+                            self._expand_unchecked(outstanding_nodes, neighbours, connected_nodes)
                         else:
-                            self._add_node_to_cluster(node=checking,
-                                                      cluster=this_cluster,
-                                                      state=this_cluster.BORDER_NODE)
+                            self._add_node_to_cluster(
+                                node=checking,
+                                cluster=this_cluster,
+                                state=this_cluster.BORDER_NODE
+                            )
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
         # more likely to be in earlier containers.
