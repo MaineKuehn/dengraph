@@ -23,23 +23,17 @@ def davies_bouldin_score(clusters, graph):
             maximum_distance = 0
             for cluster_2 in clusters:
                 if cluster_1 != cluster_2:
-                    try:
-                        means_cache[cluster_1]
-                    except KeyError:
-                        means_cache[cluster_1] = graph.distance.mean(list(cluster_1))
-                        score_cache[cluster_1] = inter_cluster_mean_score(
-                            cluster_1,
-                            graph,
-                            means_cache[cluster_1])
-                    try:
-                        means_cache[cluster_2]
-                    except KeyError:
-                        means_cache[cluster_2] = graph.distance.mean(list(cluster_2))
-                        score_cache[cluster_2] = inter_cluster_mean_score(
-                            cluster_2,
-                            graph,
-                            means_cache[cluster_2])
-
+                    for current_cluster in [cluster_1, cluster_2]:
+                        try:
+                            means_cache[current_cluster]
+                        except KeyError:
+                            means_cache[current_cluster] = graph.distance.mean(
+                                list(current_cluster))
+                            score_cache[current_cluster] = inter_cluster_mean_score(
+                                current_cluster,
+                                graph,
+                                means_cache[current_cluster]
+                            )
                     distance = (score_cache[cluster_1] + score_cache[cluster_2]) / \
                         graph.distance(means_cache[cluster_1], means_cache[cluster_2])
                     if distance > maximum_distance:
