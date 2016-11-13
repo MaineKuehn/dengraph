@@ -47,7 +47,10 @@ def avg_inter_cluster_distance(sample, cluster, graph):
     result = 0
     if sample in cluster:
         for node in cluster:
-            result += graph.distance(node, sample)
+            try:
+                result += graph[node:sample]
+            except dengraph.graph.NoSuchEdge:
+                result += graph.distance(node, sample)
         return result / float(len(list(cluster)) - 1)
     raise dengraph.graph.NoSuchNode
 
@@ -68,7 +71,10 @@ def avg_intra_cluster_distances(sample, clusters, graph):
         if sample not in cluster:
             distance = 0
             for node in cluster:
-                distance += graph.distance(node, sample)
+                try:
+                    distance += graph[node:sample]
+                except dengraph.graph.NoSuchEdge:
+                    distance += graph.distance(node, sample)
             distance /= float(len(list(cluster)))
             results.append(distance)
     return results
