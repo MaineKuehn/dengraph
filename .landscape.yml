@@ -5,6 +5,7 @@ autodetect: true
 ignore-paths:
     - dengraph_examples
     - dengraph_unittests
+    - dengraph_sphinx
 
 pep8:
   disable:
