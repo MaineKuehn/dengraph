@@ -1,17 +1,20 @@
-import unittest
 import random
-import itertools
 import textwrap
 
-
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 import dengraph.graph
 import dengraph.graphs.graph_io
 import dengraph.graphs.adjacency_graph
-from dengraph.graph import NoSuchNode
 
 
 class TestAdjacencyGraph(unittest.TestCase):
+    #: distance graph class to test
+    graph_cls = dengraph.graphs.adjacency_graph.AdjacencyGraph
+
     @staticmethod
     def random_content(length, connections=None, distance_range=1.0):
         connections, have_connections = connections if connections is not None else length * length / 2, 0
@@ -58,7 +61,7 @@ class TestAdjacencyGraph(unittest.TestCase):
         """.strip())
         graph = dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True)
         self.assertTrue(slice("6", "1") in graph)
-        al_graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source=graph, max_distance=1)
+        al_graph = self.graph_cls(source=graph, max_distance=1)
         self.assertEqual(1, al_graph["6":"7"])
         self.assertEqual(1, al_graph["7":"6"])
         with self.assertRaises(dengraph.graph.NoSuchEdge):
@@ -66,14 +69,14 @@ class TestAdjacencyGraph(unittest.TestCase):
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             al_graph["6":"1"]
         # create empty graph
-        al_graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(max_distance=1)
+        al_graph = self.graph_cls(max_distance=1)
         self.assertIsNotNone(al_graph)
         # create graph from wrong type
         with self.assertRaises(TypeError):
-            dengraph.graphs.adjacency_graph.AdjacencyGraph(source=[1, 2, 3])
+            self.graph_cls(source=[1, 2, 3])
 
     def test_containment(self):
-        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+        graph = self.graph_cls(source={
             1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
             2: {1: 1},
             3: {1: 1},
@@ -90,7 +93,7 @@ class TestAdjacencyGraph(unittest.TestCase):
         self.assertFalse(slice(6, 1) in graph)
 
     def test_get(self):
-        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+        graph = self.graph_cls(source={
             1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
             2: {1: 1},
             3: {1: 1},
@@ -110,7 +113,7 @@ class TestAdjacencyGraph(unittest.TestCase):
             graph[8]
 
     def test_set(self):
-        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+        graph = self.graph_cls(source={
             1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
             2: {1: 1},
             3: {1: 1},
@@ -131,8 +134,23 @@ class TestAdjacencyGraph(unittest.TestCase):
         graph[9:1] = 1
         self.assertEqual(1, graph[1:9])
 
+    def test_setitem_node(self):
+        """Setitem of individual nodes"""
+        graph = self.graph_cls(
+            {idx: {} for idx in range(5)}
+        )
+        self.assertIn(1, graph)
+        self.assertNotIn(5, graph)
+        for null_edge in ({}, None, False):
+            new_node = len(graph)
+            with self.subTest(null_edge=null_edge, new_node=new_node):
+                graph[new_node] = null_edge
+                self.assertIn(new_node, graph)
+                graph[new_node] = null_edge
+                self.assertIn(new_node, graph)
+
     def test_deletion(self):
-        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+        graph = self.graph_cls(source={
             1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
             2: {1: 1},
             3: {1: 1},
@@ -152,7 +170,7 @@ class TestAdjacencyGraph(unittest.TestCase):
             del graph[6]
 
     def test_neighbours(self):
-        graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(source={
+        graph = self.graph_cls(source={
             1: {2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 8: 1},
             2: {1: 1},
             3: {1: 1},
