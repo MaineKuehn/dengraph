@@ -33,12 +33,11 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def _merge_clusters(self, base_cluster, cluster):
         base_cluster += cluster
-        if base_cluster == cluster:
-            return base_cluster
-        try:
-            self.clusters.remove(cluster)
-        except ValueError:
-            pass
+        if base_cluster != cluster:
+            try:
+                self.clusters.remove(cluster)
+            except ValueError:
+                pass
         return base_cluster
 
     def core_cluster_for_node(self, core_node):
@@ -114,7 +113,11 @@ class DenGraphIO(dengraph.graph.Graph):
     def _cluster_removed(self, cluster):
         for node in cluster.border_nodes:
             clusters = self.clusters_for_node(node=node)
-            if len(list(clusters)) <= 1:
+            try:
+                # check whether there is at least one additional cluster containing node
+                next(clusters)
+                next(clusters)
+            except StopIteration:
                 self.noise.add(node)
         try:
             self.clusters.remove(cluster)
@@ -138,21 +141,24 @@ class DenGraphIO(dengraph.graph.Graph):
             if len(neighbours) >= self.core_neighbours:
                 tmp_cluster.categorize_node(checking, tmp_cluster.CORE_NODE)
                 self._expand_unchecked(unchecked=unchecked, checked=checked, neighbours=neighbours)
-            elif len(neighbours) > 0:
+            elif neighbours:
                 tmp_cluster.categorize_node(checking, tmp_cluster.BORDER_NODE)
         return tmp_cluster
 
     def _remove_noise(self, candidates):
         for candidate in candidates:
             clusters = self.clusters_for_node(node=candidate)
-            if len(list(clusters)) == 0:
+            try:
+                # noise is contained in no clusters
+                next(clusters)
+            except StopIteration:
                 self.noise.add(candidate)
 
     def _edge_removed(self, node):
         is_downgraded, cluster, _ = self._test_change_from_core(node=node)
         if is_downgraded:
             self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
-            if len(cluster.core_nodes) == 0:
+            if not cluster.core_nodes:
                 # remove cluster
                 self._cluster_removed(cluster=cluster)
 
@@ -165,12 +171,12 @@ class DenGraphIO(dengraph.graph.Graph):
                 new_cluster.core_nodes - new_cluster.border_nodes
             while missing:
                 split_cluster = self._validate_cluster(cluster=core_cluster, nodes=[missing.pop()])
-                if len(split_cluster.core_nodes) > 0:
+                if split_cluster.core_nodes:
                     self._cluster_added(split_cluster)
                     noise -= split_cluster.core_nodes.union(split_cluster.border_nodes)
                     missing -= split_cluster.core_nodes
             self._cluster_removed(cluster=core_cluster)
-            if len(new_cluster.core_nodes) > 0:
+            if new_cluster.core_nodes:
                 self._cluster_added(new_cluster)
             self._remove_noise(candidates=noise)
         except KeyError:
@@ -240,7 +246,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 neighbours = self.graph.get_neighbours(node=node, distance=self.cluster_distance)
                 if len(neighbours) >= self.core_neighbours:
                     unchecked = set()
-                    checked = set([node])
+                    checked = {node}
                     this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
                     self.clusters.append(this_cluster)
                     self._add_node_to_cluster(node=node,
