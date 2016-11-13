@@ -21,7 +21,7 @@ class TestCompat(unittest.TestCase):
     def test_range(self):
         """Py3.X range"""
         self.assertNotIsInstance(compat.range(5), list)
-        self.assertEqual(list(compat.range(10)), range(10))
+        self.assertEqual(list(compat.range(10)), list(range(10)))
         self.assertIn(19, compat.range(15, 20))
         self.assertNotIn(25, compat.range(25))
 
