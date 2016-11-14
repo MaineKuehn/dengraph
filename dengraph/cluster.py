@@ -16,7 +16,7 @@ class DenGraphCluster(dengraph.graph.Graph):
     :param core_nodes: initial set of core nodes
     :type core_nodes: set or None
     :param border_nodes: initial set of border nodes
-    :type botder_nodes: set or None
+    :type border_nodes: set or None
     """
     CORE_NODE = 1
     BORDER_NODE = 2
@@ -165,7 +165,7 @@ class FrozenDenGraphCluster(DenGraphCluster):
     """
     Immutable, hashable cluster in a DenGraph
 
-    Clusters of this type cannot be modified but behaves properly in `dict` and other mappings.
+    Clusters of this type cannot be modified but behave properly in `dict` and other mappings.
     """
     def __init__(self, graph, core_nodes=None, border_nodes=None):
         if isinstance(graph, DenGraphCluster):
