@@ -54,16 +54,26 @@ class Graph(dengraph.compat.ABCBase):
       Remove the edge between nodes `a` and `b` from `g`.  Raises
       :exc:`NoSuchEdge` if the edge is not in the graph.
 
-    .. describe:: g[a] = {}
-                  g[a] = None
+    .. describe:: g[a]
+
+      Return the edges between nodes `a` and any other node, as
+      `{b: ab_edge, c: ac_edge, ...}`. Raises :py:exc:`NoSuchNode` if `a` is
+      not in `g`.
+
+    .. describe:: g[a] = None
+                  g[a] = a
 
       Add the node `a` to graph `g`, without explicit edges. Graphs for which
       edges are computed, not set, may create them automatically.
+
+      If `a` is already in `g`, this is a noop.
 
     .. describe:: g[a] = {b: ab_edge, c: ac_edge, ...}
 
       Add the node `a` to graph `g` if it is not present. Set the edge between
       nodes `a` and `b` to `ab_edge`, between `a` and `c` to `ac_edge`, etc.
+      Remove any other edge from `a`. Raises :py:exc:`NoSuchNode` if any of `b`,
+      `c`, etc. are not in `g`.
 
     .. describe:: del g[a]
 
@@ -73,6 +83,11 @@ class Graph(dengraph.compat.ABCBase):
     .. describe:: a in g
 
       Return `True` if `g` has a node `a`, else `False`.
+
+    .. describe:: a:b in g
+                  slice(a, b) in g
+
+      Return `True` if `g` has an edge from node `a` to `b`, else `False`.
 
     .. describe:: iter(g)
 
@@ -116,7 +131,7 @@ class Graph(dengraph.compat.ABCBase):
 
     def get_neighbours(self, node, distance=ANY_DISTANCE):
         """
-        Get all nodes with edge weight to `node` smaller or equal to `distance`
+        Yield all nodes with edge weight to `node` smaller or equal to `distance`
 
         :param node: node from which edges originate.
         :param distance: maximum allowed distance to other nodes.
