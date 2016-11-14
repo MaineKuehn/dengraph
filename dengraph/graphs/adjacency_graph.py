@@ -82,7 +82,10 @@ class AdjacencyGraph(dengraph.graph.Graph):
             except KeyError:
                 raise dengraph.graph.NoSuchEdge
         else:
-            raise TypeError('Not an edge: %s' % item)
+            try:
+                return self._adjacency[item]
+            except KeyError:
+                raise dengraph.graph.NoSuchNode
 
     def __setitem__(self, item, value):
         # a:b -> slice -> edge

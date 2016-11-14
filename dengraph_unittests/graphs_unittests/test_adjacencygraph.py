@@ -109,8 +109,9 @@ class TestAdjacencyGraph(unittest.TestCase):
             graph[8:7]
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             graph[9:10]
-        with self.assertRaises(TypeError):
-            graph[8]
+        self.assertEqual(graph[2], {1: 1})
+        self.assertEqual(graph[6], {1: 2, 7:1})
+        self.assertEqual(graph[8], {1: 1})
 
     def test_set(self):
         graph = self.graph_cls(source={
@@ -143,12 +144,22 @@ class TestAdjacencyGraph(unittest.TestCase):
         self.assertNotIn(5, graph)
         for null_edge in (len(graph), None):
             new_node = len(graph)
-            with self.subTest(null_edge=null_edge, new_node=new_node):
+            with self.subTest(null_edge=null_edge, new_node=new_node, test='insert'):
                 self.assertNotIn(new_node, graph)
                 graph[new_node] = null_edge
                 self.assertIn(new_node, graph)
                 graph[new_node] = null_edge
                 self.assertIn(new_node, graph)
+                self.assertEqual(graph[new_node], {})
+            edges = {1: 3, 2: 5}
+            with self.subTest(null_edge=null_edge, new_node=new_node, test='set'):
+                graph[new_node] = edges
+                self.assertEqual(graph[new_node], edges)
+                for node_to in edges:
+                    self.assertEqual(graph[new_node:node_to], edges[node_to])
+            with self.subTest(null_edge=null_edge, new_node=new_node, test='insert'):
+                graph[new_node] = null_edge
+                self.assertEqual(graph[new_node], edges)
 
     def test_deletion(self):
         graph = self.graph_cls(source={
