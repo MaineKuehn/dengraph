@@ -56,9 +56,9 @@ class Graph(dengraph.compat.ABCBase):
 
     .. describe:: g[a]
 
-      Return the edges between nodes `a` and any other node, as
-      `{b: ab_edge, c: ac_edge, ...}`. Raises :py:exc:`NoSuchNode` if `a` is
-      not in `g`.
+      Return the edges between nodes `a` and any other node as an adjacency
+      mapping `{b: ab_edge, c: ac_edge, ...}`. Raises :py:exc:`NoSuchNode` if
+      `a` is not in `g`.
 
     .. describe:: g[a] = None
                   g[a] = a
