@@ -112,6 +112,12 @@ class TestAdjacencyGraph(unittest.TestCase):
         self.assertEqual(graph[2], {1: 1})
         self.assertEqual(graph[6], {1: 2, 7:1})
         self.assertEqual(graph[8], {1: 1})
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[9]
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph[-1]
+        with self.assertRaises(dengraph.graph.NoSuchNode):
+            graph['notanode']
 
     def test_set(self):
         graph = self.graph_cls(source={
