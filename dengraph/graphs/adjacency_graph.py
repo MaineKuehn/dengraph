@@ -97,13 +97,16 @@ class AdjacencyGraph(dengraph.graph.Graph):
             except KeyError:
                 raise dengraph.graph.NoSuchNode  # first edge node
         else:
-            # g[a] = None
-            value = value if value else {}
+            # g[a] = g[a]
+            if self._adjacency.get(item, object()) is value:
+                return
+            # g[a] = None, g[a] = a
+            elif value is None or value is item:
+                if item not in self._adjacency:
+                    self._adjacency[item] = {}
             # g[a] = {b: 3, c: 4, d: 6}
-            if item not in self._adjacency:
-                self._adjacency[item] = value.copy()
             else:
-                self._adjacency[item].update(value)
+                self._adjacency[item] = value.copy()
 
     def __delitem__(self, item):
         # a:b -> slice -> edge

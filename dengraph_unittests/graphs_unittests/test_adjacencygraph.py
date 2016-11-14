@@ -141,9 +141,10 @@ class TestAdjacencyGraph(unittest.TestCase):
         )
         self.assertIn(1, graph)
         self.assertNotIn(5, graph)
-        for null_edge in ({}, None, False):
+        for null_edge in (len(graph), None):
             new_node = len(graph)
             with self.subTest(null_edge=null_edge, new_node=new_node):
+                self.assertNotIn(new_node, graph)
                 graph[new_node] = null_edge
                 self.assertIn(new_node, graph)
                 graph[new_node] = null_edge
