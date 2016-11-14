@@ -91,10 +91,13 @@ class TestDistanceGraph(unittest.TestCase):
     def test_getitem_node(self):
         """Distance Graph: cannot get nodes"""
         for nodes in self.make_node_samples():
+            distance = self.distance_cls()
             graph = self.graph_cls(nodes, self.distance_cls())
-            for node in nodes:
-                with self.assertRaises(TypeError):
-                    graph[node]
+            for node_from in nodes:
+                adjacency = graph[node_from]
+                self.assertEqual(len(adjacency), len(graph) - 1)
+                for node_to in adjacency:
+                    self.assertEqual(distance(node_from, node_to), graph[node_from:node_to])
 
     def test_setitem_edge(self):
         """Distance Graph: cannot set edges"""

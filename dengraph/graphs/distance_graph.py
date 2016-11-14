@@ -46,7 +46,9 @@ class DistanceGraph(graph.Graph):
                 node_to, node_from = node_from, node_to
             return self.distance(node_from, node_to)
         else:
-            raise TypeError('Not an edge: %s' % item)
+            if item not in self:
+                raise dengraph.graph.NoSuchNode
+            return {candidate: self[item:candidate] for candidate in self if candidate != item}
 
     def __setitem__(self, item, value):
         if value or isinstance(item, slice):
@@ -128,7 +130,7 @@ class CachedDistanceGraph(DistanceGraph):
                 self._distance_values[node_from, node_to] = self.distance(node_from, node_to)
                 return self._distance_values[node_from, node_to]
         else:
-            raise TypeError('Not an edge: %s' % item)
+            return super(CachedDistanceGraph, self).__getitem__(item)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
