@@ -148,15 +148,13 @@ class AdjacencyGraph(dengraph.graph.Graph):
             for node in itertools.chain(self, other):
                 if node in new_adjacency:
                     continue
-                # we are already one level in, and have an implicit copy when calling update
-                # this is sufficient to copy our internal data but preserve node and edge identity
-                self_adjacency = self._adjacency[node]  # our own internal buffer, do NOT modify
-                other_adjacency = {neighbour: self[node:neighbour] for neighbour in self.get_neighbours(node)}
+                self_adjacency = self[node].copy() if node in self else {}
+                other_adjacency = other[node].copy() if node in other else {}
                 # make sure there is no ambiguity in edges from sequence of merging
                 for common_node in dengraph.compat.viewkeys(self_adjacency) & dengraph.compat.viewkeys(other_adjacency):
                     if self_adjacency[common_node] != other_adjacency[common_node]:
                         raise ValueError('Edge [%r:%r] inconsistent between nodes' % (node, common_node))
-                other_adjacency.update(self_adjacency)  # update other so we do not mutate our own state
+                other_adjacency.update(self_adjacency)
                 new_adjacency[node] = other_adjacency
             return self.__class__(new_adjacency)
         return NotImplemented

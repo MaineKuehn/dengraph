@@ -1,5 +1,6 @@
 import random
 import textwrap
+import itertools
 
 try:
     import unittest2 as unittest
@@ -167,9 +168,80 @@ class TestAdjacencyGraph(unittest.TestCase):
                 self.assertEqual(graph[new_node], edges)
                 for node_to in edges:
                     self.assertEqual(graph[new_node:node_to], edges[node_to])
-            with self.subTest(null_edge=null_edge, new_node=new_node, test='insert'):
+            with self.subTest(null_edge=null_edge, new_node=new_node, test='ensure'):
                 graph[new_node] = null_edge
                 self.assertEqual(graph[new_node], edges)
+            with self.subTest(null_edge=null_edge, new_node=new_node, test='expand'):
+                edges = graph[new_node]
+                edges[4] = 99
+                graph[new_node] = edges
+                self.assertEqual(graph[new_node], edges.copy())
+                for node_to in edges:
+                    self.assertEqual(graph[new_node:node_to], edges[node_to])
+
+    def test_add_separate(self):
+        graph_a = self.graph_cls(
+            {node_from: {
+                node_to: node_to * node_from for node_to in range(5) if node_to != node_from
+                } for node_from in range(5)
+             }
+        )
+        graph_b = self.graph_cls(
+            {node_from: {
+                node_to: node_to * node_from for node_to in range(5, 10) if node_to != node_from
+                } for node_from in range(5, 10)
+             }
+        )
+        graph = graph_a + graph_b
+        for source_graph in (graph_a, graph_b):
+            for node_to, node_from in itertools.product(source_graph, source_graph):
+                if node_to != node_from:
+                    self.assertEqual(graph[node_to:node_from], source_graph[node_to:node_from])
+                else:
+                    with self.assertRaises(dengraph.graph.NoSuchEdge):
+                        graph[node_to:node_from]
+                    with self.assertRaises(dengraph.graph.NoSuchEdge):
+                        source_graph[node_to:node_from]
+        for node_to, node_from in itertools.product(graph_a, graph_b):
+            with self.assertRaises(dengraph.graph.NoSuchEdge):
+                source_graph[node_to:node_from]
+
+    def test_add_overlap(self):
+        graph_a = self.graph_cls(
+            {node_from: {
+                node_to: node_to * node_from for node_to in range(8) if node_to != node_from
+                } for node_from in range(10)
+             }
+        )
+        graph_b = self.graph_cls(
+            {node_from: {
+                node_to: node_to * node_from for node_to in range(3, 10) if node_to != node_from
+                } for node_from in range(10)
+             }
+        )
+        graph = graph_a + graph_b
+        for node_to, node_from in itertools.product(graph, graph):
+            if node_to != node_from:
+                self.assertEqual(graph[node_to:node_from], node_to * node_from)
+            else:
+                with self.assertRaises(dengraph.graph.NoSuchEdge):
+                    graph[node_to:node_from]
+
+    def test_add_conflict(self):
+        graph_a = self.graph_cls(
+            {node_from: {
+                node_to: node_to * node_from for node_to in range(8) if node_to != node_from
+                } for node_from in range(10)
+             }
+        )
+        graph_b = self.graph_cls(
+            {node_from: {
+                node_to: 2 * node_to * node_from for node_to in range(3, 10) if node_to != node_from
+                } for node_from in range(10)
+             }
+        )
+        with self.assertRaises(ValueError):
+            graph_a + graph_b
 
     def test_deletion(self):
         graph = self.graph_cls(source={
