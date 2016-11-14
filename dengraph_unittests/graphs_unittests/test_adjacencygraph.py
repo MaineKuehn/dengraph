@@ -140,6 +140,10 @@ class TestAdjacencyGraph(unittest.TestCase):
         graph[9] = {}
         graph[9:1] = 1
         self.assertEqual(1, graph[1:9])
+        edge = graph[9]
+        edge[2] = 2
+        graph[9] = edge
+        self.assertEqual(graph[9], {1: 1, 2: 2})
 
     def test_setitem_node(self):
         """Setitem of individual nodes"""
