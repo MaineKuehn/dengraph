@@ -12,6 +12,12 @@ class NoSuchNode(Exception):
     pass
 
 
+class AdjacencyListTypeError(TypeError):
+    """AdjacencyList was set to incorrect type"""
+    def __init__(self, edge):
+        TypeError.__init__('AdjacencyList must be None, its node or a mapping, not %r' % edge.__class__)
+
+
 ANY_DISTANCE = dengraph.utilities.placeholder.Placeholder('<Any Distance>')
 
 
