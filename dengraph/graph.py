@@ -33,11 +33,20 @@ class Graph(dengraph.compat.ABCBase):
     to be `symmetric`. Otherwise it is not guaranteed, that incremental behaviour
     still creates valid clustering results.
 
+    .. describe:: g.symmetric
+
+      Indicates whether graph `g` is guaranteed to be symmetric, having only
+      undirected edges. If `True`, `g[a:b] == g[b:a]` for any nodes `a` and `b`
+      in `g`; the graph enforces this, e.g. `g[a:b] = c` implies `g[b:a] = c`.
+      If `False`, symmetric edges are allowed but not enforced.
+
+      Read-only unless indicated otherwise.
+
     All implementations of this ABC guarantee the following operators:
 
     .. describe:: len(g)
 
-      Return the number of nodes in the graph *g*.
+      Return the number of nodes in the graph `g`.
 
     .. describe:: g[a:b]
 
