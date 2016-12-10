@@ -10,8 +10,9 @@ class AdjacencyGraph(dengraph.graph.Graph):
     """
     Graph storing distances via adjacency lists
 
-    :param source: adjacency mapping or graph
+    :param source: adjacency information
     :param max_distance: maximum allowed distance
+    :param symmetric: whether the graph enforces symmetry
 
     There are multiple formats to provide adjacency information via `source`:
 
@@ -30,7 +31,8 @@ class AdjacencyGraph(dengraph.graph.Graph):
     :note: :py:class:`~AdjacencyGraph` does not store `max_distance`. It is not
            checked when adding edges or merging other graphs.
     """
-    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE):
+    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE, symmetric=False):
+        self._symmetric = symmetric
         self._adjacency = {}  # {node: {neighbour: distance, neighbour: distance, ...}, ...}
         if isinstance(source, dengraph.graph.Graph):
             self._adjacency.update(self._adjacency_from_graph(source, max_distance))
@@ -41,6 +43,13 @@ class AdjacencyGraph(dengraph.graph.Graph):
             pass
         else:
             raise TypeError("parameter 'source' must be an instance of Graph, a Mapping or None")
+        if self._symmetric:
+            self._check_symmetry()
+
+    @property
+    def symmetric(self):
+        """Whether this graph enforces symmetry. Read-only attribute."""
+        return self._symmetric
 
     @staticmethod
     def _adjacency_from_graph(graph, max_distance):
@@ -60,6 +69,18 @@ class AdjacencyGraph(dengraph.graph.Graph):
                     other: neighbours[other] for other in neighbours if neighbours[other] <= max_distance
                 }
         return adjacency
+
+    def _check_symmetry(self):
+        """Validate that adjacency list is symmetric"""
+        adjacency = self._adjacency
+        for node_a in adjacency:
+            for node_b in adjacency[node_a]:
+                try:
+                    if adjacency[node_a][node_b] != self[node_b][node_a]:
+                        raise ValueError("symmetric graph initialized with assymetric edges")
+                except KeyError:
+                    raise ValueError("symmetric graph initialized with assymetric edges")
+        return True
 
     def __contains__(self, item):
         # a:b -> slice -> edge
@@ -108,8 +129,17 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 if item not in self._adjacency:
                     self._adjacency[item] = {}
             # g[a] = {b: 3, c: 4, d: 6}
-            else:
+            elif isinstance(value, dengraph.compat.collections_abc.Mapping):
+                if self._symmetric:
+                    # if we know node already, clean up first
+                    if item in self._adjacency:
+                        for node_to in self._adjacency[item]:
+                            del self._adjacency[node_to][item]  # safe unless graph wrongfully marked as symmetric
+                    for node_to in value:
+                        self._adjacency[node_to][item] = value[node_to]
                 self._adjacency[item] = value.copy()
+            else:
+                raise dengraph.graph.AdjacencyListTypeError(value)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
@@ -117,17 +147,23 @@ class AdjacencyGraph(dengraph.graph.Graph):
             node_from, node_to = item.start, item.stop
             try:
                 del self._adjacency[node_from][node_to]
+                if self.symmetric:
+                    del self._adjacency[node_to][node_from]
             except KeyError:
                 raise dengraph.graph.NoSuchEdge
         else:
             try:
-                del self._adjacency[item]
+                node_adjacency = self._adjacency.pop(item)
             except KeyError:
                 raise dengraph.graph.NoSuchNode
             else:
                 # clean up all edges to this node
-                for node in self:
-                    self._adjacency[node].pop(item, None)
+                if self._symmetric:
+                    for node in node_adjacency:
+                        del self._adjacency[node][item]  # safe unless graph wrongfully marked as symmetric
+                else:
+                    for node in self:
+                        self._adjacency[node].pop(item, None)
 
     def __iter__(self):
         return iter(self._adjacency)
@@ -153,11 +189,14 @@ class AdjacencyGraph(dengraph.graph.Graph):
                 # make sure there is no ambiguity in edges from sequence of merging
                 for common_node in dengraph.compat.viewkeys(self_adjacency) & dengraph.compat.viewkeys(other_adjacency):
                     if self_adjacency[common_node] != other_adjacency[common_node]:
-                        raise ValueError('Edge [%r:%r] inconsistent between nodes' % (node, common_node))
+                        raise ValueError('Edge inconsistent in graphs')
                 other_adjacency.update(self_adjacency)
                 new_adjacency[node] = other_adjacency
-            return self.__class__(new_adjacency)
+            return self.__class__(new_adjacency, symmetric=self.symmetric and other.symmetric)
         return NotImplemented
+
+    # order is not important
+    __radd__ = __add__
 
     def __repr__(self):
         return '%s(adjacency=%s)' % (
@@ -178,13 +217,13 @@ class BoundedAdjacencyGraph(AdjacencyGraph):
     Instances of this class store their `max_distance` parameter. It is used
     to optimize memory and lookups. Any edges bigger than `max_distance` are
     silently ignored when trying to insert them. Querying for neighbours via
-    :py:meth:`get_neighbours` is optimized if the search distance is higher
-    than the graph's bound.
+    :py:meth:`get_neighbours` is optimized if the search distance is greater
+    or equal to the graph's bound.
     """
-    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE):
+    def __init__(self, source=None, max_distance=dengraph.graph.ANY_DISTANCE, symmetric=False):
         self._max_distance = max_distance
         self._effective_bound = None
-        super(BoundedAdjacencyGraph, self).__init__(source=source, max_distance=max_distance)
+        super(BoundedAdjacencyGraph, self).__init__(source=source, max_distance=max_distance, symmetric=symmetric)
 
     def __setitem__(self, item, value):
         # a:b -> slice -> edge

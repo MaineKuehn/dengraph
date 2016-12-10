@@ -187,7 +187,6 @@ class DenGraphIO(dengraph.graph.Graph):
     def _node_removed(self, node, neighbours):
         if node not in self.noise:
             for neighbour in neighbours:
-                del self.graph[neighbour:node]
                 del self.graph[node:neighbour]
                 self._edge_removed(node=neighbour)
             cluster = self.core_cluster_for_node(core_node=node)

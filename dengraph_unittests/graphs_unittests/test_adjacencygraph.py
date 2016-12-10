@@ -130,7 +130,7 @@ class TestAdjacencyGraph(unittest.TestCase):
             6: {1: 2, 7: 1},
             7: {6: 1},
             8: {1: 1}
-        }, max_distance=1)
+        }, max_distance=1, symmetric=True)
         self.assertFalse(slice(1, 6) in graph)
         graph[1:6] = 2
         self.assertEqual(2, graph[1:6])
@@ -294,7 +294,7 @@ class TestBoundedAdjacencyGraph(TestAdjacencyGraph):
             6: {1: 2, 7: 1},
             7: {6: 1},
             8: {1: 1}
-        }, max_distance=1)
+        }, max_distance=1, symmetric=True)
         self.assertFalse(slice(1, 6) in graph)
         graph[1:6] = 2
         with self.assertRaises(dengraph.graph.NoSuchEdge):

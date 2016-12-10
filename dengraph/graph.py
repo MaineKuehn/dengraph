@@ -108,11 +108,16 @@ class Graph(dengraph.compat.ABCBase):
 
       Return an iterator over the nodes in `g`.
 
+    .. describe:: g + h
+
+      Add nodes and edges from graphs `g` and `h`. If both `g` and `h` are
+      symmetric, the result is symmetric as well.
+
     In addition, several methods are provided. While methods and operators for
     retrieving data must be implemented by all subclasses, methods for
     *modifying* data may not be applicable to certain graphs.
     """
-    symmetric = True
+    symmetric = False
 
     def __len__(self):
         raise NotImplementedError
