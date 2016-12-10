@@ -26,6 +26,11 @@ class DenGraphCluster(dengraph.graph.Graph):
         self.core_nodes = set(core_nodes) if core_nodes is not None else set()
         self.border_nodes = set(border_nodes) if border_nodes is not None else set()
 
+    @property
+    def symmetric(self):
+        """Whether this graph enforces symmetry"""
+        return self.graph.symmetric
+
     def categorize_node(self, node, state):
         """
         Mark a node as core or border
