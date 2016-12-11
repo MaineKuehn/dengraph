@@ -200,7 +200,7 @@ class DenGraphIO(dengraph.graph.Graph):
         for neighbour in neighbours:
             try:
                 neighbouring_cluster = self.core_cluster_for_node(core_node=neighbour)
-                cluster = self._merge_clusters(cluster, neighbouring_cluster)
+                cluster = self._merge_clusters(neighbouring_cluster, cluster)
             except NoSuchCluster:
                 # node is no core
                 self._add_node_to_cluster(node=neighbour, cluster=cluster, state=cluster.BORDER_NODE)
