@@ -24,6 +24,8 @@ class DenGraphIO(dengraph.graph.Graph):
         :param cluster_distance: eta
         :param core_neighbours: epsilon
         """
+        if not base_graph.symmetric:
+            raise ValueError('undefined behaviour for unsymmetric graphs')
         self.graph = base_graph
         self.cluster_distance = cluster_distance
         self.core_neighbours = core_neighbours
@@ -187,7 +189,6 @@ class DenGraphIO(dengraph.graph.Graph):
     def _node_removed(self, node, neighbours):
         if node not in self.noise:
             for neighbour in neighbours:
-                del self.graph[neighbour:node]
                 del self.graph[node:neighbour]
                 self._edge_removed(node=neighbour)
             cluster = self.core_cluster_for_node(core_node=node)
