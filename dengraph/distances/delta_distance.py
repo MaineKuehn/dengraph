@@ -29,8 +29,8 @@ class DeltaDistance(dengraph.distance.Distance):
 
 
 class IncrementalDeltaDistance(DeltaDistance, dengraph.distance.IncrementalDistance):
-    def update(self, first, second, base_distance=0, default=None):
+    def update(self, static, dynamic, dynamic_changes, base_distance=0, default=None):
         result = base_distance
-        for change in second:
+        for change in dynamic_changes:
             result = self(base_distance, change)
         return result
