@@ -71,10 +71,14 @@ class IncrementalDistance(Distance):
     builds upon a sequence of changes that are considered for updating the current distance value
     based on the given changes.
 
-    .. function:: update(first, second, *[, base_distance, default])
+    .. function:: update(static, dynamic, dynamic_changes, *[, base_distance, default])
 
-       Return the updated distance between node representations *first* and applied changes for
-       *second*.
+       Return the updated distance between the *static* node representation and the *dynamic* node
+       representation. The distance is updated regarding the *dynamic_changes* that are considered
+       for the *dynamic* object.
+
+       Attention: The actual update of *dynamic* with *dynamic_changes* is considered to be done
+       outside of this method. Nothing is going to be updated here, except the distance value!
 
        There are two optional keyword-only argument. The *base_distance* is taken to apply the
        distance changes to. If it is not given, a distance of 0 is considered. The *default*
@@ -92,5 +96,5 @@ class IncrementalDistance(Distance):
     def median(self, *args, **kwargs):
         raise NotImplementedError
 
-    def update(self, first, second, base_distance=0, default=None):
+    def update(self, static, dynamic, dynamic_changes, base_distance=0, default=None):
         raise NotImplementedError
