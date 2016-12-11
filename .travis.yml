@@ -19,9 +19,11 @@ matrix:
   - python: "3.6-dev"
   - python: "nightly"
 before_script:
+  - export PYTHONHASHSEED=${PYTHONHASHSEED:-${RANDOM}}
   - if [[ $TRAVIS_PYTHON_VERSION != "3.2" ]]; then COVERAGE_SUPPORTED="Yes"; echo "coverage reports enabled"; fi
   - if [[ -n "$COVERAGE_SUPPORTED" ]]; then pip install codecov; fi
   - export COVERAGE_PROCESS_START=$(pwd)/.coveragerc
+  - echo "export PYTHONHASHSEED=${PYTHONHASHSEED}"
 script:
   - if [[ -n "$COVERAGE_SUPPORTED" ]]; then coverage run setup.py test; else python setup.py test; fi
 after_success:
