@@ -25,18 +25,34 @@ class DenGraphVIO(DenGraphIO):
                 raise dengraph.distance.NoDistanceSupport
         except AttributeError:
             raise dengraph.distance.NoDistanceSupport
+        self.virtual_nodes = {}
         super(DenGraphVIO, self).__init__(base_graph, cluster_distance, core_neighbours)
 
+    def persist(self, virtual_node):
+        del self.virtual_nodes[id(virtual_node)]
+        self.graph[virtual_node] = None
+
     def probe(self, virtual_node):
+        updated_node = self._update_distances(virtual_node)
+        return ((cluster, distance) for cluster, distance in updated_node["distances"].items())
+
+    def update_probe(self, virtual_node, changes):
+        updated_node = self._update_distances(virtual_node, changes)
+        return ((cluster, distance) for cluster, distance in updated_node["distances"].items())
+
+    def _update_distances(self, virtual_node, changes=None):
+        saved_node = self.virtual_nodes.setdefault(id(virtual_node), {"clusters": {}, "distances": {}})
+        distance = self.graph.distance
         for cluster in self.clusters:
-            yield cluster, self._distance_to_cluster(virtual_node, cluster)
-
-    def update_probe(self, virtual_node, old_distance, cluster):
-        distance = self.graph.distance
-        cluster_mean = distance.mean(cluster)
-        return distance.update(cluster_mean, [virtual_node], old_distance)
-
-    def _distance_to_cluster(self, node, cluster):
-        distance = self.graph.distance
-        cluster_mean = distance.mean(cluster)
-        return distance(cluster_mean, node)
+            try:
+                cluster_mean = saved_node["clusters"][cluster]
+            except KeyError:
+                cluster_mean = distance.mean(cluster)
+                saved_node["clusters"][cluster] = cluster_mean
+            if changes is not None:
+                # update distance
+                saved_node["distances"][cluster] = distance.update(
+                    cluster_mean, virtual_node, changes, saved_node["distances"][cluster])
+            else:
+                saved_node["distances"][cluster] = distance(cluster_mean, virtual_node)
+        return saved_node
