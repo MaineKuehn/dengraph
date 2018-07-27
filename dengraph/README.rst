@@ -1,7 +1,7 @@
 dengraph - Density-based Graph Clustering
 =========================================
 
-|travis| |codecov| |landscape|
+|documentation| |travis| |codecov| |pypi| |license|
 
 DenGraph performs a density-based graph clustering.
 The algorithm was proposed as an extension for DBSCAN to support overlapping clusters.
@@ -93,12 +93,20 @@ This module is based on several publications:
 
 .. |travis| image:: https://travis-ci.org/MaineKuehn/dengraph.svg?branch=master
     :target: https://travis-ci.org/MaineKuehn/dengraph
-    :alt: Unit Tests
+    :alt: Test Status
 
 .. |codecov| image:: https://codecov.io/gh/MaineKuehn/dengraph/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/MaineKuehn/dengraph
-  :alt: Code Coverage
+    :target: https://codecov.io/gh/MaineKuehn/dengraph
+    :alt: Code Coverage
 
-.. |landscape| image:: https://landscape.io/github/MaineKuehn/dengraph/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/MaineKuehn/dengraph/master
-   :alt: Code Health
+.. |documentation| image:: https://readthedocs.org/projects/dengraph/badge/?version=latest
+    :target: http://dengraph.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. |pypi| image:: https://img.shields.io/pypi/v/dengraph.svg
+    :alt: Available on PyPI
+    :target: https://pypi.python.org/pypi/dengraph/
+
+.. |license| image:: https://img.shields.io/github/license/MaineKuehn/dengraph.svg
+    :alt: License
+    :target: https://github.com/MaineKuehn/dengraph/blob/master/LICENSE.txt
