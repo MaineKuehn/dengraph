@@ -14,7 +14,8 @@ class DenGraphIO(dengraph.graph.Graph):
     Density Graph Clustering allowing for Overlap and Incremental updates.
 
     :param base_graph: the underlying graph
-    :param cluster_distance: maximum distance for nodes to be considered as neighbours (ε)
+    :param cluster_distance: maximum distance for nodes to be considered as
+        neighbours (ε)
     :param core_neighbours: number of neighbours required for core nodes (η)
     """
 
@@ -44,7 +45,8 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def core_cluster_for_node(self, core_node):
         """
-        Method determines the current clusters a node belongs to and is labeled as core node.
+        Method determines the current clusters a node belongs to and is labeled as
+        core node.
 
         :param core_node: the core node to check cluster for
         :return: Cluster that nas node as a core node

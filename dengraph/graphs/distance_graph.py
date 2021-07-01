@@ -8,8 +8,10 @@ class DistanceGraph(graph.Graph):
     Graph of nodes connected by a distance function
 
     :param nodes: all nodes contained in the graph
-    :param distance: a function `dist(a, b)->object` that computes the distance between any two nodes
-    :param symmetric: whether distance can be treated as symmetric, i.e. `dist(a, b) == dist(b, a)`
+    :param distance: a function `dist(a, b)->object` that computes the distance
+        between any two nodes
+    :param symmetric: whether distance can be treated as symmetric,
+        i.e. `dist(a, b) == dist(b, a)`
 
     :warning: For N nodes, all NxN edges are exposed. This may lead to
               O(N\ :sup:2\ ) runtime complexity.
@@ -120,8 +122,10 @@ class CachedDistanceGraph(DistanceGraph):
     an infinite value.
 
     :param nodes: all nodes contained in the graph
-    :param distance: a function `dist(a, b)->object` that computes the distance between any two nodes
-    :param symmetric: whether distance can be treated as symmetric, i.e. `dist(a, b) == dist(b, a)`
+    :param distance: a function `dist(a, b)->object` that computes the distance
+        between any two nodes
+    :param symmetric: whether distance can be treated as symmetric,
+        i.e. `dist(a, b) == dist(b, a)`
 
     :warning: For N nodes, all NxN edges are exposed and stored. This may lead
               to O(N\ :sup:2\ ) runtime and memory complexity.

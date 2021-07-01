@@ -23,15 +23,16 @@ except AttributeError:
 
         class ABCBase(object):
             """
-            Helper class that provides a standard way to create an ABC using inheritance.
+            Helper class that provides a standard way to create an ABC using
+            inheritance.
 
             A helper class that has :class:`ABCMeta` as its metaclass.  With this class,
             an abstract base class can be created by simply deriving from :class:`ABC`,
             avoiding sometimes confusing metaclass usage.
 
             Note that the type of :class:`ABC` is still :class:`ABCMeta`, therefore
-            inheriting from :class:`ABC` requires the usual precautions regarding metaclass
-            usage, as multiple inheritance may lead to metaclass conflicts.
+            inheriting from :class:`ABC` requires the usual precautions regarding
+            metaclass usage, as multiple inheritance may lead to metaclass conflicts.
 
             .. versionadded:: 3.4
 

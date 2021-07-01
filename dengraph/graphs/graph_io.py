@@ -56,7 +56,8 @@ def csv_graph_reader(
     :param iterable: an iterable yielding lines of CSV
     :param nodes_header: whether and how to interpret a header specifying nodes
     :param literal_type: type callable to evaluate literals
-    :param max_distance: maximum allowed distance for edges, beyond which edges are ignored
+    :param max_distance: maximum allowed distance for edges, beyond which edges
+        are ignored
     :param valid_edge: callable to test whether an edge should be inserted
     :param symmetric: whether to mirror the underlying matrix
 

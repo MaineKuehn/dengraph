@@ -6,17 +6,19 @@ import dengraph.distance
 
 class DenGraphVIO(DenGraphIO):
     """
-    Density-based graph clustering that builds on DenGraphIO and therefore supports incremental
-    clustering as well as overlapping clusters.
-    The special about DenGraphVIO is the support for virtual nodes. Virtual nodes do not modify
-    the underlying clustering but allow to get distances to the current instance of clusters.
-    Virtual nodes can be updated anytime to get the current distances to available clusters.
-    Virtual nodes are expected to by dynamic objects that will either converge to an existing
-    cluster or diverge into noise. Whenever the dynamic object has finished, one can persist
-    the virtual node to the current clustering.
+    Density-based graph clustering that builds on DenGraphIO and therefore supports
+    incremental clustering as well as overlapping clusters.
+    The special about DenGraphVIO is the support for virtual nodes. Virtual nodes do
+    not modify the underlying clustering but allow to get distances to the current
+    instance of clusters. Virtual nodes can be updated anytime to get the current
+    distances to available clusters. Virtual nodes are expected to by dynamic objects
+    that will either converge to an existing cluster or diverge into noise. Whenever
+    the dynamic object has finished, one can persist the virtual node to the current
+    clustering.
 
     :param base_graph: the underlying graph
-    :param cluster_distance: maximum distance for nodes to be considered as neighbours (ε)
+    :param cluster_distance: maximum distance for nodes to be considered as
+        neighbours (ε)
     :param core_neighbours: number of neighbours required for core nodes (η)
     """
 

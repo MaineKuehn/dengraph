@@ -41,7 +41,8 @@ class DenGraphCluster(dengraph.graph.Graph):
 
         :param node: node to categorize
         :param state: category of the node
-        :type state: :py:attr:`DenGraphCluster.CORE_NODE` or :py:attr:`DenGraphCluster.BORDER_NODE`
+        :type state: :py:attr:`DenGraphCluster.CORE_NODE` or
+            :py:attr:`DenGraphCluster.BORDER_NODE`
         """
         if state == self.CORE_NODE:
             self.border_nodes.discard(node)
@@ -188,7 +189,8 @@ class FrozenDenGraphCluster(DenGraphCluster):
     """
     Immutable, hashable cluster in a DenGraph
 
-    Clusters of this type cannot be modified but behave properly in `dict` and other mappings.
+    Clusters of this type cannot be modified but behave properly in `dict` and
+    other mappings.
     """
 
     def __init__(self, graph, core_nodes=None, border_nodes=None):
