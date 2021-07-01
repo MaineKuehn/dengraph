@@ -87,8 +87,8 @@ class DenGraphIO(dengraph.graph.Graph):
         self, node: Hashable
     ) -> Tuple[bool, Optional[DenGraphCluster], Set[Hashable]]:
         """
-        Method determines if a given node does become a core node. This method returns False,
-        if the node is already a core node.
+        Method determines if a given node does become a core node. This method returns
+        False, if the node is already a core node.
 
         :param node: The node to check
         :return: True, if node changes to core node, False otherwise
@@ -259,8 +259,8 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def _node_added(self, node: Hashable):
         """
-        Method calculates for a newly added node, how it influences the current clustering.
-        The node might become core, border, or even noise.
+        Method calculates for a newly added node, how it influences the current
+        clustering. The node might become core, border, or even noise.
 
         :param node: The node that was just added
         """

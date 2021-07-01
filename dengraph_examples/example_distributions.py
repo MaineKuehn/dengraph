@@ -109,7 +109,8 @@ if __name__ == "__main__":
             # one percent of points make a cluster
             distance = 0.05
             neighbours = 0.666 * max(int(math.pi * density * (distance ** 2)), 1)
-            # print('Clustering with %d neighbours, %.3f distance' % (neighbours, distance))
+            # print('Clustering with %d neighbours, %.3f distance' %
+            # (neighbours, distance))
             # cluster graph
             start_time = time.time()
             dengraph = DenGraphIO(

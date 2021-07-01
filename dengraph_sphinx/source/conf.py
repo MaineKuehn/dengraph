@@ -56,7 +56,7 @@ author = u"Eileen Kuehn, Max Fischer"
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-import dengraph.__about__
+import dengraph.__about__  # noqa: E402
 
 # The short X.Y version.
 version = dengraph.__about__.__version__
