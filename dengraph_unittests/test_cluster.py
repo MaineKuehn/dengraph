@@ -2,7 +2,12 @@ import unittest
 
 import dengraph.graph
 
-from dengraph.cluster import DenGraphCluster, FrozenDenGraphCluster, GraphError
+from dengraph.cluster import (
+    DenGraphCluster,
+    FrozenDenGraphCluster,
+    GraphError,
+    NodeType,
+)
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.distances.delta_distance import DeltaDistance
 
@@ -14,21 +19,21 @@ class TestDenGraphCluster(unittest.TestCase):
         )
         self.assertEqual(cluster.core_nodes, set())
         self.assertEqual(cluster.border_nodes, set())
-        cluster.categorize_node(1, cluster.BORDER_NODE)
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
-        cluster.categorize_node(1, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
 
     def test_recategorisation(self):
         cluster = DenGraphCluster(
             graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         )
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
-        cluster.categorize_node(1, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
 
     def test_get(self):
@@ -39,10 +44,10 @@ class TestDenGraphCluster(unittest.TestCase):
         )
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[1:2]
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[1:2]
-        cluster.categorize_node(2, cluster.BORDER_NODE)
+        cluster.categorize_node(2, NodeType.BORDER)
         self.assertEqual(1, cluster[1:2])
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[3:2]
@@ -60,7 +65,7 @@ class TestDenGraphCluster(unittest.TestCase):
         cluster = DenGraphCluster(
             graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         )
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster)
         del cluster[1]
         self.assertFalse(1 in cluster)
@@ -154,13 +159,13 @@ class TestDenGraphCluster(unittest.TestCase):
     def test_frozencluster(self):
         graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster = DenGraphCluster(graph=graph)
-        cluster.categorize_node(1, cluster.CORE_NODE)
-        cluster.categorize_node(2, cluster.BORDER_NODE)
-        cluster.categorize_node(3, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
+        cluster.categorize_node(2, NodeType.BORDER)
+        cluster.categorize_node(3, NodeType.BORDER)
 
         frozen = FrozenDenGraphCluster(cluster)
         with self.assertRaises(TypeError):
-            frozen.categorize_node(4, frozen.BORDER_NODE)
+            frozen.categorize_node(4, NodeType.BORDER)
         with self.assertRaises(TypeError):
             frozen += cluster
         with self.assertRaises(TypeError):

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from typing import Hashable
 from dengraph.dengraph import DenGraphIO
+from dengraph.graphs.distance_graph import DistanceGraph
 import dengraph.distance
 
 
@@ -22,7 +24,11 @@ class DenGraphVIO(DenGraphIO):
     :param core_neighbours: number of neighbours required for core nodes (η)
     """
 
-    def __init__(self, base_graph, cluster_distance, core_neighbours):
+    graph: DistanceGraph
+
+    def __init__(
+        self, base_graph: DistanceGraph, cluster_distance: float, core_neighbours: int
+    ):
         try:
             if not isinstance(base_graph.distance, dengraph.distance.Distance):
                 raise dengraph.distance.NoDistanceSupport
@@ -31,25 +37,25 @@ class DenGraphVIO(DenGraphIO):
         self.virtual_nodes = {}
         super(DenGraphVIO, self).__init__(base_graph, cluster_distance, core_neighbours)
 
-    def persist(self, virtual_node):
+    def persist(self, virtual_node: Hashable):
         del self.virtual_nodes[id(virtual_node)]
         self.graph[virtual_node] = None
 
-    def probe(self, virtual_node):
+    def probe(self, virtual_node: Hashable):
         updated_node = self._update_distances(virtual_node)
         return (
             (cluster, distance)
             for cluster, distance in updated_node["distances"].items()
         )
 
-    def update_probe(self, virtual_node, changes):
+    def update_probe(self, virtual_node: Hashable, changes):
         updated_node = self._update_distances(virtual_node, changes)
         return (
             (cluster, distance)
             for cluster, distance in updated_node["distances"].items()
         )
 
-    def _update_distances(self, virtual_node, changes=None):
+    def _update_distances(self, virtual_node: Hashable, changes=None):
         saved_node = self.virtual_nodes.setdefault(
             id(virtual_node), {"clusters": {}, "distances": {}}
         )

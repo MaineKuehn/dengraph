@@ -1,6 +1,13 @@
 from __future__ import absolute_import
+from enum import Enum
+from typing import Hashable
 import dengraph.graph
 import dengraph.utilities.pretty
+
+
+class NodeType(Enum):
+    CORE = 1
+    BORDER = 2
 
 
 class GraphError(Exception):
@@ -19,9 +26,6 @@ class DenGraphCluster(dengraph.graph.Graph):
     :type border_nodes: set or None
     """
 
-    CORE_NODE = 1
-    BORDER_NODE = 2
-
     def __init__(self, graph, core_nodes=None, border_nodes=None):
         self.graph = graph
         self.core_nodes = set(core_nodes) if core_nodes is not None else set()
@@ -32,7 +36,7 @@ class DenGraphCluster(dengraph.graph.Graph):
         """Whether this graph enforces symmetry"""
         return self.graph.symmetric
 
-    def categorize_node(self, node, state):
+    def categorize_node(self, node: Hashable, state: NodeType):
         """
         Mark a node as core or border
 
@@ -41,13 +45,11 @@ class DenGraphCluster(dengraph.graph.Graph):
 
         :param node: node to categorize
         :param state: category of the node
-        :type state: :py:attr:`DenGraphCluster.CORE_NODE` or
-            :py:attr:`DenGraphCluster.BORDER_NODE`
         """
-        if state == self.CORE_NODE:
+        if state == NodeType.CORE:
             self.border_nodes.discard(node)
             self.core_nodes.add(node)
-        elif state == self.BORDER_NODE:
+        elif state == NodeType.BORDER:
             self.core_nodes.discard(node)
             self.border_nodes.add(node)
         else:
@@ -55,9 +57,9 @@ class DenGraphCluster(dengraph.graph.Graph):
                 "invalid state %r, expected %r (%s.CORE_NODE) or %r (%s.BORDER_NODE)"
                 % (
                     state,
-                    self.CORE_NODE,
+                    NodeType.CORE,
                     self.__class__.__name__,
-                    self.BORDER_NODE,
+                    NodeType.BORDER,
                     self.__class__.__name__,
                 )
             )

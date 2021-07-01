@@ -53,7 +53,7 @@ class DistanceGraph(graph.Graph):
             return self.distance(node_from, node_to)
         else:
             if item not in self:
-                raise dengraph.graph.NoSuchNode
+                raise graph.NoSuchNode
             return {
                 candidate: self[item:candidate]
                 for candidate in self
