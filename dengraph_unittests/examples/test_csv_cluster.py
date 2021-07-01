@@ -30,8 +30,8 @@ friends = DenGraphIO(
 ).clusters
 
 if __name__ == "__main__":
-    print('Relation based on call statistics:')
+    print("Relation based on call statistics:")
     for idx, group in enumerate(friends):
-        print('-- Superfriends', idx+1, '--------')
-        print('Close      :', ', '.join(group.core_nodes))
-        print('Acquainted :', ', '.join(group.border_nodes))
+        print("-- Superfriends", idx + 1, "--------")
+        print("Close      :", ", ".join(group.core_nodes))
+        print("Acquainted :", ", ".join(group.border_nodes))

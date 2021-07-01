@@ -52,6 +52,7 @@ class Distance(dengraph.compat.ABCBase):
        *default* is not provided, a :exc:`ValueError` is raised.
 
     """
+
     is_symmetric = True
 
     def __call__(self, first, second, default=None):
@@ -87,6 +88,7 @@ class IncrementalDistance(Distance):
        a :exc:`ValueError` is raised.
 
     """
+
     def __call__(self, first, second, default=None):
         raise NotImplementedError
 

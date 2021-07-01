@@ -8,14 +8,17 @@ from dengraph import compat
 
 class TestCompat(unittest.TestCase):
     """Tests for python version compatibility helpers"""
+
     def test_abc(self):
         """ABC Baseclass"""
+
         class ABC(compat.ABCBase):
             pass
 
         @ABC.register
         class ABCImplementation(object):
             pass
+
         self.assertIsInstance(ABCImplementation(), ABC)
 
     def test_range(self):
@@ -27,7 +30,7 @@ class TestCompat(unittest.TestCase):
 
     def test_views(self):
         """Dict views"""
-        t_dict = {1: 1.0, 'b': 'B', False: True, 'dict': {}}
+        t_dict = {1: 1.0, "b": "B", False: True, "dict": {}}
         self.assertNotIsInstance(compat.viewitems(t_dict), list)
         self.assertNotIsInstance(compat.viewkeys(t_dict), list)
         self.assertNotIsInstance(compat.viewvalues(t_dict), list)

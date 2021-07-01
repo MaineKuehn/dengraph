@@ -19,6 +19,7 @@ class DenGraphVIO(DenGraphIO):
     :param cluster_distance: maximum distance for nodes to be considered as neighbours (ε)
     :param core_neighbours: number of neighbours required for core nodes (η)
     """
+
     def __init__(self, base_graph, cluster_distance, core_neighbours):
         try:
             if not isinstance(base_graph.distance, dengraph.distance.Distance):
@@ -34,14 +35,22 @@ class DenGraphVIO(DenGraphIO):
 
     def probe(self, virtual_node):
         updated_node = self._update_distances(virtual_node)
-        return ((cluster, distance) for cluster, distance in updated_node["distances"].items())
+        return (
+            (cluster, distance)
+            for cluster, distance in updated_node["distances"].items()
+        )
 
     def update_probe(self, virtual_node, changes):
         updated_node = self._update_distances(virtual_node, changes)
-        return ((cluster, distance) for cluster, distance in updated_node["distances"].items())
+        return (
+            (cluster, distance)
+            for cluster, distance in updated_node["distances"].items()
+        )
 
     def _update_distances(self, virtual_node, changes=None):
-        saved_node = self.virtual_nodes.setdefault(id(virtual_node), {"clusters": {}, "distances": {}})
+        saved_node = self.virtual_nodes.setdefault(
+            id(virtual_node), {"clusters": {}, "distances": {}}
+        )
         distance = self.graph.distance
         for cluster in self.clusters:
             try:
@@ -52,7 +61,11 @@ class DenGraphVIO(DenGraphIO):
             if changes is not None:
                 # update distance
                 saved_node["distances"][cluster] = distance.update(
-                    cluster_mean, virtual_node, changes, saved_node["distances"][cluster])
+                    cluster_mean,
+                    virtual_node,
+                    changes,
+                    saved_node["distances"][cluster],
+                )
             else:
                 saved_node["distances"][cluster] = distance(cluster_mean, virtual_node)
         return saved_node

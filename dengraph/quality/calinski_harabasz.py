@@ -18,9 +18,13 @@ def calinski_harabasz_score(clusters, graph):
     """
     if len(clusters) > 1:
         try:
-            intra_inter = intra_cluster_variance(clusters, graph) / inter_cluster_variance(clusters, graph)
+            intra_inter = intra_cluster_variance(
+                clusters, graph
+            ) / inter_cluster_variance(clusters, graph)
         except ZeroDivisionError:
             intra_inter = float("inf")
-        result = intra_inter * ((len(list(graph)) - len(clusters)) / float(len(clusters) - 1))
+        result = intra_inter * (
+            (len(list(graph)) - len(clusters)) / float(len(clusters) - 1)
+        )
         return result
     raise ValueError

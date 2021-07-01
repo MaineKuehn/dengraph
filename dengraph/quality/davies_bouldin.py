@@ -28,14 +28,14 @@ def davies_bouldin_score(clusters, graph):
                             means_cache[current_cluster]
                         except KeyError:
                             means_cache[current_cluster] = graph.distance.mean(
-                                list(current_cluster))
-                            score_cache[current_cluster] = inter_cluster_mean_score(
-                                current_cluster,
-                                graph,
-                                means_cache[current_cluster]
+                                list(current_cluster)
                             )
-                    distance = (score_cache[cluster_1] + score_cache[cluster_2]) / \
-                        graph.distance(means_cache[cluster_1], means_cache[cluster_2])
+                            score_cache[current_cluster] = inter_cluster_mean_score(
+                                current_cluster, graph, means_cache[current_cluster]
+                            )
+                    distance = (
+                        score_cache[cluster_1] + score_cache[cluster_2]
+                    ) / graph.distance(means_cache[cluster_1], means_cache[cluster_2])
                     if distance > maximum_distance:
                         maximum_distance = distance
             result += maximum_distance

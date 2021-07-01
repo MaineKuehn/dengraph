@@ -8,6 +8,7 @@ import abc as _abc
 try:
     ABCBase = _abc.ABC
 except AttributeError:
+
     class ABCBase(metaclass=_abc.ABCMeta):
         """
         Helper class that provides a standard way to create an ABC using inheritance.

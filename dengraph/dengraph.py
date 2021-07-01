@@ -25,7 +25,7 @@ class DenGraphIO(dengraph.graph.Graph):
         :param core_neighbours: epsilon
         """
         if not base_graph.symmetric:
-            raise ValueError('undefined behaviour for unsymmetric graphs')
+            raise ValueError("undefined behaviour for unsymmetric graphs")
         self.graph = base_graph
         self.cluster_distance = cluster_distance
         self.core_neighbours = core_neighbours
@@ -107,7 +107,7 @@ class DenGraphIO(dengraph.graph.Graph):
         clustering = DenGraphIO(
             base_graph=cluster,
             cluster_distance=self.cluster_distance,
-            core_neighbours=self.core_neighbours
+            core_neighbours=self.core_neighbours,
         )
         self.noise.update(clustering.noise)
         self.clusters.remove(cluster)
@@ -139,11 +139,14 @@ class DenGraphIO(dengraph.graph.Graph):
             checking = unchecked.pop()
             if checking == base:
                 return
-            neighbours = set(cluster.get_neighbours(node=checking,
-                                                distance=self.cluster_distance))
+            neighbours = set(
+                cluster.get_neighbours(node=checking, distance=self.cluster_distance)
+            )
             if len(neighbours) >= self.core_neighbours:
                 tmp_cluster.categorize_node(checking, tmp_cluster.CORE_NODE)
-                self._expand_unchecked(unchecked=unchecked, checked=checked, neighbours=neighbours)
+                self._expand_unchecked(
+                    unchecked=unchecked, checked=checked, neighbours=neighbours
+                )
             elif neighbours:
                 tmp_cluster.categorize_node(checking, tmp_cluster.BORDER_NODE)
         return tmp_cluster
@@ -160,7 +163,9 @@ class DenGraphIO(dengraph.graph.Graph):
     def _edge_removed(self, node):
         is_downgraded, cluster, _ = self._test_change_from_core(node=node)
         if is_downgraded:
-            self._add_node_to_cluster(node=node, cluster=cluster, state=cluster.BORDER_NODE)
+            self._add_node_to_cluster(
+                node=node, cluster=cluster, state=cluster.BORDER_NODE
+            )
             if not cluster.core_nodes:
                 # remove cluster
                 self._cluster_removed(cluster=cluster)
@@ -168,12 +173,19 @@ class DenGraphIO(dengraph.graph.Graph):
     def _check_cluster(self, nodes, core_cluster):
         missing = set(nodes)
         try:
-            new_cluster = self._validate_cluster(cluster=core_cluster, nodes=[missing.pop()])
+            new_cluster = self._validate_cluster(
+                cluster=core_cluster, nodes=[missing.pop()]
+            )
             missing -= new_cluster.core_nodes
-            noise = core_cluster.core_nodes.union(core_cluster.border_nodes) - \
-                new_cluster.core_nodes - new_cluster.border_nodes
+            noise = (
+                core_cluster.core_nodes.union(core_cluster.border_nodes)
+                - new_cluster.core_nodes
+                - new_cluster.border_nodes
+            )
             while missing:
-                split_cluster = self._validate_cluster(cluster=core_cluster, nodes=[missing.pop()])
+                split_cluster = self._validate_cluster(
+                    cluster=core_cluster, nodes=[missing.pop()]
+                )
                 if split_cluster.core_nodes:
                     self._cluster_added(split_cluster)
                     noise -= split_cluster.core_nodes.union(split_cluster.border_nodes)
@@ -193,8 +205,13 @@ class DenGraphIO(dengraph.graph.Graph):
                 self._edge_removed(node=neighbour)
             cluster = self.core_cluster_for_node(core_node=node)
             self._check_cluster(
-                nodes=[neighbour for neighbour in neighbours if neighbour in cluster.core_nodes],
-                core_cluster=cluster)
+                nodes=[
+                    neighbour
+                    for neighbour in neighbours
+                    if neighbour in cluster.core_nodes
+                ],
+                core_cluster=cluster,
+            )
         self.noise.discard(node)
 
     def _merge_neighbours(self, neighbours, cluster):
@@ -204,7 +221,9 @@ class DenGraphIO(dengraph.graph.Graph):
                 cluster = self._merge_clusters(neighbouring_cluster, cluster)
             except NoSuchCluster:
                 # node is no core
-                self._add_node_to_cluster(node=neighbour, cluster=cluster, state=cluster.BORDER_NODE)
+                self._add_node_to_cluster(
+                    node=neighbour, cluster=cluster, state=cluster.BORDER_NODE
+                )
         return cluster
 
     def _edge_added(self, nodes, new_node=None):
@@ -213,10 +232,14 @@ class DenGraphIO(dengraph.graph.Graph):
             if becomes_core:
                 this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
                 self.clusters.append(this_cluster)
-                self._add_node_to_cluster(node=node, cluster=this_cluster, state=this_cluster.CORE_NODE)
+                self._add_node_to_cluster(
+                    node=node, cluster=this_cluster, state=this_cluster.CORE_NODE
+                )
                 self._merge_neighbours(neighbours=neighbours, cluster=this_cluster)
             elif cluster and new_node:
-                self._add_node_to_cluster(node=new_node, cluster=cluster, state=cluster.BORDER_NODE)
+                self._add_node_to_cluster(
+                    node=new_node, cluster=cluster, state=cluster.BORDER_NODE
+                )
 
     def _node_added(self, node):
         """
@@ -226,7 +249,9 @@ class DenGraphIO(dengraph.graph.Graph):
         :param node: The node that was just added
         """
         self.noise.add(node)
-        neighbours = set(self.graph.get_neighbours(node=node, distance=self.cluster_distance))
+        neighbours = set(
+            self.graph.get_neighbours(node=node, distance=self.cluster_distance)
+        )
         neighbours.add(node)
         self._edge_added(neighbours, new_node=node)
 
@@ -246,38 +271,43 @@ class DenGraphIO(dengraph.graph.Graph):
         self.noise = set(self.graph)
         for node in self.graph:  # nodes from single iteration over graph
             if node in self.noise:
-                neighbours = set(self.graph.get_neighbours(node=node, distance=self.cluster_distance))
+                neighbours = set(
+                    self.graph.get_neighbours(node=node, distance=self.cluster_distance)
+                )
                 if len(neighbours) >= self.core_neighbours:
                     # node forms a new cluster
                     this_cluster = dengraph.cluster.DenGraphCluster(self.graph)
                     self.clusters.append(this_cluster)
                     self._add_node_to_cluster(
-                        node=node,
-                        cluster=this_cluster,
-                        state=this_cluster.CORE_NODE
+                        node=node, cluster=this_cluster, state=this_cluster.CORE_NODE
                     )
                     outstanding_nodes = set()  # nodes which still need categorizing
-                    connected_nodes = {node}  # nodes which need not be scheduled for categorizing again
+                    connected_nodes = {
+                        node
+                    }  # nodes which need not be scheduled for categorizing again
                     outstanding_nodes.update(neighbours)
                     connected_nodes.update(neighbours)
                     while outstanding_nodes:
                         checking = outstanding_nodes.pop()
-                        neighbours = set(self.graph.get_neighbours(
-                            node=checking,
-                            distance=self.cluster_distance
-                        ))
+                        neighbours = set(
+                            self.graph.get_neighbours(
+                                node=checking, distance=self.cluster_distance
+                            )
+                        )
                         if len(neighbours) >= self.core_neighbours:
                             self._add_node_to_cluster(
                                 node=checking,
                                 cluster=this_cluster,
-                                state=this_cluster.CORE_NODE
+                                state=this_cluster.CORE_NODE,
                             )
-                            self._expand_unchecked(outstanding_nodes, neighbours, connected_nodes)
+                            self._expand_unchecked(
+                                outstanding_nodes, neighbours, connected_nodes
+                            )
                         else:
                             self._add_node_to_cluster(
                                 node=checking,
                                 cluster=this_cluster,
-                                state=this_cluster.BORDER_NODE
+                                state=this_cluster.BORDER_NODE,
                             )
         # sort clusters by length to reduce '__contains__' checks
         # having big clusters first means on average, searched elements are
@@ -334,7 +364,9 @@ class DenGraphIO(dengraph.graph.Graph):
                     return
             self._check_cluster(nodes=[item.start, item.stop], core_cluster=cluster)
         else:
-            neighbours = set(self.graph.get_neighbours(node=item, distance=self.cluster_distance))
+            neighbours = set(
+                self.graph.get_neighbours(node=item, distance=self.cluster_distance)
+            )
             self._node_removed(node=item, neighbours=neighbours)
             del self.graph[item]
 
@@ -345,9 +377,9 @@ class DenGraphIO(dengraph.graph.Graph):
     def __eq__(self, other):
         if isinstance(self, other.__class__):
             if (
-                len(self) != len(other) or
-                self.cluster_distance != other.cluster_distance or
-                self.core_neighbours != other.core_neighbours
+                len(self) != len(other)
+                or self.cluster_distance != other.cluster_distance
+                or self.core_neighbours != other.core_neighbours
             ):
                 return False
             elif self.noise != other.noise:
@@ -356,7 +388,7 @@ class DenGraphIO(dengraph.graph.Graph):
                 return all(my_clst in other.clusters for my_clst in self.clusters)
 
     def __repr__(self):
-        return '%s(cluster_distance=%s, core_neighbours=%s, clusters=%s, noise=%s)' % (
+        return "%s(cluster_distance=%s, core_neighbours=%s, clusters=%s, noise=%s)" % (
             self.__class__.__name__,
             self.cluster_distance,
             self.core_neighbours,
@@ -366,6 +398,7 @@ class DenGraphIO(dengraph.graph.Graph):
 
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
         raise NotImplementedError  # TODO: find closest nodes
+
 
 #: alias to have a separate name for future optimizations
 DenGraphO = DenGraphIO

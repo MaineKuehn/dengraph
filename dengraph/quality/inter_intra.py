@@ -33,7 +33,9 @@ def intra_cluster_variance(clusters, graph):
     mean = graph.distance.mean([node for cluster in clusters for node in cluster])
     result = 0
     for cluster in clusters:
-        result += len(cluster) * graph.distance(graph.distance.mean(list(cluster)), mean)**2
+        result += (
+            len(cluster) * graph.distance(graph.distance.mean(list(cluster)), mean) ** 2
+        )
     return result
 
 
@@ -53,6 +55,6 @@ def inter_cluster_variance(clusters, graph):
         for cluster in clusters:
             cluster_mean = graph.distance.mean(list(cluster))
             for node in cluster:
-                result += graph.distance(cluster_mean, node)**2
+                result += graph.distance(cluster_mean, node) ** 2
         return result
     return float("inf")

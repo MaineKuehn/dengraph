@@ -38,14 +38,23 @@ class Circle2D(Distribution):
     :param noise: width of distribution around `radius_center`
     :type noise: float
     """
+
     def __init__(self, radius_center=None, noise=0.1):
         self.radius_center = radius_center if radius_center is not None else 1.0 - noise
         self.noise = noise
-        self._core_area = math.pi * ((self.radius_center + self.noise) ** 2 - (self.radius_center - self.noise) ** 2)
+        self._core_area = math.pi * (
+            (self.radius_center + self.noise) ** 2
+            - (self.radius_center - self.noise) ** 2
+        )
 
     def __iter__(self):
         radius_center, noise = self.radius_center, self.noise
-        rnd_float, rnd_gauss, msin, mcos = random.random, random.gauss, math.sin, math.cos
+        rnd_float, rnd_gauss, msin, mcos = (
+            random.random,
+            random.gauss,
+            math.sin,
+            math.cos,
+        )
         while True:
             angle = math.pi * 2 * rnd_float()
             radius = rnd_gauss(radius_center, noise)
@@ -64,13 +73,24 @@ class Moon(Distribution):
     :param noise: width of distribution around `radius_center`
     :type noise: float
     """
-    def __init__(self, radius_center=None, noise=0.1, angular_center=0, angular_noise=0.5 * math.pi, center=(0., 0.)):
+
+    def __init__(
+        self,
+        radius_center=None,
+        noise=0.1,
+        angular_center=0,
+        angular_noise=0.5 * math.pi,
+        center=(0.0, 0.0),
+    ):
         self.radius_center = radius_center if radius_center is not None else 1.0 - noise
         self.noise = noise
         self.angular_center = angular_center
         self.angular_noise = angular_noise
         self.center = center
-        self._core_area = angular_noise * ((self.radius_center + self.noise) ** 2 - (self.radius_center - self.noise) ** 2)
+        self._core_area = angular_noise * (
+            (self.radius_center + self.noise) ** 2
+            - (self.radius_center - self.noise) ** 2
+        )
 
     def __iter__(self):
         radius_center, noise = self.radius_center, self.noise
@@ -95,13 +115,17 @@ class Square(Distribution):
     :param center: center in `(X, Y)`
     :type center: tuple[float, float]
     """
-    def __init__(self, length=(1., 1.), center=(0., 0.)):
+
+    def __init__(self, length=(1.0, 1.0), center=(0.0, 0.0)):
         self.length = length
         self.center = center
 
     def __iter__(self):
         length_x, length_y = self.length
-        offset_x, offset_y = self.center[0] - length_x / 2, self.center[1] - length_y / 2
+        offset_x, offset_y = (
+            self.center[0] - length_x / 2,
+            self.center[1] - length_y / 2,
+        )
         rnd_float = random.random
         while True:
             yield rnd_float() * length_x + offset_x, rnd_float() * length_y + offset_y
@@ -121,18 +145,27 @@ class Checkers(Distribution):
     :param border: relative border size between squares
     :type border: float
     """
-    def __init__(self, length=(1., 1.), count=(8, 8), border=0.2):
+
+    def __init__(self, length=(1.0, 1.0), count=(8, 8), border=0.2):
         self.length = length
         self.count = count
         self.border = border
 
     def __iter__(self):
-        x_length, y_length = self.length[0] / self.count[0], self.length[1] / self.count[1]
+        x_length, y_length = (
+            self.length[0] / self.count[0],
+            self.length[1] / self.count[1],
+        )
         squares = [
-            iter(Square(
-                length=(x_length * (1-self.border), y_length * (1-self.border)),
-                center=(x_length * (x_idx + 0.5 - self.count[0] / 2.0), y_length * (y_idx + 0.5 - self.count[1] / 2.0))
-            ))
+            iter(
+                Square(
+                    length=(x_length * (1 - self.border), y_length * (1 - self.border)),
+                    center=(
+                        x_length * (x_idx + 0.5 - self.count[0] / 2.0),
+                        y_length * (y_idx + 0.5 - self.count[1] / 2.0),
+                    ),
+                )
+            )
             for x_idx in range(self.count[0])
             for y_idx in range(self.count[1])
             if (x_idx + y_idx) % 2 == 0
@@ -154,6 +187,7 @@ class Gaussian(Distribution):
     :param deviation: width in `(X, Y)`
     :type deviation: tuple[float, float]
     """
+
     def __init__(self, center=(0, 0), deviation=(0.075, 0.075)):
         self.center = center
         self.deviation = deviation

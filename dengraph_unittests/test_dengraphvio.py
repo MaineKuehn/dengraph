@@ -37,16 +37,15 @@ class TestDenGraphVIO(unittest.TestCase):
     def test_creation(self):
         io_graph = DenGraphVIO(
             base_graph=DistanceGraph(
-                nodes=[1, 2, 3, 4, 5, 6],
-                distance=DeltaDistance(),
-                symmetric=True
+                nodes=[1, 2, 3, 4, 5, 6], distance=DeltaDistance(), symmetric=True
             ),
             cluster_distance=5,
-            core_neighbours=5
+            core_neighbours=5,
         )
         self.assertIsNotNone(io_graph)
 
-        literal = textwrap.dedent("""
+        literal = textwrap.dedent(
+            """
         1,2,3,4,5,6
         0,1,1,1,1,1
         1,0,1,1,1,1
@@ -54,23 +53,24 @@ class TestDenGraphVIO(unittest.TestCase):
         1,1,1,0,1,1
         1,1,1,1,0,1
         1,1,1,1,1,0
-        """.strip())
+        """.strip()
+        )
         with self.assertRaises(dengraph.distance.NoDistanceSupport):
             io_graph = DenGraphVIO(
-                base_graph=dengraph.graphs.graph_io.csv_graph_reader(literal.splitlines(), symmetric=True),
+                base_graph=dengraph.graphs.graph_io.csv_graph_reader(
+                    literal.splitlines(), symmetric=True
+                ),
                 cluster_distance=5,
-                core_neighbours=5
+                core_neighbours=5,
             )
 
     def test_simple(self):
         io_graph = DenGraphVIO(
             base_graph=DistanceGraph(
-                nodes=[1, 2, 3, 4, 5, 6],
-                distance=DeltaDistance(),
-                symmetric=True
+                nodes=[1, 2, 3, 4, 5, 6], distance=DeltaDistance(), symmetric=True
             ),
             cluster_distance=5,
-            core_neighbours=5
+            core_neighbours=5,
         )
         cluster, distance = next(io_graph.probe(1))
         self.assertEqual(2.5, distance)
@@ -84,15 +84,15 @@ class TestDenGraphVIO(unittest.TestCase):
             base_graph=DistanceGraph(
                 nodes=[1, 2, 3, 4, 5, 6],
                 distance=IncrementalListDistance(),
-                symmetric=True
+                symmetric=True,
             ),
             cluster_distance=5,
-            core_neighbours=5
+            core_neighbours=5,
         )
         base_object = [1]
         io_graph.probe(base_object)
         for i in range(1, 4):
-            cluster, current_distance = next(io_graph.probe([1+i]))
+            cluster, current_distance = next(io_graph.probe([1 + i]))
             _, new_distance = next(io_graph.update_probe(base_object, [1]))
             base_object[0] += 1
             self.assertEqual(current_distance, new_distance)

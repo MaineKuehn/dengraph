@@ -24,19 +24,25 @@ def repr_container(container, max_elements=1, max_chars=10):
         return '"%s...[+%d]"' % (container[:max_chars], len(container) - max_chars)
     elif isinstance(container, (dict, dengraph.compat.collections_abc.Mapping)):
         citer = iter(container)
-        item_repr = ', '.join('%r: %r' % (key, container[key]) for key in (next(citer) for _ in range(max_elements)))
+        item_repr = ", ".join(
+            "%r: %r" % (key, container[key])
+            for key in (next(citer) for _ in range(max_elements))
+        )
     else:  # elif isinstance(container, (set, frozenset, list, tuple)):
         citer = iter(container)
-        item_repr = ', '.join(repr(next(citer)) for _ in range(max_elements))
-    start, stop = CONTAINER_SYMBOLS.get(type(container), '<>')
-    return start + item_repr + ', <%d elements>' % (len(container) - max_elements) + stop
+        item_repr = ", ".join(repr(next(citer)) for _ in range(max_elements))
+    start, stop = CONTAINER_SYMBOLS.get(type(container), "<>")
+    return (
+        start + item_repr + ", <%d elements>" % (len(container) - max_elements) + stop
+    )
+
 
 CONTAINER_SYMBOLS = {
-    list: '[]',
-    tuple: '()',
-    dict: '{}',
-    set: '{}',
-    frozenset: ('f{', '}'),
+    list: "[]",
+    tuple: "()",
+    dict: "{}",
+    set: "{}",
+    frozenset: ("f{", "}"),
 }
 
 
@@ -48,16 +54,16 @@ def str_time(seconds):
     :return: `str` representation in appropriate unit
     """
     if seconds is None:
-        return '---  s'
+        return "---  s"
     if seconds == 0:
-        return '0.0  s'
+        return "0.0  s"
     e_power = 18
-    for t_power, prefix in enumerate(u'EPTGMk mμnpfa'):
+    for t_power, prefix in enumerate(u"EPTGMk mμnpfa"):
         power = e_power - t_power * 3
         p_num = seconds / (10 ** power)
-        if 1E3 > p_num > 1.0:
+        if 1e3 > p_num > 1.0:
             if p_num > 100:
-                return '%3.0f %ss' % (p_num, prefix)
+                return "%3.0f %ss" % (p_num, prefix)
             if p_num > 10:
-                return '%2.0f. %ss' % (p_num, prefix)
-            return '%3.1f %ss' % (p_num, prefix)
+                return "%2.0f. %ss" % (p_num, prefix)
+            return "%3.1f %ss" % (p_num, prefix)
