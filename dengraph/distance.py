@@ -17,41 +17,45 @@ class Distance(dengraph.compat.ABCBase):
 
        Return the distance between node representations *x* and *y*.
 
-       There is one optional keyword-only argument. The *default* argument specifies a distance
-       to return if the distance for the given objects can not be determined. If the distance can
-       not be returned and *default* is not provided, a :exc:`ValueError` is raised.
+       There is one optional keyword-only argument. The *default* argument specifies a
+       distance to return if the distance for the given objects can not be determined.
+       If the distance can not be returned and *default* is not provided, a
+       :exc:`ValueError` is raised.
 
     .. function:: mean(iterable, *[, default])
                   mean(arg1, arg2, *args[, default])
 
-       Return the mean representation of an iterable or the mean representation of two or more
-       arguments.
+       Return the mean representation of an iterable or the mean representation of
+       two or more arguments.
 
        If one positional argument is provided, it should be an :term:`iterable`.
-       The mean representation based on the given node representation is returned. If two or more
-       positional arguments are provided, the mean representation of the given nodes is returned.
+       The mean representation based on the given node representation is returned.
+       If two or more positional arguments are provided, the mean representation of
+       the given nodes is returned.
 
-       There is one optional keyword-only argument. The *default* argument specifies a mean
-       representation to return if the provided iterable is empty. If the iterable is empty and
-       *default* is not provided, a :exc:`ValueError` is raised.
+       There is one optional keyword-only argument. The *default* argument specifies
+       a mean representation to return if the provided iterable is empty. If the
+       iterable is empty and *default* is not provided, a :exc:`ValueError` is raised.
 
-       Return the mean node representation between node representations `a` and `b`, if any.
+       Return the mean node representation between node representations `a` and `b`,
+       if any.
 
     .. function:: median(iterable, *[, default])
                   median(arg1, arg2, *args[, default])
 
-       Return the median representation of an iterable or the median representation of two or more
-       arguments.
+       Return the median representation of an iterable or the median representation
+       of two or more arguments.
 
        If one positional argument is provided, it should be an :term:`iterable`.
-       The median representation based on the given node representation is returned. If two or more
-       positional arguments are provided, the median representation of the given nodes is returned.
+       The median representation based on the given node representation is returned.
+       If two or more positional arguments are provided, the median representation
+       of the given nodes is returned.
 
-       There is one optional keyword-only argument. The *default* argument specifies a median
-       representation to return if the provided iterable is empty. If the iterable is empty and
-       *default* is not provided, a :exc:`ValueError` is raised.
-
+       There is one optional keyword-only argument. The *default* argument specifies
+       a median representation to return if the provided iterable is empty. If the
+       iterable is empty and *default* is not provided, a :exc:`ValueError` is raised.
     """
+
     is_symmetric = True
 
     def __call__(self, first, second, default=None):
@@ -66,27 +70,29 @@ class Distance(dengraph.compat.ABCBase):
 
 class IncrementalDistance(Distance):
     """
-    An incremental distance provides the interface to efficiently calculate the distance between
-    two given objects. One of the objects is treated as a dynamic object. The distance therefore
-    builds upon a sequence of changes that are considered for updating the current distance value
-    based on the given changes.
+    An incremental distance provides the interface to efficiently calculate the
+    distance between two given objects. One of the objects is treated as a dynamic
+    object. The distance therefore builds upon a sequence of changes that are
+    considered for updating the current distance value based on the given changes.
 
     .. function:: update(static, dynamic, dynamic_changes, *[, base_distance, default])
 
-       Return the updated distance between the *static* node representation and the *dynamic* node
-       representation. The distance is updated regarding the *dynamic_changes* that are considered
-       for the *dynamic* object.
+       Return the updated distance between the *static* node representation and the
+       *dynamic* node representation. The distance is updated regarding the
+       *dynamic_changes* that are considered for the *dynamic* object.
 
-       Attention: The actual update of *dynamic* with *dynamic_changes* is considered to be done
-       outside of this method. Nothing is going to be updated here, except the distance value!
+       Attention: The actual update of *dynamic* with *dynamic_changes* is considered
+       to be done outside of this method. Nothing is going to be updated here, except
+       the distance value!
 
-       There are two optional keyword-only argument. The *base_distance* is taken to apply the
-       distance changes to. If it is not given, a distance of 0 is considered. The *default*
-       argument specifies a distance to return if the distance for the given objects can not be
-       determined. If the distance can not be returned and *default* is not provided,
-       a :exc:`ValueError` is raised.
+       There are two optional keyword-only argument. The *base_distance* is taken to
+       apply the distance changes to. If it is not given, a distance of 0 is considered.
+       The *default* argument specifies a distance to return if the distance for the
+       given objects can not be determined. If the distance can not be returned and
+       *default* is not provided, a :exc:`ValueError` is raised.
 
     """
+
     def __call__(self, first, second, default=None):
         raise NotImplementedError
 

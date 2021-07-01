@@ -8,12 +8,15 @@ class DistanceGraph(graph.Graph):
     Graph of nodes connected by a distance function
 
     :param nodes: all nodes contained in the graph
-    :param distance: a function `dist(a, b)->object` that computes the distance between any two nodes
-    :param symmetric: whether distance can be treated as symmetric, i.e. `dist(a, b) == dist(b, a)`
+    :param distance: a function `dist(a, b)->object` that computes the distance
+        between any two nodes
+    :param symmetric: whether distance can be treated as symmetric,
+        i.e. `dist(a, b) == dist(b, a)`
 
     :warning: For N nodes, all NxN edges are exposed. This may lead to
               O(N\ :sup:2\ ) runtime complexity.
     """
+
     def __init__(self, nodes, distance, symmetric=True):
         self._nodes = set(nodes)
         self.distance = distance
@@ -33,7 +36,10 @@ class DistanceGraph(graph.Graph):
     def __getitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
-            assert item.step is None, '%s does not support stride argument for edges' % self.__class__.__name__
+            assert item.step is None, (
+                "%s does not support stride argument for edges"
+                % self.__class__.__name__
+            )
             node_from, node_to = item.start, item.stop
             if node_from not in self._nodes:
                 raise graph.NoSuchEdge  # first edge node
@@ -47,19 +53,27 @@ class DistanceGraph(graph.Graph):
             return self.distance(node_from, node_to)
         else:
             if item not in self:
-                raise dengraph.graph.NoSuchNode
-            return {candidate: self[item:candidate] for candidate in self if candidate != item}
+                raise graph.NoSuchNode
+            return {
+                candidate: self[item:candidate]
+                for candidate in self
+                if candidate != item
+            }
 
     def __setitem__(self, item, value):
         if value or isinstance(item, slice):
-            raise TypeError('%s does not support edge assignment' % self.__class__.__name__)
+            raise TypeError(
+                "%s does not support edge assignment" % self.__class__.__name__
+            )
         else:
             self._nodes.add(item)
 
     def __delitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
-            raise TypeError('%s does not support edge deletion' % self.__class__.__name__)
+            raise TypeError(
+                "%s does not support edge deletion" % self.__class__.__name__
+            )
         else:
             try:
                 self._nodes.remove(item)
@@ -75,19 +89,27 @@ class DistanceGraph(graph.Graph):
         if distance is graph.ANY_DISTANCE:
             return (candidate for candidate in self if candidate != node)
         else:
-            return (candidate for candidate in self if self[node:candidate] <= distance and candidate != node)
+            return (
+                candidate
+                for candidate in self
+                if self[node:candidate] <= distance and candidate != node
+            )
 
     def __add__(self, other):
         if isinstance(self, other.__class__) and self.distance == other.distance:
-            return self.__class__(self._nodes.union(other), self.distance, self.symmetric and other.symmetric)
+            return self.__class__(
+                self._nodes.union(other),
+                self.distance,
+                self.symmetric and other.symmetric,
+            )
         return NotImplemented
 
     def __repr__(self):
-        return '%s(distance=%r, symmetric=%r, nodes=%s)' % (
+        return "%s(distance=%r, symmetric=%r, nodes=%s)" % (
             self.__class__.__name__,
             self.distance,
             self.symmetric,
-            dengraph.utilities.pretty.repr_container(self._nodes)
+            dengraph.utilities.pretty.repr_container(self._nodes),
         )
 
 
@@ -100,12 +122,15 @@ class CachedDistanceGraph(DistanceGraph):
     an infinite value.
 
     :param nodes: all nodes contained in the graph
-    :param distance: a function `dist(a, b)->object` that computes the distance between any two nodes
-    :param symmetric: whether distance can be treated as symmetric, i.e. `dist(a, b) == dist(b, a)`
+    :param distance: a function `dist(a, b)->object` that computes the distance
+        between any two nodes
+    :param symmetric: whether distance can be treated as symmetric,
+        i.e. `dist(a, b) == dist(b, a)`
 
     :warning: For N nodes, all NxN edges are exposed and stored. This may lead
               to O(N\ :sup:2\ ) runtime and memory complexity.
     """
+
     def __init__(self, nodes, distance, symmetric=True):
         super(CachedDistanceGraph, self).__init__(nodes, distance, symmetric)
         self._distance_values = {}
@@ -113,7 +138,10 @@ class CachedDistanceGraph(DistanceGraph):
     def __getitem__(self, item):
         # a:b -> slice -> edge
         if isinstance(item, slice):
-            assert item.step is None, '%s does not support stride argument for edges' % self.__class__.__name__
+            assert item.step is None, (
+                "%s does not support stride argument for edges"
+                % self.__class__.__name__
+            )
             node_from, node_to = item.start, item.stop
             if node_from not in self._nodes:
                 raise graph.NoSuchEdge  # first edge node
@@ -127,7 +155,9 @@ class CachedDistanceGraph(DistanceGraph):
             try:
                 return self._distance_values[node_from, node_to]
             except KeyError:
-                self._distance_values[node_from, node_to] = self.distance(node_from, node_to)
+                self._distance_values[node_from, node_to] = self.distance(
+                    node_from, node_to
+                )
                 return self._distance_values[node_from, node_to]
         else:
             return super(CachedDistanceGraph, self).__getitem__(item)

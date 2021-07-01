@@ -2,104 +2,93 @@ import unittest
 
 import dengraph.graph
 
-from dengraph.cluster import DenGraphCluster, FrozenDenGraphCluster, GraphError
+from dengraph.cluster import (
+    DenGraphCluster,
+    FrozenDenGraphCluster,
+    GraphError,
+    NodeType,
+)
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.distances.delta_distance import DeltaDistance
 
 
 class TestDenGraphCluster(unittest.TestCase):
     def test_creation(self):
-        cluster = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1, 2, 3],
-            distance=None,
-            symmetric=True
-        ))
+        cluster = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3], distance=None, symmetric=True)
+        )
         self.assertEqual(cluster.core_nodes, set())
         self.assertEqual(cluster.border_nodes, set())
-        cluster.categorize_node(1, cluster.BORDER_NODE)
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
-        cluster.categorize_node(1, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
 
     def test_recategorisation(self):
-        cluster = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1,2,3,4],
-            distance=None,
-            symmetric=True
-        ))
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
+        )
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
-        cluster.categorize_node(1, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.BORDER)
         self.assertTrue(1 in cluster.border_nodes and 1 not in cluster.core_nodes)
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster.core_nodes and 1 not in cluster.border_nodes)
 
     def test_get(self):
-        cluster = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1,2,3,4],
-            distance=DeltaDistance(),
-            symmetric=True
-        ))
+        cluster = DenGraphCluster(
+            graph=DistanceGraph(
+                nodes=[1, 2, 3, 4], distance=DeltaDistance(), symmetric=True
+            )
+        )
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[1:2]
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[1:2]
-        cluster.categorize_node(2, cluster.BORDER_NODE)
+        cluster.categorize_node(2, NodeType.BORDER)
         self.assertEqual(1, cluster[1:2])
         with self.assertRaises(dengraph.graph.NoSuchEdge):
             cluster[3:2]
 
     def test_set(self):
-        cluster = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1,2,3,4],
-            distance=None,
-            symmetric=True
-        ))
+        cluster = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
+        )
         with self.assertRaises(TypeError):
             cluster[1:2] = 1
         with self.assertRaises(TypeError):
             cluster[1] = {}
 
     def test_deletion(self):
-        cluster = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        ))
-        cluster.categorize_node(1, cluster.CORE_NODE)
+        cluster = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
+        )
+        cluster.categorize_node(1, NodeType.CORE)
         self.assertTrue(1 in cluster)
         del cluster[1]
         self.assertFalse(1 in cluster)
 
     def test_add_differing_graphs(self):
-        cluster_a = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1, 2, 3],
-            distance=None,
-            symmetric=True
-        ))
-        cluster_b = DenGraphCluster(graph=DistanceGraph(
-            nodes=[2, 3, 4],
-            distance=None,
-            symmetric=True
-        ))
+        cluster_a = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3], distance=None, symmetric=True)
+        )
+        cluster_b = DenGraphCluster(
+            graph=DistanceGraph(nodes=[2, 3, 4], distance=None, symmetric=True)
+        )
         with self.assertRaises(GraphError):
             cluster_a + cluster_b
         with self.assertRaises(GraphError):
             cluster_a += cluster_b
 
     def test_add(self):
-        graph = DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        )
+        graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster_a = DenGraphCluster(graph=graph)
         cluster_b = DenGraphCluster(graph=graph)
-        cluster_a.border_nodes = set([2,3])
+        cluster_a.border_nodes = set([2, 3])
         cluster_a.core_nodes = set([1])
-        cluster_b.border_nodes = set([3,4])
+        cluster_b.border_nodes = set([3, 4])
         cluster_b.core_nodes = set([2])
 
         cluster_c = cluster_a + cluster_b
@@ -109,16 +98,12 @@ class TestDenGraphCluster(unittest.TestCase):
         self.assertEqual(set([3, 4]), cluster_c.border_nodes)
 
     def test_inplace_add(self):
-        graph = DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        )
+        graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster_a = DenGraphCluster(graph)
         cluster_b = DenGraphCluster(graph)
-        cluster_a.border_nodes = set([2,3])
+        cluster_a.border_nodes = set([2, 3])
         cluster_a.core_nodes = set([1])
-        cluster_b.border_nodes = set([3,4])
+        cluster_b.border_nodes = set([3, 4])
         cluster_b.core_nodes = set([2])
 
         cluster_a += cluster_b
@@ -126,27 +111,19 @@ class TestDenGraphCluster(unittest.TestCase):
         self.assertEqual(set([3, 4]), cluster_a.border_nodes)
 
     def test_sub_differing_graphs(self):
-        cluster_a = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        ))
-        cluster_b = DenGraphCluster(graph=DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        ))
+        cluster_a = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
+        )
+        cluster_b = DenGraphCluster(
+            graph=DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
+        )
         with self.assertRaises(GraphError):
             cluster_a - cluster_b
         with self.assertRaises(GraphError):
             cluster_a -= cluster_b
 
     def test_sub(self):
-        graph = DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        )
+        graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster_a = DenGraphCluster(graph=graph)
         cluster_b = DenGraphCluster(graph=graph)
         cluster_a.border_nodes = set([2, 3])
@@ -168,13 +145,9 @@ class TestDenGraphCluster(unittest.TestCase):
         self.assertEqual(set([]), cluster_a.border_nodes)
 
     def test_sub_no_node(self):
-        graph = DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        )
+        graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster_a = DenGraphCluster(graph=graph)
-        cluster_a.core_nodes = set([1,2])
+        cluster_a.core_nodes = set([1, 2])
         cluster_b = DenGraphCluster(graph=graph)
         cluster_b.core_nodes = set([2, 3])
 
@@ -184,19 +157,15 @@ class TestDenGraphCluster(unittest.TestCase):
             cluster_a -= cluster_b
 
     def test_frozencluster(self):
-        graph = DistanceGraph(
-            nodes=[1, 2, 3, 4],
-            distance=None,
-            symmetric=True
-        )
+        graph = DistanceGraph(nodes=[1, 2, 3, 4], distance=None, symmetric=True)
         cluster = DenGraphCluster(graph=graph)
-        cluster.categorize_node(1, cluster.CORE_NODE)
-        cluster.categorize_node(2, cluster.BORDER_NODE)
-        cluster.categorize_node(3, cluster.BORDER_NODE)
+        cluster.categorize_node(1, NodeType.CORE)
+        cluster.categorize_node(2, NodeType.BORDER)
+        cluster.categorize_node(3, NodeType.BORDER)
 
         frozen = FrozenDenGraphCluster(cluster)
         with self.assertRaises(TypeError):
-            frozen.categorize_node(4, frozen.BORDER_NODE)
+            frozen.categorize_node(4, NodeType.BORDER)
         with self.assertRaises(TypeError):
             frozen += cluster
         with self.assertRaises(TypeError):

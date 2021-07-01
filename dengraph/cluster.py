@@ -1,6 +1,13 @@
 from __future__ import absolute_import
+from enum import Enum
+from typing import Hashable
 import dengraph.graph
 import dengraph.utilities.pretty
+
+
+class NodeType(Enum):
+    CORE = 1
+    BORDER = 2
 
 
 class GraphError(Exception):
@@ -18,8 +25,6 @@ class DenGraphCluster(dengraph.graph.Graph):
     :param border_nodes: initial set of border nodes
     :type border_nodes: set or None
     """
-    CORE_NODE = 1
-    BORDER_NODE = 2
 
     def __init__(self, graph, core_nodes=None, border_nodes=None):
         self.graph = graph
@@ -31,7 +36,7 @@ class DenGraphCluster(dengraph.graph.Graph):
         """Whether this graph enforces symmetry"""
         return self.graph.symmetric
 
-    def categorize_node(self, node, state):
+    def categorize_node(self, node: Hashable, state: NodeType):
         """
         Mark a node as core or border
 
@@ -40,19 +45,24 @@ class DenGraphCluster(dengraph.graph.Graph):
 
         :param node: node to categorize
         :param state: category of the node
-        :type state: :py:attr:`DenGraphCluster.CORE_NODE` or :py:attr:`DenGraphCluster.BORDER_NODE`
         """
-        if state == self.CORE_NODE:
+        if state == NodeType.CORE:
             self.border_nodes.discard(node)
             self.core_nodes.add(node)
-        elif state == self.BORDER_NODE:
+        elif state == NodeType.BORDER:
             self.core_nodes.discard(node)
             self.border_nodes.add(node)
         else:
             raise ValueError(
-                'invalid state %r, expected %r (%s.CORE_NODE) or %r (%s.BORDER_NODE)' % (
-                    state, self.CORE_NODE, self.__class__.__name__, self.BORDER_NODE, self.__class__.__name__
-                ))
+                "invalid state %r, expected %r (%s.CORE_NODE) or %r (%s.BORDER_NODE)"
+                % (
+                    state,
+                    NodeType.CORE,
+                    self.__class__.__name__,
+                    NodeType.BORDER,
+                    self.__class__.__name__,
+                )
+            )
 
     def __len__(self):
         return len(self.core_nodes) + len(self.border_nodes)
@@ -80,19 +90,25 @@ class DenGraphCluster(dengraph.graph.Graph):
         self.border_nodes.discard(key)
 
     def __setitem__(self, key, value):
-        raise TypeError('Cannot add new nodes/edges to cluster')
+        raise TypeError("Cannot add new nodes/edges to cluster")
 
     def __contains__(self, node):
         return node in self.border_nodes or node in self.core_nodes
 
     def __eq__(self, other):
         if isinstance(self, other.__class__):
-            return self.core_nodes == other.core_nodes and self.border_nodes == other.border_nodes
+            return (
+                self.core_nodes == other.core_nodes
+                and self.border_nodes == other.border_nodes
+            )
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(self, other.__class__):
-            return self.core_nodes != other.core_nodes or self.border_nodes != other.border_nodes
+            return (
+                self.core_nodes != other.core_nodes
+                or self.border_nodes != other.border_nodes
+            )
         return NotImplemented
 
     def __iadd__(self, other):
@@ -127,8 +143,10 @@ class DenGraphCluster(dengraph.graph.Graph):
                 self.core_nodes.clear()
                 self.border_nodes.clear()
                 return self
-            if not (other.core_nodes.issubset(self.core_nodes) and
-                    other.border_nodes.issubset(self.border_nodes)):
+            if not (
+                other.core_nodes.issubset(self.core_nodes)
+                and other.border_nodes.issubset(self.border_nodes)
+            ):
                 raise dengraph.graph.NoSuchNode
             self.core_nodes = self.core_nodes - other.core_nodes
             self.border_nodes = self.border_nodes - other.border_nodes
@@ -139,8 +157,10 @@ class DenGraphCluster(dengraph.graph.Graph):
         if isinstance(self, other.__class__):
             if self.graph != other.graph:
                 raise GraphError
-            if not (other.core_nodes.issubset(self.core_nodes) and
-                    other.border_nodes.issubset(self.border_nodes)):
+            if not (
+                other.core_nodes.issubset(self.core_nodes)
+                and other.border_nodes.issubset(self.border_nodes)
+            ):
                 raise dengraph.graph.NoSuchNode
             cluster = DenGraphCluster(self.graph)
             cluster.border_nodes = self.border_nodes - other.border_nodes
@@ -150,12 +170,13 @@ class DenGraphCluster(dengraph.graph.Graph):
 
     def get_neighbours(self, node, distance=dengraph.graph.ANY_DISTANCE):
         return [
-            neighbour for neighbour in self.graph.get_neighbours(node, distance)
+            neighbour
+            for neighbour in self.graph.get_neighbours(node, distance)
             if neighbour in self
         ]
 
     def __repr__(self):
-        return '%s(graph=%s, core_nodes=%s, border_nodes=%s)' % (
+        return "%s(graph=%s, core_nodes=%s, border_nodes=%s)" % (
             self.__class__.__name__,
             self.graph,
             dengraph.utilities.pretty.repr_container(self.core_nodes),
@@ -170,15 +191,21 @@ class FrozenDenGraphCluster(DenGraphCluster):
     """
     Immutable, hashable cluster in a DenGraph
 
-    Clusters of this type cannot be modified but behave properly in `dict` and other mappings.
+    Clusters of this type cannot be modified but behave properly in `dict` and
+    other mappings.
     """
+
     def __init__(self, graph, core_nodes=None, border_nodes=None):
         if isinstance(graph, DenGraphCluster):
-            assert core_nodes is None and border_nodes is None, "Cloning takes only one argument"
+            assert (
+                core_nodes is None and border_nodes is None
+            ), "Cloning takes only one argument"
             core_nodes = graph.core_nodes
             border_nodes = graph.border_nodes
             graph = graph.graph
-        super(FrozenDenGraphCluster, self).__init__(graph, core_nodes=core_nodes, border_nodes=border_nodes)
+        super(FrozenDenGraphCluster, self).__init__(
+            graph, core_nodes=core_nodes, border_nodes=border_nodes
+        )
         self.core_nodes = frozenset(self.core_nodes)
         self.border_nodes = frozenset(self.border_nodes)
 
@@ -186,10 +213,16 @@ class FrozenDenGraphCluster(DenGraphCluster):
         return hash((self.__class__, self.core_nodes, self.border_nodes))
 
     def categorize_node(self, node, state):
-        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
+        raise TypeError(
+            "%s object does not support content modification" % self.__class__.__name__
+        )
 
     def __iadd__(self, other):
-        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
+        raise TypeError(
+            "%s object does not support content modification" % self.__class__.__name__
+        )
 
     def __isub__(self, other):
-        raise TypeError('%s object does not support content modification' % self.__class__.__name__)
+        raise TypeError(
+            "%s object does not support content modification" % self.__class__.__name__
+        )

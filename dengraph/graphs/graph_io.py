@@ -21,8 +21,9 @@ class DistanceMatrixLiteral(csv.Dialect):
     16  .5   1
     ```
     """
+
     #: no explicit delimeters required
-    delimiter = ' '
+    delimiter = " "
     #: string literals can be written as "foo"
     quotechar = "'"
     doublequote = False
@@ -31,7 +32,7 @@ class DistanceMatrixLiteral(csv.Dialect):
     #: allow for alignment with arbitrary whitespace
     skipinitialspace = True
     quoting = csv.QUOTE_MINIMAL
-    lineterminator = '\n'
+    lineterminator = "\n"
 
 
 def stripped_literal(literal):
@@ -40,14 +41,14 @@ def stripped_literal(literal):
 
 
 def csv_graph_reader(
-        iterable,
-        nodes_header=True,
-        literal_type=stripped_literal,
-        max_distance=dengraph.graph.ANY_DISTANCE,
-        valid_edge=bool,
-        symmetric=False,
-        *args,
-        **kwargs
+    iterable,
+    nodes_header=True,
+    literal_type=stripped_literal,
+    max_distance=dengraph.graph.ANY_DISTANCE,
+    valid_edge=bool,
+    symmetric=False,
+    *args,
+    **kwargs
 ):
     """
     Utility for reading a distance graph from a file
@@ -55,7 +56,8 @@ def csv_graph_reader(
     :param iterable: an iterable yielding lines of CSV
     :param nodes_header: whether and how to interpret a header specifying nodes
     :param literal_type: type callable to evaluate literals
-    :param max_distance: maximum allowed distance for edges, beyond which edges are ignored
+    :param max_distance: maximum allowed distance for edges, beyond which edges
+        are ignored
     :param valid_edge: callable to test whether an edge should be inserted
     :param symmetric: whether to mirror the underlying matrix
 
@@ -140,20 +142,28 @@ def csv_graph_reader(
         nodes = [nodes_header(element) for element in first_line]
         first_line = None
     else:
-        raise TypeError("parameter 'nodes_header' must be True, False, an iterable or a callable")
+        raise TypeError(
+            "parameter 'nodes_header' must be True, False, an iterable or a callable"
+        )
     # merge edge conditions to reduce checks
     if max_distance is dengraph.graph.ANY_DISTANCE:
         _valid_edge = valid_edge
     else:
+
         def _valid_edge(this_edge):
             return valid_edge(this_edge) and this_edge <= max_distance
+
     # fill graph with nodes
-    graph = dengraph.graphs.adjacency_graph.AdjacencyGraph({node: {} for node in nodes}, symmetric=symmetric)
+    graph = dengraph.graphs.adjacency_graph.AdjacencyGraph(
+        {node: {} for node in nodes}, symmetric=symmetric
+    )
     # still need to consume the first line as content if not unset
     iter_rows = reader if first_line is None else itertools.chain([first_line], reader)
     for row_idx, row in enumerate(iter_rows):
         node_from = nodes[row_idx]
-        for idx, literal in enumerate(row if not symmetric else row[-len(nodes) + row_idx:]):
+        for idx, literal in enumerate(
+            row if not symmetric else row[-len(nodes) + row_idx :]  # noqa: E203
+        ):
             node_to = nodes[idx] if not symmetric else nodes[row_idx + idx]
             edge = literal_type(literal.strip())
             if not _valid_edge(edge):

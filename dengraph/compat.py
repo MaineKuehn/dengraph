@@ -20,23 +20,26 @@ except AttributeError:
     try:
         from .compat3 import ABCBase
     except SyntaxError:
+
         class ABCBase(object):
             """
-            Helper class that provides a standard way to create an ABC using inheritance.
+            Helper class that provides a standard way to create an ABC using
+            inheritance.
 
             A helper class that has :class:`ABCMeta` as its metaclass.  With this class,
             an abstract base class can be created by simply deriving from :class:`ABC`,
             avoiding sometimes confusing metaclass usage.
 
             Note that the type of :class:`ABC` is still :class:`ABCMeta`, therefore
-            inheriting from :class:`ABC` requires the usual precautions regarding metaclass
-            usage, as multiple inheritance may lead to metaclass conflicts.
+            inheriting from :class:`ABC` requires the usual precautions regarding
+            metaclass usage, as multiple inheritance may lead to metaclass conflicts.
 
             .. versionadded:: 3.4
 
             .. versionchanged:: 3.3
                Subclasses can use :py:meth:`register` as a Decorator.
             """
+
             __metaclass__ = _abc.ABCMeta
 
             @classmethod
@@ -53,9 +56,11 @@ except AttributeError:
 
 if sys.version_info < (3, 3):
     import backports.range  # py2.X requires range backport
+
     range = backports.range.range
 else:
     import builtins
+
     range = builtins.range
 
 
@@ -97,8 +102,11 @@ def viewitems(mapping):
 
 # limit names we export to not expose implementation details
 __all__ = [
-    'compat_version',
-    'collections_abc', 'ABCBase',
-    'range',
-    'viewkeys', 'viewvalues', 'viewitems',
+    "compat_version",
+    "collections_abc",
+    "ABCBase",
+    "range",
+    "viewkeys",
+    "viewvalues",
+    "viewitems",
 ]

@@ -17,7 +17,12 @@ class TestDistanceGraph(unittest.TestCase):
 
     @staticmethod
     def random_nodes(length_hint):
-        return list({random.randint(-length_hint * 10, length_hint * 10) for _ in range(length_hint)})
+        return list(
+            {
+                random.randint(-length_hint * 10, length_hint * 10)
+                for _ in range(length_hint)
+            }
+        )
 
     def make_node_samples(self, lengths=range(5, 101, 20)):
         yield [1, 2, 3, 10]
@@ -27,14 +32,10 @@ class TestDistanceGraph(unittest.TestCase):
     def test_symmetric(self):
         """Distance Graph: symmetric elements for symmetric distance"""
         if not self.distance_cls.is_symmetric:
-            self.skipTest('Distance is not symmetric')
+            self.skipTest("Distance is not symmetric")
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
-            graph = self.graph_cls(
-                nodes,
-                distance,
-                symmetric=True
-            )
+            graph = self.graph_cls(nodes, distance, symmetric=True)
             for node_a, node_b in itertools.product(nodes, nodes):
                 self.assertEqual(distance(node_a, node_b), graph[node_a:node_b])
                 self.assertEqual(graph[node_a:node_b], graph[node_b:node_a])
@@ -68,7 +69,9 @@ class TestDistanceGraph(unittest.TestCase):
             graph = self.graph_cls(nodes, self.distance_cls())
             for node_a, node_b in itertools.product(nodes, nodes):
                 self.assertIn(slice(node_a, node_b), graph)
-            for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+            for node_a, node_b in itertools.product(
+                nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)
+            ):
                 self.assertNotIn(slice(node_a, node_b), graph)
                 self.assertNotIn(slice(node_b, node_a), graph)
 
@@ -81,8 +84,12 @@ class TestDistanceGraph(unittest.TestCase):
                     graph = self.graph_cls(nodes, distance)
                     for node_a, node_b in itertools.product(nodes, nodes):
                         self.assertEqual(distance(node_a, node_b), graph[node_a:node_b])
-                        self.assertEqual(distance(node_a, node_b), graph[slice(node_a, node_b)])
-                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                        self.assertEqual(
+                            distance(node_a, node_b), graph[slice(node_a, node_b)]
+                        )
+                    for node_a, node_b in itertools.product(
+                        nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)
+                    ):
                         with self.assertRaises(NoSuchEdge):
                             graph[node_a:node_b]
                         with self.assertRaises(NoSuchEdge):
@@ -97,7 +104,9 @@ class TestDistanceGraph(unittest.TestCase):
                 adjacency = graph[node_from]
                 self.assertEqual(len(adjacency), len(graph) - 1)
                 for node_to in adjacency:
-                    self.assertEqual(distance(node_from, node_to), graph[node_from:node_to])
+                    self.assertEqual(
+                        distance(node_from, node_to), graph[node_from:node_to]
+                    )
 
     def test_setitem_edge(self):
         """Distance Graph: cannot set edges"""
@@ -107,7 +116,9 @@ class TestDistanceGraph(unittest.TestCase):
             for node_a, node_b in itertools.product(nodes, nodes):
                 with self.assertRaises(TypeError):
                     graph[node_a:node_b] = 0
-            for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+            for node_a, node_b in itertools.product(
+                nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)
+            ):
                 with self.assertRaises(TypeError):
                     graph[node_a:node_b] = 0
                 with self.assertRaises(TypeError):
@@ -136,7 +147,9 @@ class TestDistanceGraph(unittest.TestCase):
                         with self.assertRaises(TypeError):
                             del graph[node_a:node_b]
                     # cannot remove invalid edges
-                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                    for node_a, node_b in itertools.product(
+                        nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)
+                    ):
                         with self.assertRaises(TypeError):
                             del graph[node_a:node_b]
                         with self.assertRaises(TypeError):
@@ -147,7 +160,9 @@ class TestDistanceGraph(unittest.TestCase):
         for symmetric in (True, False):
             with self.subTest(symmetric=symmetric):
                 for nodes in self.make_node_samples():
-                    graph = self.graph_cls(nodes, self.distance_cls(), symmetric=symmetric)
+                    graph = self.graph_cls(
+                        nodes, self.distance_cls(), symmetric=symmetric
+                    )
                     for node in (object(), None, max(nodes) + 1, min(nodes) - 1):
                         with self.assertRaises(NoSuchNode):
                             del graph[node]
@@ -181,19 +196,20 @@ class TestDistanceGraph(unittest.TestCase):
     def test_add(self):
         """Distance Graph: addition of graphs"""
         for nodes in self.make_node_samples():
-            nodes_a, nodes_b = nodes[len(nodes) // 2:], nodes[:len(nodes) // 2]
+            nodes_a, nodes_b = (
+                nodes[len(nodes) // 2 :],  # noqa: E203
+                nodes[: len(nodes) // 2],
+            )
             distance = self.distance_cls()
-            graph_a, graph_b = self.graph_cls(nodes_a, distance), self.graph_cls(nodes_b, distance)
+            graph_a, graph_b = self.graph_cls(nodes_a, distance), self.graph_cls(
+                nodes_b, distance
+            )
             self.assertEqual(set(graph_a + graph_b), set(graph_b + graph_a))
 
     def test_attributes(self):
         for nodes in self.make_node_samples():
             distance = self.distance_cls()
-            graph = self.graph_cls(
-                nodes,
-                distance,
-                symmetric=True
-            )
+            graph = self.graph_cls(nodes, distance, symmetric=True)
             for node in nodes:
                 self.assertTrue(node in graph)  # checking for contains
             self.assertEqual(len(set(nodes)), len(graph))  # checking for length
@@ -208,26 +224,19 @@ class TestDistanceGraph(unittest.TestCase):
         threshold = 1
         nodes = list(range(maximum))
         distance = self.distance_cls()
-        graph = self.graph_cls(
-            nodes,
-            distance,
-            symmetric=True
-        )
+        graph = self.graph_cls(nodes, distance, symmetric=True)
         for node in nodes:
             self.assertEqual(
                 set(graph.get_neighbours(node, distance=threshold)),
                 {
-                    elem for elem in range(node-threshold, node+threshold+1)
+                    elem
+                    for elem in range(node - threshold, node + threshold + 1)
                     if elem != node and 0 <= elem < maximum
-                }
+                },
             )
 
     def test_exception(self):
-        graph = self.graph_cls(
-            nodes=[],
-            distance=None,
-            symmetric=True
-        )
+        graph = self.graph_cls(nodes=[], distance=None, symmetric=True)
         self.assertIsNotNone(graph)
         with self.assertRaises(NoSuchNode):
             del graph[1]
@@ -248,7 +257,9 @@ class TestCachedDistanceGraph(TestDistanceGraph):
                     graph = self.graph_cls(nodes, distance, symmetric=symmetric)
                     for node_a, node_b in itertools.product(nodes, nodes):
                         del graph[node_a:node_b]
-                    for node_a, node_b in itertools.product(nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)):
+                    for node_a, node_b in itertools.product(
+                        nodes, (object(), None, max(nodes) + 1, min(nodes) - 1)
+                    ):
                         with self.assertRaises(NoSuchEdge):
                             del graph[node_a:node_b]
                         with self.assertRaises(NoSuchEdge):

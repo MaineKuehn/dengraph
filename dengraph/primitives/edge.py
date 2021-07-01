@@ -22,12 +22,13 @@ class Edge(object):
            attributes, or used in :py:func:`hash`-based containers such as
            :py:class:`set` or :py:class:`dict` keys.
     """
+
     def __call__(self, node_from, node_to):
         return self[node_from:node_to]
 
     def __getitem__(self, item):
         if not isinstance(item, slice):
-            raise TypeError('%s supports only slice notation' % self.__class__.__name__)
+            raise TypeError("%s supports only slice notation" % self.__class__.__name__)
         return item
 
     def __repr__(self):
