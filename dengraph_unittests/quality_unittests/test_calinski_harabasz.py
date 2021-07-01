@@ -2,7 +2,7 @@ from dengraph_unittests.utility import unittest
 
 from dengraph_unittests.quality_unittests.test_silhouette import ListDistance
 
-from dengraph.quality.calinski_harabasz import *
+from dengraph.quality.calinski_harabasz import calinski_harabasz_score
 from dengraph.distances.delta_distance import DeltaDistance
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.dengraph import DenGraphIO

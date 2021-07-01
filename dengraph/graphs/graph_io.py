@@ -161,7 +161,7 @@ def csv_graph_reader(
     for row_idx, row in enumerate(iter_rows):
         node_from = nodes[row_idx]
         for idx, literal in enumerate(
-            row if not symmetric else row[-len(nodes) + row_idx :]
+            row if not symmetric else row[-len(nodes) + row_idx :]  # noqa: E203
         ):
             node_to = nodes[idx] if not symmetric else nodes[row_idx + idx]
             edge = literal_type(literal.strip())

@@ -339,7 +339,7 @@ class DenGraphIO(dengraph.graph.Graph):
         # add stuff to graph
         try:
             self.graph[key] = value
-        except:
+        except KeyError:
             raise
         else:
             if isinstance(key, slice):

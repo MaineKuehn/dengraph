@@ -64,9 +64,7 @@ class GraphIOTest(unittest.TestCase):
         """CSV GraphIO: invalid header"""
         literals = ["a,b", "0,1", "1,0"]
         with self.assertRaises(TypeError):
-            graph = dengraph.graphs.graph_io.csv_graph_reader(
-                literals, nodes_header=None
-            )
+            _ = dengraph.graphs.graph_io.csv_graph_reader(literals, nodes_header=None)
 
     def test_header_none(self):
         """CSV GraphIO: default, enumerated header"""

@@ -2,7 +2,11 @@ from dengraph_unittests.utility import unittest
 
 from dengraph_unittests.quality_unittests.test_silhouette import ListDistance
 
-from dengraph.quality.inter_intra import *
+from dengraph.quality.inter_intra import (
+    inter_cluster_mean_score,
+    inter_cluster_variance,
+    intra_cluster_variance,
+)
 from dengraph.dengraph import DenGraphIO
 from dengraph.distances.delta_distance import DeltaDistance
 from dengraph.graphs.distance_graph import DistanceGraph

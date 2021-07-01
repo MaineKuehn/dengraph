@@ -196,7 +196,10 @@ class TestDistanceGraph(unittest.TestCase):
     def test_add(self):
         """Distance Graph: addition of graphs"""
         for nodes in self.make_node_samples():
-            nodes_a, nodes_b = nodes[len(nodes) // 2 :], nodes[: len(nodes) // 2]
+            nodes_a, nodes_b = (
+                nodes[len(nodes) // 2 :],  # noqa: E203
+                nodes[: len(nodes) // 2],
+            )
             distance = self.distance_cls()
             graph_a, graph_b = self.graph_cls(nodes_a, distance), self.graph_cls(
                 nodes_b, distance

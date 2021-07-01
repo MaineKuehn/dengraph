@@ -3,7 +3,7 @@ import dengraph.graph
 
 from dengraph_unittests.utility import unittest
 
-from dengraph.quality.silhouette import *
+from dengraph.quality.silhouette import silhouette_score, avg_inter_cluster_distance
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.distances.delta_distance import DeltaDistance
 from dengraph.dengraph import DenGraphIO

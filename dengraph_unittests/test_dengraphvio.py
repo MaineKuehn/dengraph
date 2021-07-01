@@ -5,7 +5,7 @@ import dengraph.distance
 
 from dengraph_unittests.utility import unittest
 
-from dengraph.distances.delta_distance import DeltaDistance, IncrementalDeltaDistance
+from dengraph.distances.delta_distance import DeltaDistance
 from dengraph.graphs.distance_graph import DistanceGraph
 from dengraph.dengraphvio import DenGraphVIO
 
